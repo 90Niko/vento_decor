@@ -1,0 +1,461 @@
+"use client";
+
+import {
+  ChangeEvent,
+  DragEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+const MAX_FILES = 10;
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const ACCEPTED_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".jfif",
+  ".png",
+  ".webp",
+  ".gif",
+  ".avif",
+  ".heic",
+  ".heif",
+  ".svg",
+];
+const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+interface SelectedImage {
+  id: string;
+  file: File;
+  previewUrl: string;
+}
+
+interface UploadedImage {
+  publicId: string;
+  url: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+  originalName: string;
+}
+
+interface UploadResponse {
+  images: UploadedImage[];
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function isAcceptedImage(file: File): boolean {
+  const extension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+  return file.type.startsWith("image/") || ACCEPTED_EXTENSIONS.includes(extension);
+}
+
+function uploadForm(
+  formData: FormData,
+  uploadPath: string,
+  authorizationToken: string | undefined,
+  onProgress: (value: number) => void,
+): Promise<UploadResponse> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    const apiUrl =
+      CONFIGURED_API_URL ??
+      `${window.location.protocol}//${window.location.hostname}:3001`;
+
+    request.open("POST", `${apiUrl}${uploadPath}`);
+    if (authorizationToken) {
+      request.setRequestHeader("Authorization", `Bearer ${authorizationToken}`);
+    }
+    request.timeout = 120_000;
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    });
+    request.addEventListener("load", () => {
+      if (request.status < 200 || request.status >= 300) {
+        let message = `Качването не бе успешно (код ${request.status}).`;
+
+        try {
+          const response = JSON.parse(request.responseText) as {
+            message?: unknown;
+          };
+          if (typeof response.message === "string") {
+            message = response.message;
+          } else if (
+            Array.isArray(response.message) &&
+            response.message.every((item) => typeof item === "string")
+          ) {
+            message = response.message.join(" ");
+          }
+        } catch {
+          // Keep the status-based message when the server response is not JSON.
+        }
+
+        reject(new Error(message));
+        return;
+      }
+
+      try {
+        resolve(JSON.parse(request.responseText) as UploadResponse);
+      } catch {
+        reject(new Error("Сървърът върна неочакван отговор."));
+      }
+    });
+    request.addEventListener("error", () => {
+      reject(new Error("Няма връзка със сървъра."));
+    });
+    request.addEventListener("timeout", () => {
+      reject(new Error("Качването отне твърде дълго. Опитай отново."));
+    });
+    request.send(formData);
+  });
+}
+
+interface UploadStudioProps {
+  uploadPath?: string;
+  authorizationToken?: string;
+}
+
+export function UploadStudio({
+  uploadPath = "/uploads/images",
+  authorizationToken,
+}: UploadStudioProps = {}) {
+  const [selected, setSelected] = useState<SelectedImage[]>([]);
+  const [uploaded, setUploaded] = useState<UploadedImage[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrls = useRef<string[]>([]);
+
+  useEffect(() => {
+    const urls = previewUrls.current;
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
+
+  const addFiles = (files: FileList | File[]) => {
+    setError(null);
+    setMessage(null);
+
+    const existing = new Set(
+      selected.map(
+        ({ file }) => `${file.name}-${file.size}-${file.lastModified}`,
+      ),
+    );
+    const incoming = Array.from(files).filter((file) => {
+      const key = `${file.name}-${file.size}-${file.lastModified}`;
+      return isAcceptedImage(file) &&
+        file.size <= MAX_FILE_SIZE &&
+        !existing.has(key);
+    });
+    const availableSlots = MAX_FILES - selected.length;
+    const accepted = incoming.slice(0, availableSlots).map((file) => {
+      const previewUrl = URL.createObjectURL(file);
+      previewUrls.current.push(previewUrl);
+      return {
+        id: `${file.name}-${file.size}-${file.lastModified}`,
+        file,
+        previewUrl,
+      };
+    });
+
+    if (accepted.length < Array.from(files).length) {
+      setError(
+        "Някои файлове са пропуснати. Избери изображения до 20 MB.",
+      );
+    } else if (accepted.length > 0) {
+      setMessage(
+        `${accepted.length} ${accepted.length === 1 ? "снимка е избрана" : "снимки са избрани"}. Натисни зеления бутон „Качи избраните снимки“.`,
+      );
+    }
+
+    setSelected((current) => [...current, ...accepted]);
+  };
+
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      addFiles(event.target.files);
+    }
+    event.target.value = "";
+  };
+
+  const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    addFiles(event.dataTransfer.files);
+  };
+
+  const removeImage = (id: string) => {
+    setSelected((current) => {
+      const image = current.find((item) => item.id === id);
+      if (image) {
+        URL.revokeObjectURL(image.previewUrl);
+        previewUrls.current = previewUrls.current.filter(
+          (url) => url !== image.previewUrl,
+        );
+      }
+      return current.filter((item) => item.id !== id);
+    });
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (selected.length === 0) {
+      setError("Избери поне една снимка.");
+      return;
+    }
+
+    const formData = new FormData();
+    selected.forEach(({ file }) => formData.append("images", file));
+
+    setIsUploading(true);
+    setProgress(0);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const response = await uploadForm(
+        formData,
+        uploadPath,
+        authorizationToken,
+        setProgress,
+      );
+      setUploaded((current) => [...response.images, ...current]);
+      selected.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl));
+      previewUrls.current = [];
+      setSelected([]);
+      setProgress(100);
+      const uploadMessage =
+        response.images.length === 1
+          ? "Снимката е качена успешно."
+          : `${response.images.length} снимки са качени успешно.`;
+      setMessage(uploadMessage);
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Възникна неочаквана грешка.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+      <form
+        onSubmit={handleSubmit}
+        className="surface-card rounded-[2rem] p-3 sm:p-4"
+      >
+        <label
+          onDragEnter={(event) => {
+            event.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragOver={(event) => event.preventDefault()}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          className={`group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.6rem] border border-dashed px-6 py-12 text-center transition duration-300 sm:min-h-96 ${
+            isDragging
+              ? "scale-[0.99] border-[#a45d3f] bg-[#f5e9df]"
+              : "border-[#17362d]/20 bg-[linear-gradient(145deg,rgba(238,240,231,.82),rgba(255,253,249,.72))] hover:border-[#a45d3f]/60 hover:bg-[#f8f2ea]"
+          }`}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*,.heic,.heif,.jfif,.avif,.svg"
+            multiple
+            onChange={handleInput}
+            className="sr-only"
+            disabled={isUploading}
+            suppressHydrationWarning
+          />
+          <span className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#17362d] text-white shadow-[0_14px_35px_rgba(23,54,45,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3">
+            <UploadIcon />
+          </span>
+          <span className="text-xl font-semibold tracking-[-0.02em]">
+            Пусни снимките тук
+          </span>
+          <span className="mt-2 text-sm leading-6 text-[#60736b]">
+            или натисни, за да избереш от устройството
+          </span>
+          <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#60736b] shadow-sm">
+            JPG, PNG, SVG, HEIC, WebP и други · до 20 MB · максимум 10
+          </span>
+        </label>
+
+        {selected.length > 0 && (
+          <div className="mt-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-semibold">Готови за качване</h2>
+              <span className="text-sm text-[#60736b]">
+                {selected.length}/{MAX_FILES}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {selected.map((image) => (
+                <div
+                  key={image.id}
+                  className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#dfe4d8] shadow-sm"
+                >
+                  <div
+                    role="img"
+                    aria-label={`Преглед на ${image.file.name}`}
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${image.previewUrl})` }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-8 pb-3 text-left text-white">
+                    <p className="truncate text-xs font-medium">
+                      {image.file.name}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-white/70">
+                      {formatBytes(image.file.size)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage(image.id)}
+                    className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition hover:bg-[#a45d3f]"
+                    aria-label={`Премахни ${image.file.name}`}
+                  >
+                    <CloseIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div aria-live="polite" className="mt-5 min-h-6 text-sm">
+          {error && <p className="text-[#a23f32]">{error}</p>}
+          {message && <p className="text-[#287055]">{message}</p>}
+        </div>
+
+        {isUploading && (
+          <div className="mt-2" aria-label={`Качване ${progress}%`}>
+            <div className="mb-2 flex justify-between text-xs font-medium">
+              <span>Качване към галерията</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-[#dfe4d8]">
+              <div
+                className="h-full rounded-full bg-[#a45d3f] transition-[width] duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={selected.length === 0 || isUploading}
+          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#17362d] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#17362d]/20 transition hover:-translate-y-0.5 hover:bg-[#244d40] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-[#d7e0bf]/80" : ""}`}
+        >
+          {isUploading ? "Качване…" : "Качи избраните снимки"}
+          {!isUploading && <ArrowIcon />}
+        </button>
+      </form>
+
+      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#17362d,#234b3f)] p-6 text-[#eef0e7] shadow-[0_24px_80px_rgba(23,54,45,0.18)] lg:sticky lg:top-28 sm:p-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.18em] text-[#b9c8aa] uppercase">
+              Последно качени
+            </p>
+            <h2 className="mt-2 text-2xl font-medium tracking-[-0.03em]">
+              Твоята селекция
+            </h2>
+          </div>
+          <span className="grid h-10 min-w-10 place-items-center rounded-full bg-white/10 text-sm font-semibold">
+            {uploaded.length}
+          </span>
+        </div>
+
+        {uploaded.length === 0 ? (
+          <div className="mt-10 flex min-h-72 flex-col items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-7 text-center">
+            <GalleryIcon />
+            <p className="mt-5 font-medium">Галерията те очаква</p>
+            <p className="mt-2 max-w-56 text-sm leading-6 text-[#b9c8c0]">
+              Качените снимки ще се появят тук веднага след завършване.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-7 grid grid-cols-2 gap-3">
+            {uploaded.map((image) => (
+              <a
+                key={image.publicId}
+                href={image.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative aspect-square overflow-hidden rounded-2xl bg-white/10"
+                aria-label={`Отвори ${image.originalName}`}
+              >
+                <span
+                  role="img"
+                  aria-label={image.originalName}
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  style={{ backgroundImage: `url(${image.url})` }}
+                />
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-8 pb-3 text-[11px] text-white/80">
+                  {image.width} × {image.height}
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-[#b9c8c0]">
+          Снимките се съхраняват сигурно в облачно хранилище и се доставят
+          през оптимизирана мрежа.
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 14.5v3A2.5 2.5 0 007.5 20h9a2.5 2.5 0 002.5-2.5v-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M3.75 9h10.5m-4-4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function GalleryIcon() {
+  return (
+    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true" className="text-[#b9c8aa]">
+      <rect x="5" y="7" width="32" height="28" rx="5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="15" cy="16" r="3" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8 31l8.5-8 5.5 5 4.5-4 7.5 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

@@ -1,0 +1,62 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  engineType   = "client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model event_images {
+  id           Int           @id @default(autoincrement()) @db.UnsignedInt
+  event_id     Int           @db.UnsignedInt
+  guest_id     Int?          @db.UnsignedInt
+  url          String        @db.Text
+  public_id    String        @unique(map: "uq_event_images_public_id") @db.VarChar(255)
+  alt_text     String?       @db.VarChar(255)
+  position     Int           @default(0) @db.UnsignedInt
+  is_cover     Boolean       @default(false)
+  created_at   DateTime      @default(now()) @db.Timestamp(0)
+  updated_at   DateTime      @default(now()) @db.Timestamp(0)
+  events       events        @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_event_images_event")
+  event_guests event_guests? @relation(fields: [guest_id], references: [id], onUpdate: Restrict, map: "fk_event_images_guest")
+
+  @@index([event_id, is_cover], map: "idx_event_images_event_cover")
+  @@index([event_id], map: "idx_event_images_event_id")
+  @@index([event_id, position], map: "idx_event_images_event_position")
+  @@index([guest_id], map: "idx_event_images_guest_id")
+}
+
+model events {
+  id           Int            @id @default(autoincrement()) @db.UnsignedInt
+  public_id    String         @unique(map: "uq_events_public_id") @default(uuid()) @db.Char(36)
+  title        String         @db.VarChar(150)
+  description  String?        @db.Text
+  start_at     DateTime?      @db.DateTime(0)
+  end_at       DateTime?      @db.DateTime(0)
+  location     String?        @db.VarChar(255)
+  is_active    Boolean        @default(true)
+  created_at   DateTime       @default(now()) @db.Timestamp(0)
+  updated_at   DateTime       @default(now()) @db.Timestamp(0)
+  event_guests event_guests[]
+  event_images event_images[]
+
+  @@index([is_active, start_at], map: "idx_events_active_start")
+}
+
+model event_guests {
+  id                 Int            @id @default(autoincrement()) @db.UnsignedInt
+  event_id           Int            @db.UnsignedInt
+  name               String         @db.VarChar(100)
+  session_token_hash String         @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
+  created_at         DateTime       @default(now()) @db.Timestamp(0)
+  updated_at         DateTime       @default(now()) @db.Timestamp(0)
+  events             events         @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_event_guests_event")
+  event_images       event_images[]
+
+  @@index([event_id, created_at], map: "idx_event_guests_event_created")
+  @@index([event_id], map: "idx_event_guests_event_id")
+}
