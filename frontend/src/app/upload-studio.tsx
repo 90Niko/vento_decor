@@ -268,8 +268,8 @@ export function UploadStudio({
           onDrop={handleDrop}
           className={`group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.6rem] border border-dashed px-6 py-12 text-center transition duration-300 sm:min-h-96 ${
             isDragging
-              ? "scale-[0.99] border-[#a45d3f] bg-[#f5e9df]"
-              : "border-[#17362d]/20 bg-[linear-gradient(145deg,rgba(238,240,231,.82),rgba(255,253,249,.72))] hover:border-[#a45d3f]/60 hover:bg-[#f8f2ea]"
+              ? "scale-[0.99] border-[#5aa9d6] bg-[#eaf6ff]"
+              : "border-[#173b57]/20 bg-[linear-gradient(145deg,rgba(234,246,255,.82),rgba(255,255,255,.72))] hover:border-[#5aa9d6]/60 hover:bg-[#eaf6ff]"
           }`}
         >
           <input
@@ -282,16 +282,16 @@ export function UploadStudio({
             disabled={isUploading}
             suppressHydrationWarning
           />
-          <span className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#17362d] text-white shadow-[0_14px_35px_rgba(23,54,45,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3">
+          <span className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#173b57] text-white shadow-[0_14px_35px_rgba(23,59,87,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3">
             <UploadIcon />
           </span>
           <span className="text-xl font-semibold tracking-[-0.02em]">
             Пусни снимките тук
           </span>
-          <span className="mt-2 text-sm leading-6 text-[#60736b]">
+          <span className="mt-2 text-sm leading-6 text-[#173b57]/68">
             или натисни, за да избереш от устройството
           </span>
-          <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#60736b] shadow-sm">
+          <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#173b57]/68 shadow-sm">
             JPG, PNG, SVG, HEIC, WebP и други · до 20 MB · максимум 10
           </span>
         </label>
@@ -300,7 +300,7 @@ export function UploadStudio({
           <div className="mt-6">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-semibold">Готови за качване</h2>
-              <span className="text-sm text-[#60736b]">
+              <span className="text-sm text-[#173b57]/68">
                 {selected.length}/{MAX_FILES}
               </span>
             </div>
@@ -308,7 +308,7 @@ export function UploadStudio({
               {selected.map((image) => (
                 <div
                   key={image.id}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#dfe4d8] shadow-sm"
+                  className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#eaf6ff] shadow-sm"
                 >
                   <div
                     role="img"
@@ -327,7 +327,7 @@ export function UploadStudio({
                   <button
                     type="button"
                     onClick={() => removeImage(image.id)}
-                    className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white backdrop-blur transition hover:bg-[#a45d3f]"
+                    className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-[#173b57]/70 text-white backdrop-blur transition hover:bg-[#5aa9d6]"
                     aria-label={`Премахни ${image.file.name}`}
                   >
                     <CloseIcon />
@@ -339,8 +339,8 @@ export function UploadStudio({
         )}
 
         <div aria-live="polite" className="mt-5 min-h-6 text-sm">
-          {error && <p className="text-[#a23f32]">{error}</p>}
-          {message && <p className="text-[#287055]">{message}</p>}
+          {error && <p className="font-medium text-[#173b57]">{error}</p>}
+          {message && <p className="font-medium text-[#5aa9d6]">{message}</p>}
         </div>
 
         {isUploading && (
@@ -349,9 +349,9 @@ export function UploadStudio({
               <span>Качване към галерията</span>
               <span>{progress}%</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-[#dfe4d8]">
+            <div className="h-2 overflow-hidden rounded-full bg-[#eaf6ff]">
               <div
-                className="h-full rounded-full bg-[#a45d3f] transition-[width] duration-300"
+                className="h-full rounded-full bg-[#5aa9d6] transition-[width] duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -361,17 +361,17 @@ export function UploadStudio({
         <button
           type="submit"
           disabled={selected.length === 0 || isUploading}
-          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#17362d] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#17362d]/20 transition hover:-translate-y-0.5 hover:bg-[#244d40] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-[#d7e0bf]/80" : ""}`}
+          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#173b57] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/20 transition hover:-translate-y-0.5 hover:bg-[#5aa9d6] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-[#5aa9d6]/35" : ""}`}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}
           {!isUploading && <ArrowIcon />}
         </button>
       </form>
 
-      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#17362d,#234b3f)] p-6 text-[#eef0e7] shadow-[0_24px_80px_rgba(23,54,45,0.18)] lg:sticky lg:top-28 sm:p-8">
+      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#173b57,#5aa9d6)] p-6 text-[#ffffff] shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28 sm:p-8">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-semibold tracking-[0.18em] text-[#b9c8aa] uppercase">
+            <p className="text-xs font-semibold tracking-[0.18em] text-[#eaf6ff] uppercase">
               Последно качени
             </p>
             <h2 className="mt-2 text-2xl font-medium tracking-[-0.03em]">
@@ -387,7 +387,7 @@ export function UploadStudio({
           <div className="mt-10 flex min-h-72 flex-col items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-7 text-center">
             <GalleryIcon />
             <p className="mt-5 font-medium">Галерията те очаква</p>
-            <p className="mt-2 max-w-56 text-sm leading-6 text-[#b9c8c0]">
+            <p className="mt-2 max-w-56 text-sm leading-6 text-[#eaf6ff]/80">
               Качените снимки ще се появят тук веднага след завършване.
             </p>
           </div>
@@ -416,7 +416,7 @@ export function UploadStudio({
           </div>
         )}
 
-        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-[#b9c8c0]">
+        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-[#eaf6ff]/80">
           Снимките се съхраняват сигурно в облачно хранилище и се доставят
           през оптимизирана мрежа.
         </div>
@@ -452,7 +452,7 @@ function ArrowIcon() {
 
 function GalleryIcon() {
   return (
-    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true" className="text-[#b9c8aa]">
+    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true" className="text-[#eaf6ff]">
       <rect x="5" y="7" width="32" height="28" rx="5" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="15" cy="16" r="3" stroke="currentColor" strokeWidth="1.5" />
       <path d="M8 31l8.5-8 5.5 5 4.5-4 7.5 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

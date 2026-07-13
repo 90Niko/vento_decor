@@ -137,14 +137,14 @@ export function EventGallery({ publicId }: { publicId: string }) {
   }
 
   if (isLoading) {
-    return <p className="py-24 text-center text-[#60736b]">Зареждане…</p>;
+    return <p className="py-24 text-center text-[#173b57]/68">Зареждане…</p>;
   }
 
   if (!event) {
     return (
       <div className="rounded-[2rem] bg-white/70 p-10 text-center">
         <h1 className="text-2xl font-semibold">Галерията не е достъпна</h1>
-        <p className="mt-3 text-[#a23f32]">{error}</p>
+        <p className="mt-3 font-medium text-[#173b57]">{error}</p>
       </div>
     );
   }
@@ -172,7 +172,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
               {event.title}
             </h1>
             {event.description && (
-              <p className="mt-4 leading-7 text-[#60736b]">{event.description}</p>
+              <p className="mt-4 leading-7 text-[#173b57]/68">{event.description}</p>
             )}
             {event.location && (
               <p className="mt-4 text-sm font-semibold">📍 {event.location}</p>
@@ -187,7 +187,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
           </Link>
         </div>
 
-        <div className="mt-8 grid max-w-lg grid-cols-2 gap-4 border-t border-[#17362d]/10 pt-6">
+        <div className="mt-8 grid max-w-lg grid-cols-2 gap-4 border-t border-[#173b57]/10 pt-6">
           <Stat value={event.imageCount} label="снимки" />
           <Stat value={event.guestCount} label="регистрирани гости" />
         </div>
@@ -198,17 +198,17 @@ export function EventGallery({ publicId }: { publicId: string }) {
       <section className="mt-10">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-3xl font-medium tracking-[-0.04em]">Снимки</h2>
-          <span className="text-sm text-[#60736b]">{event.images.length} общо</span>
+          <span className="text-sm text-[#173b57]/68">{event.images.length} общо</span>
         </div>
 
         {error && (
-          <p className="mb-5 rounded-2xl bg-[#a23f32]/10 px-4 py-3 text-sm text-[#a23f32]" role="alert">
+          <p className="mb-5 rounded-2xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
             {error}
           </p>
         )}
 
         {event.images.length === 0 ? (
-          <div className="rounded-[2rem] border border-dashed border-[#17362d]/20 bg-white/45 p-14 text-center text-[#60736b]">
+          <div className="rounded-[2rem] border border-dashed border-[#173b57]/20 bg-white/45 p-14 text-center text-[#173b57]/68">
             Все още няма качени снимки за това събитие.
           </div>
         ) : activeImage ? (
@@ -241,7 +241,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
               }
               touchStartX.current = null;
             }}
-            className="outline-none focus-visible:ring-4 focus-visible:ring-[#a45d3f]/20"
+            className="outline-none focus-visible:ring-4 focus-visible:ring-[#5aa9d6]/25"
           >
             <div className="relative aspect-[5/4] sm:aspect-[16/9] lg:aspect-[16/8]">
               {event.images.map((image, index) => {
@@ -257,7 +257,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
                 return (
                   <div
                     key={image.id}
-                    className={`absolute top-1/2 transform-gpu overflow-hidden rounded-[1.25rem] shadow-[0_12px_32px_rgba(23,54,45,.18)] ring-0 ring-[#a45d3f]/0 transition-[left,width,height,opacity,transform,box-shadow] duration-500 ease-[cubic-bezier(.22,1,.36,1)] [backface-visibility:hidden] will-change-[left,width,height,opacity,transform] hover:shadow-[0_16px_38px_rgba(23,54,45,.24)] hover:ring-2 hover:ring-[#a45d3f]/45 sm:rounded-[1.5rem] ${getCarouselPositionClass(offset)}`}
+                    className={`absolute top-1/2 transform-gpu overflow-hidden rounded-[1.25rem] shadow-[0_16px_40px_rgba(23,59,87,.22)] ring-0 ring-[#5aa9d6]/0 transition-[left,width,height,opacity,transform,box-shadow] duration-500 ease-[cubic-bezier(.22,1,.36,1)] [backface-visibility:hidden] will-change-[left,width,height,opacity,transform] hover:shadow-[0_20px_48px_rgba(23,59,87,.27)] hover:ring-2 hover:ring-[#5aa9d6]/45 sm:rounded-[1.5rem] ${getCarouselPositionClass(offset)}`}
                   >
                     <button
                       type="button"
@@ -310,7 +310,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
                         disabled={deletingId === image.id}
                         aria-label={`Изтрий снимка ${index + 1}`}
                         title="Изтрий"
-                        className={`${getPhotoActionClass(offset)} hover:bg-[#a23f32] disabled:opacity-50`}
+                        className={`${getPhotoActionClass(offset)} hover:bg-[#5aa9d6] disabled:opacity-50`}
                       >
                         <TrashIcon />
                       </button>
@@ -358,7 +358,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
       errorCorrectionLevel: "H",
       margin: 2,
       width: 360,
-      color: { dark: "#17362d", light: "#fffdf8" },
+      color: { dark: "#173b57", light: "#ffffff" },
     })
       .then((dataUrl) => {
         if (!cancelled) {
@@ -387,8 +387,8 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   }
 
   return (
-    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#17362d,#285447)] p-5 text-white sm:grid-cols-[180px_1fr] sm:p-6">
-      <div className="mx-auto w-full max-w-[180px] rounded-2xl bg-[#fffdf8] p-3">
+    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white sm:grid-cols-[180px_1fr] sm:p-6">
+      <div className="mx-auto w-full max-w-[180px] rounded-2xl bg-[#ffffff] p-3">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
@@ -399,24 +399,24 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
             className="h-auto w-full rounded-xl"
           />
         ) : (
-          <div className="aspect-square animate-pulse rounded-xl bg-[#eef0e7]" />
+          <div className="aspect-square animate-pulse rounded-xl bg-[#eaf6ff]" />
         )}
       </div>
 
       <div className="flex min-w-0 flex-col justify-center">
-        <p className="text-xs font-semibold tracking-[0.16em] text-[#b9c8aa] uppercase">
+        <p className="text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
           Постоянен код за сканиране и линк
         </p>
         <p className="mt-3 break-all rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm leading-6 text-white/90">
           {publicUrl}
         </p>
         {qrError && (
-          <p className="mt-2 text-xs text-[#f0b6a8]">
+          <p className="mt-2 text-xs text-[#eaf6ff]/80">
             Кодът за сканиране не можа да бъде генериран.
           </p>
         )}
         {copyError && (
-          <p className="mt-2 text-xs text-[#f0b6a8]">
+          <p className="mt-2 text-xs text-[#eaf6ff]/80">
             Линкът не можа да бъде копиран. Маркирай го и го копирай ръчно.
           </p>
         )}
@@ -432,7 +432,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
             <a
               href={qrDataUrl}
               download={`vento-decor-${event.publicId}.png`}
-              className="rounded-full bg-[#d7e0bf] px-4 py-3 text-center text-sm font-semibold text-[#17362d] transition hover:bg-[#e4eacb]"
+              className="rounded-full bg-[#eaf6ff] px-4 py-3 text-center text-sm font-semibold text-[#173b57] transition hover:bg-[#5aa9d6]"
             >
               Свали кода за сканиране
             </a>
@@ -538,7 +538,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div>
       <p className="text-3xl font-semibold">{value}</p>
-      <p className="mt-1 text-sm text-[#60736b]">{label}</p>
+      <p className="mt-1 text-sm text-[#173b57]/68">{label}</p>
     </div>
   );
 }

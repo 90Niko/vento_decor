@@ -4,7 +4,7 @@ import { UploadStudio } from "./upload-studio";
 
 export default function Home() {
   return (
-    <main className="page-canvas min-h-screen pb-20 text-[#17362d]">
+    <main className="page-canvas min-h-screen pb-20 text-[#173b57]">
       <div className="page-container relative">
         <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
           <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
@@ -22,7 +22,7 @@ export default function Home() {
             <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-semibold tracking-[-0.055em] text-balance sm:text-7xl lg:text-[5.4rem]">
               Всеки красив момент заслужава своя галерия.
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-[#60736b] sm:text-lg sm:leading-8">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-[#173b57]/68 sm:text-lg sm:leading-8">
               Събирай снимки от гостите чрез личен линк и код за сканиране.
               Бързо качване, подредена галерия и спомени, готови за споделяне.
             </p>
@@ -38,13 +38,13 @@ export default function Home() {
           </div>
 
           <div className="surface-card reveal-up relative overflow-hidden rounded-[2rem] p-6 sm:p-8 [animation-delay:120ms]">
-            <div className="absolute top-0 right-0 h-36 w-36 translate-x-10 -translate-y-10 rounded-full bg-[#d7e0bf]/80 blur-2xl" />
+            <div className="absolute top-0 right-0 h-36 w-36 translate-x-10 -translate-y-10 rounded-full bg-[#5aa9d6]/35 blur-2xl" />
             <div className="relative">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold tracking-[0.16em] text-[#a45d3f] uppercase">
+                <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
                   Лесно за всички
                 </p>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-[#17362d] text-white">
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-[#173b57] text-white">
                   ✦
                 </span>
               </div>
@@ -65,7 +65,7 @@ export default function Home() {
                 Добави своите кадри
               </h2>
             </div>
-            <p className="max-w-md text-sm leading-6 text-[#60736b] sm:text-right">
+            <p className="max-w-md text-sm leading-6 text-[#173b57]/68 sm:text-right">
               Избери до 10 снимки наведнъж. Ще ги прегледаш преди изпращане.
             </p>
           </div>
@@ -86,11 +86,11 @@ function Feature({
   text: string;
 }) {
   return (
-    <div className="group flex gap-4 rounded-2xl border border-[#17362d]/8 bg-white/55 p-4 transition hover:border-[#a45d3f]/20 hover:bg-white/80">
-      <span className="mt-0.5 text-xs font-bold text-[#a45d3f]">{number}</span>
+    <div className="group flex gap-4 rounded-2xl border border-[#173b57]/8 bg-white/55 p-4 transition hover:border-[#5aa9d6]/30 hover:bg-white/80">
+      <span className="mt-0.5 text-xs font-bold text-[#5aa9d6]">{number}</span>
       <div>
         <p className="font-semibold">{title}</p>
-        <p className="mt-1 text-sm text-[#60736b]">{text}</p>
+        <p className="mt-1 text-sm text-[#173b57]/68">{text}</p>
       </div>
     </div>
   );

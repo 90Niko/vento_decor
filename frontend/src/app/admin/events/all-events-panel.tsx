@@ -72,24 +72,24 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
           type="button"
           onClick={() => void loadEvents()}
           disabled={isLoading}
-          className="rounded-full border border-[#17362d]/15 bg-white/60 px-5 py-2.5 text-sm font-semibold transition hover:bg-white disabled:opacity-50"
+          className="rounded-full border border-[#173b57]/15 bg-white/60 px-5 py-2.5 text-sm font-semibold transition hover:bg-white disabled:opacity-50"
         >
           Обнови
         </button>
       </div>
 
       {error && (
-        <p className="mb-5 rounded-2xl bg-[#a23f32]/10 px-4 py-3 text-sm text-[#a23f32]" role="alert">
+        <p className="mb-5 rounded-2xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
           {error}
         </p>
       )}
 
       {isLoading && events.length === 0 ? (
-        <div className="rounded-[2rem] border border-[#17362d]/10 bg-white/60 p-10 text-center text-[#60736b]">
+        <div className="rounded-[2rem] border border-[#173b57]/10 bg-white/60 p-10 text-center text-[#173b57]/68">
           Зареждане…
         </div>
       ) : events.length === 0 ? (
-        <div className="rounded-[2rem] border border-dashed border-[#17362d]/20 bg-white/45 p-10 text-center text-[#60736b]">
+        <div className="rounded-[2rem] border border-dashed border-[#173b57]/20 bg-white/45 p-10 text-center text-[#173b57]/68">
           Все още няма създадени събития.
         </div>
       ) : (
@@ -98,27 +98,27 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
             <Link
               key={event.id}
               href={`/admin/events/${event.publicId}`}
-              className="surface-card group rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-[#a45d3f]/30 hover:bg-white"
+              className="surface-card group rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-[#5aa9d6]/40 hover:bg-white"
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="rounded-full bg-[#d7e0bf]/65 px-3 py-1 text-[11px] font-semibold text-[#17362d]">
+                <span className="rounded-full bg-[#5aa9d6]/25 px-3 py-1 text-[11px] font-semibold text-[#173b57]">
                   {event.isActive ? "Активен" : "Неактивен"}
                 </span>
-                <span className="text-xs text-[#60736b]">
+                <span className="text-xs text-[#173b57]/68">
                   {formatDate(event.createdAt)}
                 </span>
               </div>
-              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em] group-hover:text-[#a45d3f]">
+              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em] group-hover:text-[#5aa9d6]">
                 {event.title}
               </h3>
-              <p className="mt-2 min-h-6 truncate text-sm text-[#60736b]">
+              <p className="mt-2 min-h-6 truncate text-sm text-[#173b57]/68">
                 {event.location ?? "Без зададена локация"}
               </p>
-              <div className="mt-6 grid grid-cols-2 gap-3 border-t border-[#17362d]/10 pt-5 text-sm">
+              <div className="mt-6 grid grid-cols-2 gap-3 border-t border-[#173b57]/10 pt-5 text-sm">
                 <Stat value={event.imageCount} label="снимки" />
                 <Stat value={event.guestCount} label="гости" />
               </div>
-              <p className="mt-5 text-sm font-semibold text-[#a45d3f]">
+              <p className="mt-5 text-sm font-semibold text-[#5aa9d6]">
                 Отвори галерията →
               </p>
             </Link>
@@ -133,7 +133,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div>
       <span className="text-lg font-semibold">{value}</span>{" "}
-      <span className="text-[#60736b]">{label}</span>
+      <span className="text-[#173b57]/68">{label}</span>
     </div>
   );
 }

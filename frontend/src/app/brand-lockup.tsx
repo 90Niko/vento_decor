@@ -16,11 +16,11 @@ export function BrandLockup({
       <span
         className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[0.95rem] shadow-sm transition duration-300 group-hover:-rotate-3 group-hover:scale-105 ${
           inverse
-            ? "bg-[#f3f1e9] text-[#17362d]"
-            : "bg-[#17362d] text-[#f8f4ed]"
+            ? "bg-[#eaf6ff] text-[#173b57]"
+            : "bg-[#173b57] text-[#ffffff]"
         }`}
       >
-        <span className="absolute -right-3 -bottom-3 h-7 w-7 rounded-full bg-[#c77a58]/70" />
+        <span className="absolute -right-3 -bottom-3 h-7 w-7 rounded-full bg-[#5aa9d6]/70" />
         <span className="relative text-sm font-bold">V</span>
       </span>
       <span>
@@ -28,7 +28,7 @@ export function BrandLockup({
           Vento Decor
         </span>
         <span
-          className={`mt-0.5 block text-xs ${inverse ? "text-[#aabdb5]" : "text-[#60736b]"}`}
+          className={`mt-0.5 block text-xs ${inverse ? "text-[#eaf6ff]/75" : "text-[#173b57]/68"}`}
         >
           {subtitle}
         </span>

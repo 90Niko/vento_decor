@@ -4,7 +4,7 @@ import { AdminEventsDashboard } from "./admin-events-dashboard";
 
 export default function AdminEventsPage() {
   return (
-    <main className="page-canvas min-h-screen pb-20 text-[#17362d]">
+    <main className="page-canvas min-h-screen pb-20 text-[#173b57]">
       <div className="page-container relative">
         <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
           <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
@@ -22,21 +22,21 @@ export default function AdminEventsPage() {
             <h1 className="mt-5 text-5xl leading-[0.98] font-semibold tracking-[-0.055em] text-balance sm:text-7xl">
               Създавай поводи. Събирай истински моменти.
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-[#60736b] sm:text-lg sm:leading-8">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-[#173b57]/68 sm:text-lg sm:leading-8">
               Управлявай събитията, споделяй код за сканиране и разглеждай
               снимките от гостите в една подредена галерия.
             </p>
           </div>
 
           <div className="surface-card reveal-up rounded-[1.75rem] p-6 [animation-delay:100ms]">
-            <p className="text-xs font-bold tracking-[0.16em] text-[#a45d3f] uppercase">
+            <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
               Работен процес
             </p>
             <div className="mt-5 flex items-center justify-between gap-2 text-center">
               <Step number="1" label="Създай" />
-              <span className="h-px flex-1 bg-[#17362d]/12" />
+              <span className="h-px flex-1 bg-[#173b57]/12" />
               <Step number="2" label="Сподели" />
-              <span className="h-px flex-1 bg-[#17362d]/12" />
+              <span className="h-px flex-1 bg-[#173b57]/12" />
               <Step number="3" label="Събери" />
             </div>
           </div>
@@ -51,10 +51,10 @@ export default function AdminEventsPage() {
 function Step({ number, label }: { number: string; label: string }) {
   return (
     <div>
-      <span className="mx-auto grid h-9 w-9 place-items-center rounded-full bg-[#17362d] text-xs font-bold text-white">
+      <span className="mx-auto grid h-9 w-9 place-items-center rounded-full bg-[#173b57] text-xs font-bold text-white">
         {number}
       </span>
-      <p className="mt-2 text-xs font-semibold text-[#60736b]">{label}</p>
+      <p className="mt-2 text-xs font-semibold text-[#173b57]/68">{label}</p>
     </div>
   );
 }

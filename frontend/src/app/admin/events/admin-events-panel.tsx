@@ -72,8 +72,8 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
       margin: 2,
       width: 360,
       color: {
-        dark: "#17362d",
-        light: "#fffdf8",
+        dark: "#173b57",
+        light: "#ffffff",
       },
     })
       .then((dataUrl) => {
@@ -164,7 +164,7 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
         className="surface-card rounded-[2rem] p-6 sm:p-8"
       >
         <div className="mb-7">
-          <p className="text-xs font-semibold tracking-[0.16em] text-[#a45d3f] uppercase">
+          <p className="text-xs font-semibold tracking-[0.16em] text-[#5aa9d6] uppercase">
             Ново събитие
           </p>
           <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em]">
@@ -215,7 +215,7 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
         </div>
 
         {error && (
-          <p className="mt-5 rounded-2xl bg-[#a23f32]/10 px-4 py-3 text-sm text-[#a23f32]" role="alert">
+          <p className="mt-5 rounded-2xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
             {error}
           </p>
         )}
@@ -223,21 +223,21 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-7 flex w-full items-center justify-center gap-3 rounded-full bg-[#17362d] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#17362d]/15 transition hover:-translate-y-0.5 hover:bg-[#244d40] disabled:cursor-wait disabled:opacity-60"
+          className="mt-7 flex w-full items-center justify-center gap-3 rounded-full bg-[#173b57] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/15 transition hover:-translate-y-0.5 hover:bg-[#5aa9d6] disabled:cursor-wait disabled:opacity-60"
         >
           {isSubmitting ? "Създаване…" : "Създай събитие и код за сканиране"}
           {!isSubmitting && <ArrowIcon />}
         </button>
       </form>
 
-      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#17362d,#234b3f)] p-6 text-[#eef0e7] shadow-[0_24px_80px_rgba(23,54,45,0.18)] lg:sticky lg:top-28 sm:p-8">
+      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#173b57,#5aa9d6)] p-6 text-[#ffffff] shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28 sm:p-8">
         {!createdEvent ? (
           <div className="flex min-h-[34rem] flex-col items-center justify-center text-center">
             <QrPlaceholderIcon />
             <h2 className="mt-6 text-2xl font-medium tracking-[-0.03em]">
               Кодът за сканиране ще се появи тук
             </h2>
-            <p className="mt-3 max-w-xs text-sm leading-6 text-[#b9c8c0]">
+            <p className="mt-3 max-w-xs text-sm leading-6 text-[#eaf6ff]/80">
               Попълни формата, за да получиш уникален публичен линк за твоите гости.
             </p>
           </div>
@@ -245,19 +245,19 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
           <div>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold tracking-[0.16em] text-[#b9c8aa] uppercase">
+                <p className="text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
                   Събитието е създадено
                 </p>
                 <h2 className="mt-2 text-2xl font-medium tracking-[-0.03em]">
                   {createdEvent.title}
                 </h2>
               </div>
-              <span className="rounded-full bg-[#b9c8aa]/15 px-3 py-1.5 text-xs font-semibold text-[#d7e0bf]">
+              <span className="rounded-full bg-[#eaf6ff]/15 px-3 py-1.5 text-xs font-semibold text-[#eaf6ff]">
                 Активен
               </span>
             </div>
 
-            <div className="mx-auto mt-7 w-full max-w-[20rem] rounded-[1.5rem] bg-[#fffdf8] p-4 shadow-2xl">
+            <div className="mx-auto mt-7 w-full max-w-[20rem] rounded-[1.5rem] bg-[#ffffff] p-4 shadow-2xl">
               {qrDataUrl ? (
                 <Image
                   src={qrDataUrl}
@@ -268,12 +268,12 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
                   className="h-auto w-full rounded-xl"
                 />
               ) : (
-                <div className="aspect-square animate-pulse rounded-xl bg-[#eef0e7]" />
+                <div className="aspect-square animate-pulse rounded-xl bg-[#eaf6ff]" />
               )}
             </div>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-[#b9c8aa] uppercase">
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-[#eaf6ff] uppercase">
                 Публичен линк
               </p>
               <p className="mt-2 break-all text-sm leading-6 text-white/90">
@@ -293,7 +293,7 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
                 <a
                   href={qrDataUrl}
                   download={`vento-decor-${createdEvent.publicId}.png`}
-                  className="rounded-full bg-[#d7e0bf] px-4 py-3 text-center text-sm font-semibold text-[#17362d] transition hover:bg-[#e4eacb]"
+                  className="rounded-full bg-[#eaf6ff] px-4 py-3 text-center text-sm font-semibold text-[#173b57] transition hover:bg-[#5aa9d6]"
                 >
                   Свали кода
                 </a>
@@ -324,7 +324,7 @@ function Field({
     <label className="block">
       <span className="mb-2 block text-sm font-semibold">
         {label}
-        {required && <span className="ml-1 text-[#a45d3f]">*</span>}
+        {required && <span className="ml-1 text-[#5aa9d6]">*</span>}
       </span>
       {children}
     </label>
@@ -334,7 +334,7 @@ function Field({
 function EventDetail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs text-[#b9c8c0]">{label}</dt>
+      <dt className="text-xs text-[#eaf6ff]/80">{label}</dt>
       <dd className="mt-1 font-medium text-white">{value}</dd>
     </div>
   );
@@ -361,7 +361,7 @@ function ArrowIcon() {
 
 function QrPlaceholderIcon() {
   return (
-    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true" className="text-[#b9c8aa]">
+    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true" className="text-[#eaf6ff]">
       <rect x="6" y="6" width="23" height="23" rx="3" stroke="currentColor" strokeWidth="2" />
       <rect x="43" y="6" width="23" height="23" rx="3" stroke="currentColor" strokeWidth="2" />
       <rect x="6" y="43" width="23" height="23" rx="3" stroke="currentColor" strokeWidth="2" />

@@ -116,33 +116,33 @@ export function EventEntry({ publicId }: { publicId: string }) {
   }
 
   return (
-    <main className="page-canvas grid min-h-screen place-items-center px-3 py-8 text-[#17362d] sm:px-6 sm:py-14">
+    <main className="page-canvas grid min-h-screen place-items-center px-3 py-8 text-[#173b57] sm:px-6 sm:py-14">
       {isLoading ? (
         <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
-          <span className="mx-auto block h-10 w-10 animate-spin rounded-full border-2 border-[#17362d]/15 border-t-[#17362d]" />
-          <p className="mt-5 text-sm font-medium text-[#60736b]">Зареждаме събитието…</p>
+          <span className="mx-auto block h-10 w-10 animate-spin rounded-full border-2 border-[#173b57]/15 border-t-[#173b57]" />
+          <p className="mt-5 text-sm font-medium text-[#173b57]/68">Зареждаме събитието…</p>
         </section>
       ) : event ? (
         <section className="surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="relative overflow-hidden bg-[linear-gradient(145deg,#17362d,#285447)] p-7 text-white sm:p-10 lg:p-12">
-            <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#d7e0bf]/15 blur-2xl" />
-            <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#c77a58]/20 blur-3xl" />
+          <div className="relative overflow-hidden bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-7 text-white sm:p-10 lg:p-12">
+            <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#eaf6ff]/15 blur-2xl" />
+            <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#5aa9d6]/20 blur-3xl" />
             <div className="relative flex h-full min-h-[30rem] flex-col">
               <BrandLockup subtitle="Галерия за гости" inverse />
               <div className="my-auto py-12">
-                <p className="text-xs font-bold tracking-[0.2em] text-[#cbd8bc] uppercase">
+                <p className="text-xs font-bold tracking-[0.2em] text-[#eaf6ff] uppercase">
                   Покана за споделяне
                 </p>
                 <h1 className="mt-4 text-4xl leading-[1.02] font-semibold tracking-[-0.05em] text-balance sm:text-6xl">
                   {event.title}
                 </h1>
                 {event.description && (
-                  <p className="mt-5 max-w-lg text-sm leading-7 text-[#c5d4ce] sm:text-base">
+                  <p className="mt-5 max-w-lg text-sm leading-7 text-[#eaf6ff]/80 sm:text-base">
                     {event.description}
                   </p>
                 )}
               </div>
-              <div className="flex flex-wrap gap-3 text-xs font-semibold text-[#dce6e1]">
+              <div className="flex flex-wrap gap-3 text-xs font-semibold text-[#eaf6ff]">
                 {event.location && (
                   <span className="rounded-full border border-white/10 bg-white/[0.07] px-4 py-2.5">
                     ◉ {event.location}
@@ -158,14 +158,14 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </div>
 
           <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#d7e0bf]/65 text-lg">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5aa9d6]/35 text-lg">
               ✦
             </span>
             <p className="eyebrow mt-8">Добре дошли</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
               Представи се на домакините
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#60736b]">
+            <p className="mt-3 text-sm leading-6 text-[#173b57]/68">
               След това ще можеш да добавиш любимите си снимки към общата галерия.
             </p>
 
@@ -188,7 +188,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
               />
 
               {error && (
-                <p className="mt-3 rounded-xl bg-[#a23f32]/8 px-4 py-3 text-sm text-[#a23f32]" role="alert">
+                <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
                   {error}
                 </p>
               )}
@@ -201,7 +201,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 {isSubmitting ? "Продължаване…" : "Продължи към снимките"}
                 {!isSubmitting && <span aria-hidden="true">→</span>}
               </button>
-              <p className="mt-4 text-center text-xs leading-5 text-[#829189]">
+              <p className="mt-4 text-center text-xs leading-5 text-[#173b57]/58">
                 Не се изисква регистрация. Името се използва само за тази галерия.
               </p>
             </form>
@@ -209,9 +209,9 @@ export function EventEntry({ publicId }: { publicId: string }) {
         </section>
       ) : (
         <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#a23f32]/8 text-2xl">!</span>
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#5aa9d6]/15 text-2xl">!</span>
           <h1 className="mt-6 text-2xl font-semibold">Линкът не е достъпен</h1>
-          <p className="mt-3 text-sm leading-6 text-[#a23f32]">{error}</p>
+          <p className="mt-3 text-sm font-medium leading-6 text-[#173b57]">{error}</p>
         </section>
       )}
     </main>

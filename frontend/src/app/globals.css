@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f2eb;
-  --foreground: #17362d;
-  --muted: #64776f;
-  --accent: #b96848;
-  --surface: #fffdf9;
+  --background: #eaf6ff;
+  --foreground: #173b57;
+  --muted: rgb(23 59 87 / 68%);
+  --accent: #5aa9d6;
+  --surface: #ffffff;
 }
 
 @theme inline {
@@ -32,13 +32,13 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid rgb(185 104 72 / 35%);
+  outline: 3px solid rgb(90 169 214 / 42%);
   outline-offset: 3px;
 }
 
 ::selection {
-  background: #d7e0bf;
-  color: #17362d;
+  background: #5aa9d6;
+  color: #173b57;
 }
 
 @layer components {
@@ -46,9 +46,9 @@ a {
     position: relative;
     overflow: hidden;
     background:
-      radial-gradient(circle at 8% 5%, rgb(215 224 191 / 68%), transparent 30rem),
-      radial-gradient(circle at 92% 28%, rgb(231 205 184 / 55%), transparent 34rem),
-      #f5f2eb;
+      radial-gradient(circle at 8% 5%, rgb(90 169 214 / 32%), transparent 30rem),
+      radial-gradient(circle at 92% 28%, rgb(255 255 255 / 78%), transparent 34rem),
+      #eaf6ff;
   }
 
   .page-container {
@@ -57,9 +57,9 @@ a {
   }
 
   .surface-card {
-    border: 1px solid rgb(23 54 45 / 10%);
-    background: rgb(255 253 249 / 78%);
-    box-shadow: 0 24px 80px rgb(39 57 49 / 9%);
+    border: 1px solid rgb(23 59 87 / 10%);
+    background: rgb(255 255 255 / 78%);
+    box-shadow: 0 24px 80px rgb(23 59 87 / 9%);
     backdrop-filter: blur(18px);
   }
 
@@ -87,20 +87,20 @@ a {
     justify-content: center;
     gap: 0.65rem;
     border-radius: 999px;
-    background: #17362d;
+    background: #173b57;
     padding: 0.9rem 1.35rem;
     color: white;
     font-size: 0.875rem;
     font-weight: 700;
-    box-shadow: 0 12px 30px rgb(23 54 45 / 18%);
+    box-shadow: 0 12px 30px rgb(23 59 87 / 18%);
     transition: transform 180ms ease, background-color 180ms ease,
       box-shadow 180ms ease;
   }
 
   .primary-action:hover {
     transform: translateY(-2px);
-    background: #244d40;
-    box-shadow: 0 16px 38px rgb(23 54 45 / 23%);
+    background: #5aa9d6;
+    box-shadow: 0 16px 38px rgb(23 59 87 / 23%);
   }
 
   .secondary-action {
@@ -108,11 +108,11 @@ a {
     align-items: center;
     justify-content: center;
     gap: 0.55rem;
-    border: 1px solid rgb(23 54 45 / 13%);
+    border: 1px solid rgb(23 59 87 / 13%);
     border-radius: 999px;
     background: rgb(255 255 255 / 58%);
     padding: 0.85rem 1.2rem;
-    color: #17362d;
+    color: #173b57;
     font-size: 0.875rem;
     font-weight: 700;
     backdrop-filter: blur(12px);
@@ -122,30 +122,30 @@ a {
 
   .secondary-action:hover {
     transform: translateY(-2px);
-    border-color: rgb(23 54 45 / 25%);
+    border-color: rgb(23 59 87 / 25%);
     background: white;
   }
 
   .field-input {
     width: 100%;
     border-radius: 1.05rem;
-    border: 1px solid rgb(23 54 45 / 14%);
+    border: 1px solid rgb(23 59 87 / 14%);
     background: rgb(255 255 255 / 72%);
     padding: 0.95rem 1rem;
-    color: #17362d;
+    color: #173b57;
     outline: none;
     transition: border-color 160ms ease, box-shadow 160ms ease,
       background-color 160ms ease;
   }
 
   .field-input::placeholder {
-    color: #87958f;
+    color: rgb(23 59 87 / 52%);
   }
 
   .field-input:focus {
-    border-color: rgb(164 93 63 / 65%);
+    border-color: rgb(90 169 214 / 75%);
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgb(164 93 63 / 10%);
+    box-shadow: 0 0 0 4px rgb(90 169 214 / 16%);
   }
 }
 
