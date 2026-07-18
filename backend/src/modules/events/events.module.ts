@@ -4,6 +4,7 @@ import { EventsService } from './application/events.service';
 import { GuestAccessService } from './application/guest-access.service';
 import { EventsRepository } from './domain/repositories/events.repository';
 import { PrismaEventsRepository } from './infrastructure/prisma-events.repository';
+import { ResendGuestOtpEmailService } from './infrastructure/resend-guest-otp-email.service';
 import { EventsController } from './presentation/events.controller';
 
 @Module({
@@ -12,6 +13,7 @@ import { EventsController } from './presentation/events.controller';
   providers: [
     EventsService,
     GuestAccessService,
+    ResendGuestOtpEmailService,
     {
       provide: EventsRepository,
       useClass: PrismaEventsRepository,

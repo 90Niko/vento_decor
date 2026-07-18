@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import QRCode from "qrcode";
-import { copyToClipboard } from "../../../copy-to-clipboard";
+import { eventsService } from "@/features/events/services/events.service";
+import { getApiUrl } from "@/shared/api/client";
+import { copyToClipboard } from "@/shared/lib/copy-to-clipboard";
 
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface EventImage {
   id: number;
@@ -32,13 +33,6 @@ interface AdminEventDetails {
   images: EventImage[];
 }
 
-function getApiUrl(): string {
-  return (
-    CONFIGURED_API_URL ??
-    `${window.location.protocol}//${window.location.hostname}:3001`
-  );
-}
-
 export function EventGallery({ publicId }: { publicId: string }) {
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,10 +46,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
 
     async function loadEvent() {
       try {
-        const response = await fetch(`${getApiUrl()}/events/admin/${publicId}`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
+        const response = await eventsService.getAdminEventResponse(publicId, controller.signal);
         if (!response.ok) {
           throw new Error(
             response.status === 404
@@ -96,10 +87,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
     setError(null);
     const deletedIndex = event?.images.findIndex((item) => item.id === image.id) ?? -1;
     try {
-      const response = await fetch(
-        `${getApiUrl()}/admin/event-images/${image.id}`,
-        { method: "DELETE" },
-      );
+      const response = await eventsService.deleteImageResponse(image.id);
       if (!response.ok) {
         throw new Error(`Снимката не можа да бъде изтрита (код ${response.status}).`);
       }

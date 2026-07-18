@@ -16,7 +16,8 @@ import {
   RegisteredGuest,
 } from '../application/guest-access.service';
 import { CreateEventDto } from './dto/create-event.dto';
-import { RegisterGuestDto } from './dto/register-guest.dto';
+import { RequestGuestOtpDto } from './dto/request-guest-otp.dto';
+import { VerifyGuestOtpDto } from './dto/verify-guest-otp.dto';
 import {
   AdminEventDetailsRecord,
   AdminEventRecord,
@@ -53,11 +54,20 @@ export class EventsController {
     return this.eventsService.findPublic(publicId);
   }
 
-  @Post('public/:publicId/guests')
-  registerGuest(
+  @Post('public/:publicId/guest-otp')
+  async requestGuestOtp(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
-    @Body() dto: RegisterGuestDto,
+    @Body() dto: RequestGuestOtpDto,
+  ): Promise<{ message: string }> {
+    await this.guestAccessService.requestOtp(publicId, dto.name, dto.email);
+    return { message: 'Кодът за достъп е изпратен.' };
+  }
+
+  @Post('public/:publicId/guest-otp/verify')
+  verifyGuestOtp(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Body() dto: VerifyGuestOtpDto,
   ): Promise<RegisteredGuest> {
-    return this.guestAccessService.register(publicId, dto.name);
+    return this.guestAccessService.verifyOtp(publicId, dto.email, dto.code);
   }
 }

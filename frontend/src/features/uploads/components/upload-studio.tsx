@@ -8,6 +8,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { uploadImages } from "@/features/uploads/services/uploads.service";
+import type { UploadedImage } from "@/features/uploads/types/uploads";
 
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -23,26 +25,11 @@ const ACCEPTED_EXTENSIONS = [
   ".heif",
   ".svg",
 ];
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SelectedImage {
   id: string;
   file: File;
   previewUrl: string;
-}
-
-interface UploadedImage {
-  publicId: string;
-  url: string;
-  width: number;
-  height: number;
-  format: string;
-  bytes: number;
-  originalName: string;
-}
-
-interface UploadResponse {
-  images: UploadedImage[];
 }
 
 function formatBytes(bytes: number): string {
@@ -56,68 +43,6 @@ function formatBytes(bytes: number): string {
 function isAcceptedImage(file: File): boolean {
   const extension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
   return file.type.startsWith("image/") || ACCEPTED_EXTENSIONS.includes(extension);
-}
-
-function uploadForm(
-  formData: FormData,
-  uploadPath: string,
-  authorizationToken: string | undefined,
-  onProgress: (value: number) => void,
-): Promise<UploadResponse> {
-  return new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    const apiUrl =
-      CONFIGURED_API_URL ??
-      `${window.location.protocol}//${window.location.hostname}:3001`;
-
-    request.open("POST", `${apiUrl}${uploadPath}`);
-    if (authorizationToken) {
-      request.setRequestHeader("Authorization", `Bearer ${authorizationToken}`);
-    }
-    request.timeout = 120_000;
-    request.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        onProgress(Math.round((event.loaded / event.total) * 100));
-      }
-    });
-    request.addEventListener("load", () => {
-      if (request.status < 200 || request.status >= 300) {
-        let message = `Качването не бе успешно (код ${request.status}).`;
-
-        try {
-          const response = JSON.parse(request.responseText) as {
-            message?: unknown;
-          };
-          if (typeof response.message === "string") {
-            message = response.message;
-          } else if (
-            Array.isArray(response.message) &&
-            response.message.every((item) => typeof item === "string")
-          ) {
-            message = response.message.join(" ");
-          }
-        } catch {
-          // Keep the status-based message when the server response is not JSON.
-        }
-
-        reject(new Error(message));
-        return;
-      }
-
-      try {
-        resolve(JSON.parse(request.responseText) as UploadResponse);
-      } catch {
-        reject(new Error("Сървърът върна неочакван отговор."));
-      }
-    });
-    request.addEventListener("error", () => {
-      reject(new Error("Няма връзка със сървъра."));
-    });
-    request.addEventListener("timeout", () => {
-      reject(new Error("Качването отне твърде дълго. Опитай отново."));
-    });
-    request.send(formData);
-  });
 }
 
 interface UploadStudioProps {
@@ -216,21 +141,18 @@ export function UploadStudio({
       return;
     }
 
-    const formData = new FormData();
-    selected.forEach(({ file }) => formData.append("images", file));
-
     setIsUploading(true);
     setProgress(0);
     setError(null);
     setMessage(null);
 
     try {
-      const response = await uploadForm(
-        formData,
+      const response = await uploadImages({
+        files: selected.map(({ file }) => file),
         uploadPath,
         authorizationToken,
-        setProgress,
-      );
+        onProgress: setProgress,
+      });
       setUploaded((current) => [...response.images, ...current]);
       selected.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl));
       previewUrls.current = [];

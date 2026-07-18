@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BrandLockup } from "../../brand-lockup";
-import { AdminEventsDashboard } from "./admin-events-dashboard";
+import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
+import { BrandLockup } from "@/shared/components/brand-lockup";
 
 export default function AdminEventsPage() {
   return (

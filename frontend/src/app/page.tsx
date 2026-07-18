@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BrandLockup } from "./brand-lockup";
-import { UploadStudio } from "./upload-studio";
+import { UploadStudio } from "@/features/uploads/components/upload-studio";
+import { BrandLockup } from "@/shared/components/brand-lockup";
 
 export default function Home() {
   return (

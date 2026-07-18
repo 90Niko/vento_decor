@@ -1,4 +1,4 @@
-import { EventUploadPage } from "./event-upload-page";
+import { EventUploadPage } from "@/features/events/components/public/event-upload-page";
 
 interface UploadPageProps {
   params: Promise<{ publicId: string }>;

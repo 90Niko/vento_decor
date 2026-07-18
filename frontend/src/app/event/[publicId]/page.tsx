@@ -1,4 +1,4 @@
-import { EventEntry } from "./event-entry";
+import { EventEntry } from "@/features/events/components/public/event-entry";
 
 interface EventPageProps {
   params: Promise<{ publicId: string }>;

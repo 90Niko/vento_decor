@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { eventsService } from "@/features/events/services/events.service";
 
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface AdminEvent {
   id: number;
@@ -18,13 +18,6 @@ interface AdminEvent {
   imageCount: number;
 }
 
-function getApiUrl(): string {
-  return (
-    CONFIGURED_API_URL ??
-    `${window.location.protocol}//${window.location.hostname}:3001`
-  );
-}
-
 export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,9 +28,7 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${getApiUrl()}/events/admin`, {
-        cache: "no-store",
-      });
+      const response = await eventsService.getAdminEventsResponse();
       if (!response.ok) {
         throw new Error(`Събитията не могат да бъдат заредени (код ${response.status}).`);
       }

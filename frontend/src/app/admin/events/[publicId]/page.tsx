@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { EventGallery } from "./event-gallery";
-import { BrandLockup } from "../../../brand-lockup";
+import { EventGallery } from "@/features/events/components/admin/event-gallery";
+import { BrandLockup } from "@/shared/components/brand-lockup";
 
 interface EventDetailsPageProps {
   params: Promise<{ publicId: string }>;

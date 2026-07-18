@@ -43,6 +43,7 @@ model events {
   updated_at   DateTime       @default(now()) @db.Timestamp(0)
   event_guests event_guests[]
   event_images event_images[]
+  guest_otp_challenges guest_otp_challenges[]
 
   @@index([is_active, start_at], map: "idx_events_active_start")
 }
@@ -51,6 +52,7 @@ model event_guests {
   id                 Int            @id @default(autoincrement()) @db.UnsignedInt
   event_id           Int            @db.UnsignedInt
   name               String         @db.VarChar(100)
+  email              String?        @db.VarChar(255)
   session_token_hash String         @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
   created_at         DateTime       @default(now()) @db.Timestamp(0)
   updated_at         DateTime       @default(now()) @db.Timestamp(0)
@@ -59,4 +61,20 @@ model event_guests {
 
   @@index([event_id, created_at], map: "idx_event_guests_event_created")
   @@index([event_id], map: "idx_event_guests_event_id")
+  @@unique([event_id, email], map: "uq_event_guests_event_email")
+}
+
+model guest_otp_challenges {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  event_id    Int       @db.UnsignedInt
+  email       String    @db.VarChar(255)
+  name        String    @db.VarChar(100)
+  code_hash   String    @db.Char(64)
+  expires_at  DateTime  @db.DateTime(0)
+  attempts    Int       @default(0) @db.UnsignedInt
+  consumed_at DateTime? @db.DateTime(0)
+  created_at  DateTime  @default(now()) @db.Timestamp(0)
+  events      events    @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_guest_otp_challenges_event")
+
+  @@index([event_id, email, created_at], map: "idx_guest_otp_event_email_created")
 }

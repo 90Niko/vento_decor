@@ -18,6 +18,7 @@ export interface GuestRecord {
   id: number;
   eventId: number;
   name: string;
+  email: string | null;
   sessionTokenHash: string;
   createdAt: Date;
 }
@@ -53,6 +54,24 @@ export abstract class EventsRepository {
     name: string;
     sessionTokenHash: string;
   }): Promise<GuestRecord>;
+  abstract upsertGuest(data: {
+    eventId: number;
+    email: string;
+    name: string;
+    sessionTokenHash: string;
+  }): Promise<GuestRecord>;
+  abstract createOtpChallenge(data: {
+    eventId: number;
+    email: string;
+    name: string;
+    codeHash: string;
+    expiresAt: Date;
+  }): Promise<void>;
+  abstract consumeOtpChallenge(data: {
+    eventId: number;
+    email: string;
+    codeHash: string;
+  }): Promise<{ name: string } | null>;
   abstract findGuestBySession(data: {
     eventId: number;
     sessionTokenHash: string;

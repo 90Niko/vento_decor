@@ -2,7 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BrandLockup } from "../../brand-lockup";
+import { BrandLockup } from "@/shared/components/brand-lockup";
+import { eventsService } from "@/features/events/services/events.service";
 
 interface PublicEvent {
   publicId: string;
@@ -18,23 +19,21 @@ interface GuestRegistration {
   token: string;
 }
 
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-function apiUrl(): string {
-  return (
-    CONFIGURED_API_URL ??
-    `${window.location.protocol}//${window.location.hostname}:3001`
-  );
-}
-
 export function guestSessionKey(publicId: string): string {
   return `vento:event:${publicId}:guest`;
+}
+
+export function guestOtpKey(publicId: string): string {
+  return `vento:event:${publicId}:guest-otp`;
 }
 
 export function EventEntry({ publicId }: { publicId: string }) {
   const router = useRouter();
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const isOtpRequested = false;
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,9 +43,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
 
     async function loadEvent() {
       try {
-        const response = await fetch(`${apiUrl()}/events/public/${publicId}`, {
-          signal: controller.signal,
-        });
+        const response = await eventsService.getPublicEventResponse(publicId, controller.signal);
         if (!response.ok) {
           throw new Error(
             response.status === 404
@@ -84,16 +81,24 @@ export function EventEntry({ publicId }: { publicId: string }) {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${apiUrl()}/events/public/${publicId}/guests`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: normalizedName }),
-        },
-      );
+      const response = await (isOtpRequested
+        ? eventsService.verifyGuestOtpResponse(publicId, email.trim(), otp)
+        : eventsService.requestGuestOtpResponse(
+            publicId,
+            normalizedName,
+            email.trim(),
+          ));
       if (!response.ok) {
         throw new Error("Името не можа да бъде записано. Опитай отново.");
+      }
+
+      if (!isOtpRequested) {
+        sessionStorage.setItem(
+          guestOtpKey(publicId),
+          JSON.stringify({ name: normalizedName, email: email.trim() }),
+        );
+        router.push(`/event/${publicId}/verify`);
+        return;
       }
 
       const registration = (await response.json()) as GuestRegistration;
@@ -107,7 +112,9 @@ export function EventEntry({ publicId }: { publicId: string }) {
       router.push(`/event/${publicId}/upload`);
     } catch (submitError) {
       setError(
-        submitError instanceof Error
+        submitError instanceof TypeError && submitError.message === "Failed to fetch"
+          ? "Няма връзка със сървъра. Провери интернет връзката си и опитай отново."
+          : submitError instanceof Error
           ? submitError.message
           : "Възникна неочаквана грешка.",
       );
@@ -186,6 +193,39 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 placeholder="Напиши името си"
                 className="field-input mt-3 bg-white"
               />
+              <label htmlFor="guest-email" className="mt-5 block text-sm font-bold">
+                Адрес на електронна поща
+              </label>
+              <input
+                id="guest-email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(inputEvent) => setEmail(inputEvent.target.value)}
+                autoComplete="email"
+                required
+                disabled={isOtpRequested}
+                className="field-input mt-3 bg-white"
+              />
+              {isOtpRequested && (
+                <>
+                  <label htmlFor="guest-otp" className="mt-5 block text-sm font-bold">
+                    Еднократен код
+                  </label>
+                  <input
+                    id="guest-otp"
+                    name="otp"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(inputEvent) => setOtp(inputEvent.target.value)}
+                    required
+                    autoFocus
+                    className="field-input mt-3 bg-white"
+                  />
+                </>
+              )}
 
               {error && (
                 <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">

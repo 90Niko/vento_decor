@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { copyToClipboard } from "../../copy-to-clipboard";
+import { eventsService } from "@/features/events/services/events.service";
+import { copyToClipboard } from "@/shared/lib/copy-to-clipboard";
 
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface CreatedEvent {
   id: number;
@@ -19,13 +19,6 @@ interface CreatedEvent {
   publicUrl: string;
   createdAt: string;
   updatedAt: string;
-}
-
-function getApiUrl(): string {
-  return (
-    CONFIGURED_API_URL ??
-    `${window.location.protocol}//${window.location.hostname}:3001`
-  );
 }
 
 function optionalIsoDate(formData: FormData, key: string): string | undefined {
@@ -116,11 +109,7 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
     };
 
     try {
-      const response = await fetch(`${getApiUrl()}/events`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await eventsService.createEventResponse(payload);
 
       if (!response.ok) {
         throw new Error(await readError(response));

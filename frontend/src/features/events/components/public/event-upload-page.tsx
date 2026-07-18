@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UploadStudio } from "../../../upload-studio";
-import { guestSessionKey } from "../event-entry";
-import { BrandLockup } from "../../../brand-lockup";
+import { UploadStudio } from "@/features/uploads/components/upload-studio";
+import { guestSessionKey } from "./event-entry";
+import { BrandLockup } from "@/shared/components/brand-lockup";
 
 interface GuestSession {
   token: string;
