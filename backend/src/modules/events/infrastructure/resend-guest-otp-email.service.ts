@@ -11,11 +11,23 @@ export class ResendGuestOtpEmailService {
 
   constructor(private readonly config: ConfigService) {}
 
-  async send(input: { to: string; code: string; eventTitle: string }): Promise<void> {
+  async send(input: {
+    to: string;
+    code: string;
+    eventTitle: string;
+  }): Promise<boolean> {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
     const from = this.config.get<string>('RESEND_FROM_EMAIL');
-    if (!apiKey || !from) {
-      throw new ServiceUnavailableException('Входът с електронна поща не е настроен.');
+    const isConfigured = Boolean(apiKey?.startsWith('re_') && from?.includes('@'));
+
+    if (!isConfigured && process.env.NODE_ENV !== 'production') {
+      this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+      return false;
+    }
+    if (!isConfigured) {
+      throw new ServiceUnavailableException(
+        'Входът с електронна поща не е настроен.',
+      );
     }
 
     const response = await fetch('https://api.resend.com/emails', {
@@ -33,8 +45,17 @@ export class ResendGuestOtpEmailService {
     });
 
     if (!response.ok) {
-      this.logger.error(`Resend rejected OTP email with status ${response.status}.`);
-      throw new ServiceUnavailableException('Кодът за достъп не можа да бъде изпратен.');
+      this.logger.error(
+        `Resend rejected OTP email with status ${response.status}.`,
+      );
+      if (process.env.NODE_ENV !== 'production') {
+        this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+        return false;
+      }
+      throw new ServiceUnavailableException(
+        'Кодът за достъп не можа да бъде изпратен.',
+      );
     }
+    return true;
   }
 }

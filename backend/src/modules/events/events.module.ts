@@ -6,9 +6,10 @@ import { EventsRepository } from './domain/repositories/events.repository';
 import { PrismaEventsRepository } from './infrastructure/prisma-events.repository';
 import { ResendGuestOtpEmailService } from './infrastructure/resend-guest-otp-email.service';
 import { EventsController } from './presentation/events.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, AuthModule],
   controllers: [EventsController],
   providers: [
     EventsService,

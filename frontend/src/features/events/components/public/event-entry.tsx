@@ -89,13 +89,18 @@ export function EventEntry({ publicId }: { publicId: string }) {
             email.trim(),
           ));
       if (!response.ok) {
-        throw new Error("Името не можа да бъде записано. Опитай отново.");
+        throw new Error(await readResponseError(response));
       }
 
       if (!isOtpRequested) {
+        const otpResponse = (await response.json()) as { devCode?: string };
         sessionStorage.setItem(
           guestOtpKey(publicId),
-          JSON.stringify({ name: normalizedName, email: email.trim() }),
+          JSON.stringify({
+            name: normalizedName,
+            email: email.trim(),
+            devCode: otpResponse.devCode,
+          }),
         );
         router.push(`/event/${publicId}/verify`);
         return;
@@ -263,4 +268,15 @@ function formatEventDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+async function readResponseError(response: Response): Promise<string> {
+  try {
+    const payload = (await response.json()) as { message?: string | string[] };
+    if (Array.isArray(payload.message)) return payload.message.join(" ");
+    if (payload.message) return payload.message;
+  } catch {
+    // Use the status fallback below for non-JSON errors.
+  }
+  return `Заявката не беше изпълнена (код ${response.status}).`;
 }

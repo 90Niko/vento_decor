@@ -55,12 +55,13 @@ export const eventsService = {
   },
 
   getAdminEventsResponse(): Promise<Response> {
-    return fetch(`${getApiUrl()}/events/admin`, { cache: "no-store" });
+    return fetch(`${getApiUrl()}/events/admin`, { cache: "no-store", credentials: "include" });
   },
 
   getAdminEventResponse(publicId: string, signal?: AbortSignal): Promise<Response> {
     return fetch(`${getApiUrl()}/events/admin/${publicId}`, {
       cache: "no-store",
+      credentials: "include",
       signal,
     });
   },
@@ -68,6 +69,7 @@ export const eventsService = {
   createEventResponse(payload: CreateEventInput): Promise<Response> {
     return fetch(`${getApiUrl()}/events`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -76,6 +78,7 @@ export const eventsService = {
   deleteImageResponse(imageId: number): Promise<Response> {
     return fetch(`${getApiUrl()}/admin/event-images/${imageId}`, {
       method: "DELETE",
+      credentials: "include",
     });
   },
 
@@ -100,7 +103,7 @@ export const eventsService = {
   },
 
   async getAdminEvents(): Promise<AdminEventSummary[]> {
-    const response = await fetch(`${getApiUrl()}/events/admin`, { cache: "no-store" });
+    const response = await fetch(`${getApiUrl()}/events/admin`, { cache: "no-store", credentials: "include" });
     if (!response.ok) {
       throw new ApiError("Събитията не могат да бъдат заредени.", response.status);
     }
@@ -110,6 +113,7 @@ export const eventsService = {
   async getAdminEvent(publicId: string, signal?: AbortSignal): Promise<AdminEventDetails> {
     const response = await fetch(`${getApiUrl()}/events/admin/${publicId}`, {
       cache: "no-store",
+      credentials: "include",
       signal,
     });
     if (!response.ok) {
@@ -121,6 +125,7 @@ export const eventsService = {
   async createEvent(payload: CreateEventInput): Promise<CreatedEvent> {
     const response = await fetch(`${getApiUrl()}/events`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -133,6 +138,7 @@ export const eventsService = {
   async deleteImage(imageId: number): Promise<void> {
     const response = await fetch(`${getApiUrl()}/admin/event-images/${imageId}`, {
       method: "DELETE",
+      credentials: "include",
     });
     if (!response.ok) {
       throw new ApiError(`Ð¡Ð½Ð¸Ð¼ÐºÐ°Ñ‚Ð° Ð½Ðµ Ð¼Ð¾Ð¶Ðµ Ð´Ð° Ð±ÑŠÐ´Ðµ Ð¸Ð·Ñ‚Ñ€Ð¸Ñ‚Ð° (ÐºÐ¾Ð´ ${response.status}).`, response.status);

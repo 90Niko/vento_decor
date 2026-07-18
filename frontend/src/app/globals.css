@@ -51,6 +51,72 @@ a {
       #eaf6ff;
   }
 
+  .auth-canvas {
+    position: relative;
+    background:
+      radial-gradient(circle at 12% 12%, rgb(90 169 214 / 30%), transparent 26rem),
+      radial-gradient(circle at 88% 88%, rgb(255 255 255 / 90%), transparent 30rem),
+      #eaf6ff;
+  }
+
+  .auth-visual {
+    background:
+      linear-gradient(180deg, rgb(23 59 87 / 5%), rgb(23 59 87 / 45%)),
+      radial-gradient(circle at 80% 18%, rgb(127 207 241 / 38%), transparent 19rem),
+      linear-gradient(145deg, #173b57 0%, #245b7d 56%, #5aa9d6 145%);
+  }
+
+  .auth-visual::before,
+  .auth-visual::after {
+    position: absolute;
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 999px;
+    content: "";
+  }
+
+  .auth-orb {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(1px);
+    pointer-events: none;
+  }
+
+  .auth-orb-one {
+    top: -9rem;
+    left: -7rem;
+    width: 28rem;
+    height: 28rem;
+    border: 1px solid rgb(255 255 255 / 52%);
+    background: rgb(90 169 214 / 16%);
+    box-shadow:
+      0 0 0 4rem rgb(255 255 255 / 10%),
+      0 0 0 8rem rgb(90 169 214 / 6%);
+  }
+
+  .auth-orb-two {
+    right: -8rem;
+    bottom: -10rem;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid rgb(23 59 87 / 6%);
+    background: rgb(255 255 255 / 42%);
+    box-shadow: 0 0 0 5rem rgb(255 255 255 / 16%);
+  }
+
+  .auth-visual::before {
+    right: -11rem;
+    bottom: 4rem;
+    width: 28rem;
+    height: 28rem;
+  }
+
+  .auth-visual::after {
+    right: -5rem;
+    bottom: 10rem;
+    width: 16rem;
+    height: 16rem;
+  }
+
   .page-container {
     width: min(100% - 2.5rem, 72rem);
     margin-inline: auto;
@@ -158,6 +224,40 @@ a {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes auth-slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes auth-slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.auth-form-slide {
+  will-change: transform, opacity;
+}
+
+.auth-form-slide-from-right {
+  animation: auth-slide-from-right 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-form-slide-from-left {
+  animation: auth-slide-from-left 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .reveal-up {

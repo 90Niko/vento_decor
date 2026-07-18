@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { EventsModule } from './modules/events/events.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UploadsModule } from './uploads/uploads.module';
     DatabaseModule,
     EventsModule,
     UploadsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

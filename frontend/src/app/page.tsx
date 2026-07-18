@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { UploadStudio } from "@/features/uploads/components/upload-studio";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 
 export default function Home() {
@@ -9,32 +8,34 @@ export default function Home() {
         <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
           <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
             <BrandLockup subtitle="Галерия за красиви моменти" />
-            <Link href="/admin/events" className="secondary-action px-4 py-2.5 text-xs sm:text-sm">
-              <span className="hidden sm:inline">Управление на</span> събития
+            <Link href="/login" className="secondary-action px-4 py-2.5 text-xs sm:text-sm">
+              Вход за създатели
               <span aria-hidden="true">→</span>
             </Link>
           </div>
         </header>
 
-        <section className="grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.65fr)] lg:gap-16 lg:py-28">
+        <section className="grid min-h-[calc(100vh-7rem)] items-center gap-10 py-16 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.65fr)] lg:gap-16">
           <div className="reveal-up">
             <p className="eyebrow">Спомените на едно място</p>
             <h1 className="mt-6 max-w-3xl text-5xl leading-[0.98] font-semibold tracking-[-0.055em] text-balance sm:text-7xl lg:text-[5.4rem]">
               Всеки красив момент заслужава своя галерия.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-[#173b57]/68 sm:text-lg sm:leading-8">
-              Събирай снимки от гостите чрез личен линк и код за сканиране.
-              Бързо качване, подредена галерия и спомени, готови за споделяне.
+              Създай събитие, сподели личния му линк и събери снимките на всички гости в една подредена галерия.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="#качване" className="primary-action">
-                Качи снимки
-                <span aria-hidden="true">↓</span>
-              </a>
-              <Link href="/admin/events" className="secondary-action">
-                Създай събитие
+              <Link href="/register" className="primary-action">
+                Създай профил
+                <span aria-hidden="true">→</span>
+              </Link>
+              <Link href="/login" className="secondary-action">
+                Вече имам профил
               </Link>
             </div>
+            <p className="mt-5 text-xs leading-5 text-[#173b57]/52">
+              Гостите не се регистрират — те качват снимки през линка на конкретното събитие.
+            </p>
           </div>
 
           <div className="surface-card reveal-up relative overflow-hidden rounded-[2rem] p-6 sm:p-8 [animation-delay:120ms]">
@@ -42,34 +43,31 @@ export default function Home() {
             <div className="relative">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
-                  Лесно за всички
+                  Как работи
                 </p>
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-[#173b57] text-white">
                   ✦
                 </span>
               </div>
               <div className="mt-10 space-y-3">
-                <Feature number="01" title="Създай събитие" text="Получаваш личен линк и код." />
-                <Feature number="02" title="Покани гостите" text="Те въвеждат име и качват." />
-                <Feature number="03" title="Запази момента" text="Всичко остава в една галерия." />
+                <Feature
+                  number="01"
+                  title="Създай събитие"
+                  text="Получи личен линк за своите гости."
+                />
+                <Feature
+                  number="02"
+                  title="Сподели поканата"
+                  text="Гостите влизат и потвърждават своя имейл."
+                />
+                <Feature
+                  number="03"
+                  title="Събери моментите"
+                  text="Всички снимки пристигат в общата галерия."
+                />
               </div>
             </div>
           </div>
-        </section>
-
-        <section id="качване" className="scroll-mt-28">
-          <div className="mb-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="eyebrow">Медия център</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                Добави своите кадри
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-6 text-[#173b57]/68 sm:text-right">
-              Избери до 10 снимки наведнъж. Ще ги прегледаш преди изпращане.
-            </p>
-          </div>
-          <UploadStudio />
         </section>
       </div>
     </main>

@@ -48,6 +48,15 @@ model events {
   @@index([is_active, start_at], map: "idx_events_active_start")
 }
 
+model creators {
+  id            Int      @id @default(autoincrement()) @db.UnsignedInt
+  name          String   @db.VarChar(120)
+  email         String   @unique(map: "uq_creators_email") @db.VarChar(255)
+  password_hash String   @db.VarChar(255)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamp(0)
+}
+
 model event_guests {
   id                 Int            @id @default(autoincrement()) @db.UnsignedInt
   event_id           Int            @db.UnsignedInt

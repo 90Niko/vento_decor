@@ -5,7 +5,9 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { CreatorAuthGuard } from '../../auth/creator-auth.guard';
 import {
   CreatedEvent,
   EventsService,
@@ -15,13 +17,13 @@ import {
   GuestAccessService,
   RegisteredGuest,
 } from '../application/guest-access.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { RequestGuestOtpDto } from './dto/request-guest-otp.dto';
-import { VerifyGuestOtpDto } from './dto/verify-guest-otp.dto';
 import {
   AdminEventDetailsRecord,
   AdminEventRecord,
 } from '../domain/repositories/events.repository';
+import { CreateEventDto } from './dto/create-event.dto';
+import { RequestGuestOtpDto } from './dto/request-guest-otp.dto';
+import { VerifyGuestOtpDto } from './dto/verify-guest-otp.dto';
 
 @Controller('events')
 export class EventsController {
@@ -31,16 +33,19 @@ export class EventsController {
   ) {}
 
   @Post()
+  @UseGuards(CreatorAuthGuard)
   create(@Body() dto: CreateEventDto): Promise<CreatedEvent> {
     return this.eventsService.create(dto);
   }
 
   @Get('admin')
+  @UseGuards(CreatorAuthGuard)
   findAllForAdmin(): Promise<AdminEventRecord[]> {
     return this.eventsService.findAllForAdmin();
   }
 
   @Get('admin/:publicId')
+  @UseGuards(CreatorAuthGuard)
   findForAdmin(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
   ): Promise<AdminEventDetailsRecord> {
@@ -58,9 +63,18 @@ export class EventsController {
   async requestGuestOtp(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
     @Body() dto: RequestGuestOtpDto,
-  ): Promise<{ message: string }> {
-    await this.guestAccessService.requestOtp(publicId, dto.name, dto.email);
-    return { message: 'Кодът за достъп е изпратен.' };
+  ): Promise<{ message: string; devCode?: string }> {
+    const devCode = await this.guestAccessService.requestOtp(
+      publicId,
+      dto.name,
+      dto.email,
+    );
+    return {
+      message: devCode
+        ? 'Тестовият код е генериран.'
+        : 'Кодът за достъп е изпратен.',
+      ...(devCode ? { devCode } : {}),
+    };
   }
 
   @Post('public/:publicId/guest-otp/verify')

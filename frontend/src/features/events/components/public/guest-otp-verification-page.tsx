@@ -11,6 +11,7 @@ import {
 interface PendingGuestOtp {
   name: string;
   email: string;
+  devCode?: string;
 }
 
 interface GuestRegistration {
@@ -33,7 +34,10 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
       router.replace(`/event/${publicId}`);
       return;
     }
-    queueMicrotask(() => setPending(guest));
+    queueMicrotask(() => {
+      setPending(guest);
+      if (guest.devCode) setCode(guest.devCode);
+    });
   }, [publicId, router]);
 
   async function verifyCode(event: FormEvent<HTMLFormElement>) {
@@ -158,7 +162,11 @@ function readPendingGuestOtp(publicId: string): PendingGuestOtp | null {
   try {
     const parsed = JSON.parse(raw) as Partial<PendingGuestOtp>;
     return typeof parsed.name === "string" && typeof parsed.email === "string"
-      ? { name: parsed.name, email: parsed.email }
+      ? {
+          name: parsed.name,
+          email: parsed.email,
+          devCode: typeof parsed.devCode === "string" ? parsed.devCode : undefined,
+        }
       : null;
   } catch {
     sessionStorage.removeItem(guestOtpKey(publicId));

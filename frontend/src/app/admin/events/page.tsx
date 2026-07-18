@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
 import { BrandLockup } from "@/shared/components/brand-lockup";
+import { LogoutButton } from "@/features/auth/components/logout-button";
 
 export default function AdminEventsPage() {
   return (
@@ -9,10 +10,11 @@ export default function AdminEventsPage() {
         <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
           <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
             <BrandLockup subtitle="Управление на събития" />
-            <Link href="/" className="secondary-action px-4 py-2.5 text-xs sm:text-sm">
+            <Link href="/" className="hidden">
               <span aria-hidden="true">←</span>
               <span className="hidden sm:inline">Към</span> галерията
             </Link>
+            <LogoutButton />
           </div>
         </header>
 

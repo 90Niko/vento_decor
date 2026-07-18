@@ -32,7 +32,11 @@ export class GuestAccessService {
     private readonly otpEmail: ResendGuestOtpEmailService,
   ) {}
 
-  async requestOtp(publicId: string, name: string, email: string): Promise<void> {
+  async requestOtp(
+    publicId: string,
+    name: string,
+    email: string,
+  ): Promise<string | null> {
     const event = await this.requireActiveEvent(publicId);
     const normalizedEmail = email.trim().toLowerCase();
     const code = String(Math.floor(100000 + Math.random() * 900000));
@@ -43,7 +47,12 @@ export class GuestAccessService {
       codeHash: this.hashToken(code),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
     });
-    await this.otpEmail.send({ to: normalizedEmail, code, eventTitle: event.title });
+    const wasSent = await this.otpEmail.send({
+      to: normalizedEmail,
+      code,
+      eventTitle: event.title,
+    });
+    return wasSent ? null : code;
   }
 
   async verifyOtp(publicId: string, email: string, code: string): Promise<RegisteredGuest> {

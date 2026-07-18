@@ -8,9 +8,10 @@ import { PrismaEventImagesRepository } from './infrastructure/prisma-event-image
 import { UploadsController } from './uploads.controller';
 import { UploadsService } from './uploads.service';
 import { AdminEventImagesController } from './admin-event-images.controller';
+import { AuthModule } from '../modules/auth/auth.module';
 
 @Module({
-  imports: [CloudinaryModule, DatabaseModule, EventsModule],
+  imports: [CloudinaryModule, DatabaseModule, EventsModule, AuthModule],
   controllers: [
     UploadsController,
     EventUploadsController,
