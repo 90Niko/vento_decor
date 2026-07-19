@@ -12,6 +12,8 @@ interface PublicEvent {
   startAt: string | null;
   endAt: string | null;
   location: string | null;
+  coverImageUrl: string | null;
+  themeColor: string;
 }
 
 interface GuestRegistration {
@@ -37,6 +39,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const theme = getTheme(event?.themeColor);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -136,7 +139,14 @@ export function EventEntry({ publicId }: { publicId: string }) {
         </section>
       ) : event ? (
         <section className="surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="relative overflow-hidden bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-7 text-white sm:p-10 lg:p-12">
+          <div
+            className="relative overflow-hidden p-7 text-white sm:p-10 lg:p-12"
+            style={{
+              background: event.coverImageUrl
+                ? `linear-gradient(145deg, ${theme.primary}ee, ${theme.accent}bb), url("${event.coverImageUrl}") center / cover`
+                : `linear-gradient(145deg, ${theme.primary}, ${theme.accent})`,
+            }}
+          >
             <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#eaf6ff]/15 blur-2xl" />
             <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#5aa9d6]/20 blur-3xl" />
             <div className="relative flex h-full min-h-[30rem] flex-col">
@@ -170,7 +180,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </div>
 
           <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5aa9d6]/35 text-lg">
+            <span
+              className="grid h-12 w-12 place-items-center rounded-2xl text-lg text-white"
+              style={{ backgroundColor: theme.accent }}
+            >
               ✦
             </span>
             <p className="eyebrow mt-8">Добре дошли</p>
@@ -268,6 +281,19 @@ function formatEventDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+const THEMES: Record<string, { primary: string; accent: string }> = {
+  ocean: { primary: "#173b57", accent: "#5aa9d6" },
+  rose: { primary: "#6d3044", accent: "#d8899e" },
+  sage: { primary: "#354f42", accent: "#8eaa96" },
+  lavender: { primary: "#493d6b", accent: "#a99bd4" },
+  terracotta: { primary: "#6d382b", accent: "#c8795d" },
+  midnight: { primary: "#171b2e", accent: "#59658f" },
+};
+
+function getTheme(theme: string | undefined) {
+  return THEMES[theme ?? "ocean"] ?? THEMES.ocean;
 }
 
 async function readResponseError(response: Response): Promise<string> {

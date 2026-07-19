@@ -102,8 +102,7 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
         typeof description === "string" && description
           ? description
           : undefined,
-      location:
-        typeof location === "string" && location ? location : undefined,
+      location: typeof location === "string" ? location : "",
       startAt: optionalIsoDate(formData, "startAt"),
       endAt: optionalIsoDate(formData, "endAt"),
     };
@@ -192,10 +191,11 @@ export function AdminEventsPanel({ onCreated }: { onCreated?: () => void }) {
             </Field>
           </div>
 
-          <Field label="Локация">
+          <Field label="Локация" required>
             <input
               name="location"
               type="text"
+              required
               maxLength={255}
               placeholder="Град, зала или адрес"
               className="field-input"

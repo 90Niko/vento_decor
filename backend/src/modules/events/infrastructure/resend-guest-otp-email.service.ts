@@ -18,7 +18,9 @@ export class ResendGuestOtpEmailService {
   }): Promise<boolean> {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
     const from = this.config.get<string>('RESEND_FROM_EMAIL');
-    const isConfigured = Boolean(apiKey?.startsWith('re_') && from?.includes('@'));
+    const isConfigured = Boolean(
+      apiKey?.startsWith('re_') && from?.includes('@'),
+    );
 
     if (!isConfigured && process.env.NODE_ENV !== 'production') {
       this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);

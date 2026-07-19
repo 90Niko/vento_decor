@@ -15,6 +15,15 @@ export interface StoredEventImage {
   publicId: string;
 }
 
+export interface GuestGalleryImage {
+  id: number;
+  url: string;
+  publicId: string;
+  originalName: string | null;
+  guestName: string | null;
+  createdAt: Date;
+}
+
 export abstract class EventImagesRepository {
   abstract createMany(data: {
     eventId: number;
@@ -22,5 +31,6 @@ export abstract class EventImagesRepository {
     images: EventImageUploadData[];
   }): Promise<PersistedEventImage[]>;
   abstract findById(id: number): Promise<StoredEventImage | null>;
+  abstract findAllByEventId(eventId: number): Promise<GuestGalleryImage[]>;
   abstract deleteById(id: number): Promise<void>;
 }

@@ -75,6 +75,25 @@ export const eventsService = {
     });
   },
 
+  deleteEventResponse(publicId: string): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/admin/${publicId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+  },
+
+  getGuestGalleryResponse(
+    publicId: string,
+    guestToken: string,
+    signal?: AbortSignal,
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/public/${publicId}/images`, {
+      headers: { Authorization: `Bearer ${guestToken}` },
+      cache: "no-store",
+      signal,
+    });
+  },
+
   deleteImageResponse(imageId: number): Promise<Response> {
     return fetch(`${getApiUrl()}/admin/event-images/${imageId}`, {
       method: "DELETE",

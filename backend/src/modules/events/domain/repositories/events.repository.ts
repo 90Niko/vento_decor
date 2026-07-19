@@ -4,6 +4,11 @@ export interface CreateEventRecord {
   startAt: Date | null;
   endAt: Date | null;
   location: string | null;
+  eventType: string;
+  uploadDeadline: Date | null;
+  coverImageUrl: string | null;
+  coverImagePublicId: string | null;
+  themeColor: string;
 }
 
 export interface EventRecord extends CreateEventRecord {
@@ -44,6 +49,7 @@ export interface AdminEventDetailsRecord extends AdminEventRecord {
 
 export abstract class EventsRepository {
   abstract create(data: CreateEventRecord): Promise<EventRecord>;
+  abstract deleteByPublicId(publicId: string): Promise<boolean>;
   abstract findAllForAdmin(): Promise<AdminEventRecord[]>;
   abstract findByPublicIdForAdmin(
     publicId: string,

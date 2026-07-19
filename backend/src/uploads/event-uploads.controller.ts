@@ -1,6 +1,7 @@
 import {
   Controller,
   FileTypeValidator,
+  Get,
   Headers,
   MaxFileSizeValidator,
   Param,
@@ -13,6 +14,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadedEventImage, UploadsService } from './uploads.service';
+import { GuestGalleryImage } from './domain/event-images.repository';
 
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -20,6 +22,17 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024;
 @Controller('events/public/:publicId/images')
 export class EventUploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
+
+  @Get()
+  getGallery(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<GuestGalleryImage[]> {
+    const token = authorization?.startsWith('Bearer ')
+      ? authorization.slice(7).trim()
+      : undefined;
+    return this.uploadsService.getGuestGallery(publicId, token || undefined);
+  }
 
   @Post()
   @UseInterceptors(

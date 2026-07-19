@@ -48,11 +48,23 @@ function isAcceptedImage(file: File): boolean {
 interface UploadStudioProps {
   uploadPath?: string;
   authorizationToken?: string;
+  theme?: {
+    primary: string;
+    accent: string;
+    background: string;
+  };
+  onUploaded?: () => void;
 }
 
 export function UploadStudio({
   uploadPath = "/uploads/images",
   authorizationToken,
+  theme = {
+    primary: "#173b57",
+    accent: "#5aa9d6",
+    background: "#eaf6ff",
+  },
+  onUploaded,
 }: UploadStudioProps = {}) {
   const [selected, setSelected] = useState<SelectedImage[]>([]);
   const [uploaded, setUploaded] = useState<UploadedImage[]>([]);
@@ -163,6 +175,7 @@ export function UploadStudio({
           ? "Снимката е качена успешно."
           : `${response.images.length} снимки са качени успешно.`;
       setMessage(uploadMessage);
+      onUploaded?.();
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
@@ -204,7 +217,10 @@ export function UploadStudio({
             disabled={isUploading}
             suppressHydrationWarning
           />
-          <span className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#173b57] text-white shadow-[0_14px_35px_rgba(23,59,87,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3">
+          <span
+            className="mb-6 grid h-16 w-16 place-items-center rounded-2xl text-white shadow-[0_14px_35px_rgba(23,59,87,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3"
+            style={{ backgroundColor: theme.primary }}
+          >
             <UploadIcon />
           </span>
           <span className="text-xl font-semibold tracking-[-0.02em]">
@@ -283,21 +299,27 @@ export function UploadStudio({
         <button
           type="submit"
           disabled={selected.length === 0 || isUploading}
-          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#173b57] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/20 transition hover:-translate-y-0.5 hover:bg-[#5aa9d6] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-[#5aa9d6]/35" : ""}`}
+          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-black/10" : ""}`}
+          style={{ backgroundColor: theme.primary }}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}
           {!isUploading && <ArrowIcon />}
         </button>
       </form>
 
-      <aside className="rounded-[2rem] bg-[linear-gradient(155deg,#173b57,#5aa9d6)] p-6 text-[#ffffff] shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28 sm:p-8">
+      <aside
+        className="rounded-[2rem] p-6 text-white shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28 sm:p-8"
+        style={{
+          background: `linear-gradient(155deg, ${theme.primary}, ${theme.accent})`,
+        }}
+      >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-semibold tracking-[0.18em] text-[#eaf6ff] uppercase">
+            <p className="text-xs font-semibold tracking-[0.18em] text-white/65 uppercase">
               Последно качени
             </p>
             <h2 className="mt-2 text-2xl font-medium tracking-[-0.03em]">
-              Твоята селекция
+              Твоите моменти
             </h2>
           </div>
           <span className="grid h-10 min-w-10 place-items-center rounded-full bg-white/10 text-sm font-semibold">
@@ -309,8 +331,8 @@ export function UploadStudio({
           <div className="mt-10 flex min-h-72 flex-col items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-7 text-center">
             <GalleryIcon />
             <p className="mt-5 font-medium">Галерията те очаква</p>
-            <p className="mt-2 max-w-56 text-sm leading-6 text-[#eaf6ff]/80">
-              Качените снимки ще се появят тук веднага след завършване.
+            <p className="mt-2 max-w-56 text-sm leading-6 text-white/70">
+              Снимките, които споделиш, ще се появят тук веднага след качването.
             </p>
           </div>
         ) : (
@@ -338,9 +360,8 @@ export function UploadStudio({
           </div>
         )}
 
-        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-[#eaf6ff]/80">
-          Снимките се съхраняват сигурно в облачно хранилище и се доставят
-          през оптимизирана мрежа.
+        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-white/65">
+          Твоите снимки стават част от общата галерия на събитието.
         </div>
       </aside>
     </div>

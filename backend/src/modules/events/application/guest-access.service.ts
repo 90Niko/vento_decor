@@ -55,7 +55,11 @@ export class GuestAccessService {
     return wasSent ? null : code;
   }
 
-  async verifyOtp(publicId: string, email: string, code: string): Promise<RegisteredGuest> {
+  async verifyOtp(
+    publicId: string,
+    email: string,
+    code: string,
+  ): Promise<RegisteredGuest> {
     const event = await this.requireActiveEvent(publicId);
     const normalizedEmail = email.trim().toLowerCase();
     const challenge = await this.eventsRepository.consumeOtpChallenge({

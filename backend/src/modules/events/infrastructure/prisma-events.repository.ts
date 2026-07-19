@@ -21,10 +21,23 @@ export class PrismaEventsRepository implements EventsRepository {
         start_at: data.startAt,
         end_at: data.endAt,
         location: data.location,
+        event_type: data.eventType,
+        upload_deadline: data.uploadDeadline,
+        cover_image_url: data.coverImageUrl,
+        cover_image_public_id: data.coverImagePublicId,
+        theme_color: data.themeColor,
       },
     });
 
     return this.toEventRecord(event);
+  }
+
+  async deleteByPublicId(publicId: string): Promise<boolean> {
+    const result = await this.prisma.events.deleteMany({
+      where: { public_id: publicId },
+    });
+
+    return result.count === 1;
   }
 
   async findAllForAdmin(): Promise<AdminEventRecord[]> {
@@ -92,7 +105,7 @@ export class PrismaEventsRepository implements EventsRepository {
     const guest = await this.prisma.event_guests.create({
       data: {
         event_id: data.eventId,
-      name: data.name,
+        name: data.name,
         email: null,
         session_token_hash: data.sessionTokenHash,
       },
@@ -193,8 +206,8 @@ export class PrismaEventsRepository implements EventsRepository {
       ? {
           id: guest.id,
           eventId: guest.event_id,
-      name: guest.name,
-        email: guest.email,
+          name: guest.name,
+          email: guest.email,
           sessionTokenHash: guest.session_token_hash,
           createdAt: guest.created_at,
         }
@@ -209,6 +222,11 @@ export class PrismaEventsRepository implements EventsRepository {
     start_at: Date | null;
     end_at: Date | null;
     location: string | null;
+    event_type: string;
+    upload_deadline: Date | null;
+    cover_image_url: string | null;
+    cover_image_public_id: string | null;
+    theme_color: string;
     is_active: boolean;
     created_at: Date;
     updated_at: Date;
@@ -221,6 +239,11 @@ export class PrismaEventsRepository implements EventsRepository {
       startAt: event.start_at,
       endAt: event.end_at,
       location: event.location,
+      eventType: event.event_type,
+      uploadDeadline: event.upload_deadline,
+      coverImageUrl: event.cover_image_url,
+      coverImagePublicId: event.cover_image_public_id,
+      themeColor: event.theme_color,
       isActive: event.is_active,
       createdAt: event.created_at,
       updatedAt: event.updated_at,

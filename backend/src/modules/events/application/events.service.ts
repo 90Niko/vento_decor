@@ -18,7 +18,16 @@ export interface CreatedEvent extends EventRecord {
 
 export type PublicEvent = Pick<
   EventRecord,
-  'publicId' | 'title' | 'description' | 'startAt' | 'endAt' | 'location'
+  | 'publicId'
+  | 'title'
+  | 'description'
+  | 'startAt'
+  | 'endAt'
+  | 'location'
+  | 'eventType'
+  | 'uploadDeadline'
+  | 'coverImageUrl'
+  | 'themeColor'
 >;
 
 @Injectable()
@@ -44,6 +53,11 @@ export class EventsService {
       startAt,
       endAt,
       location: dto.location?.trim() || null,
+      eventType: dto.eventType ?? 'other',
+      uploadDeadline: dto.uploadDeadline ? new Date(dto.uploadDeadline) : null,
+      coverImageUrl: dto.coverImageUrl?.trim() || null,
+      coverImagePublicId: dto.coverImagePublicId?.trim() || null,
+      themeColor: dto.themeColor ?? 'ocean',
     });
     const publicAppUrl = this.configService
       .get<string>('PUBLIC_APP_URL', 'http://localhost:3002')
@@ -68,11 +82,22 @@ export class EventsService {
       startAt: event.startAt,
       endAt: event.endAt,
       location: event.location,
+      eventType: event.eventType,
+      uploadDeadline: event.uploadDeadline,
+      coverImageUrl: event.coverImageUrl,
+      themeColor: event.themeColor,
     };
   }
 
   findAllForAdmin(): Promise<AdminEventRecord[]> {
     return this.eventsRepository.findAllForAdmin();
+  }
+
+  async delete(publicId: string): Promise<void> {
+    const deleted = await this.eventsRepository.deleteByPublicId(publicId);
+    if (!deleted) {
+      throw new NotFoundException('Събитието не е намерено.');
+    }
   }
 
   async findForAdmin(publicId: string): Promise<AdminEventDetailsRecord> {

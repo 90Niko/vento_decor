@@ -51,6 +51,12 @@ a {
       #eaf6ff;
   }
 
+  .admin-canvas {
+    background:
+      radial-gradient(circle at 82% 8%, rgb(90 169 214 / 18%), transparent 24rem),
+      linear-gradient(135deg, #f7fcff 0%, #eaf6ff 100%);
+  }
+
   .auth-canvas {
     position: relative;
     background:

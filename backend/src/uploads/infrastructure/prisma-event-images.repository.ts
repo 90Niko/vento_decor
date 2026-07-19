@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/database/prisma/prisma.service';
 import {
   EventImagesRepository,
+  GuestGalleryImage,
   PersistedEventImage,
   StoredEventImage,
 } from '../domain/event-images.repository';
@@ -57,6 +58,23 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
     return image
       ? { id: image.id, url: image.url, publicId: image.public_id }
       : null;
+  }
+
+  async findAllByEventId(eventId: number): Promise<GuestGalleryImage[]> {
+    const images = await this.prisma.event_images.findMany({
+      where: { event_id: eventId },
+      orderBy: { created_at: 'desc' },
+      include: { event_guests: { select: { name: true } } },
+    });
+
+    return images.map((image) => ({
+      id: image.id,
+      url: image.url,
+      publicId: image.public_id,
+      originalName: image.alt_text,
+      guestName: image.event_guests?.name ?? null,
+      createdAt: image.created_at,
+    }));
   }
 
   async deleteById(id: number): Promise<void> {

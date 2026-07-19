@@ -38,6 +38,11 @@ model events {
   start_at     DateTime?      @db.DateTime(0)
   end_at       DateTime?      @db.DateTime(0)
   location     String?        @db.VarChar(255)
+  event_type   String         @default("other") @db.VarChar(40)
+  upload_deadline DateTime?   @db.DateTime(0)
+  cover_image_url String?     @db.Text
+  cover_image_public_id String? @db.VarChar(255)
+  theme_color String          @default("ocean") @db.VarChar(30)
   is_active    Boolean        @default(true)
   created_at   DateTime       @default(now()) @db.Timestamp(0)
   updated_at   DateTime       @default(now()) @db.Timestamp(0)

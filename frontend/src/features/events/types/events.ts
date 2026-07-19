@@ -5,6 +5,10 @@ export interface PublicEvent {
   startAt: string | null;
   endAt: string | null;
   location: string | null;
+  eventType: string;
+  uploadDeadline: string | null;
+  coverImageUrl: string | null;
+  themeColor: string;
 }
 
 export interface GuestRegistration {
@@ -51,7 +55,12 @@ export interface CreatedEvent extends PublicEvent {
 export interface CreateEventInput {
   title: string;
   description?: string;
-  location?: string;
+  location: string;
   startAt?: string;
   endAt?: string;
+  eventType?: string;
+  uploadDeadline?: string;
+  coverImageUrl?: string;
+  coverImagePublicId?: string;
+  themeColor?: string;
 }

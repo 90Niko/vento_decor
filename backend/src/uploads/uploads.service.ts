@@ -8,7 +8,10 @@ import {
   CloudinaryService,
   UploadedImage,
 } from '../infrastructure/storage/cloudinary/cloudinary.service';
-import { EventImagesRepository } from './domain/event-images.repository';
+import {
+  EventImagesRepository,
+  GuestGalleryImage,
+} from './domain/event-images.repository';
 
 export interface UploadedEventImage extends UploadedImage {
   id: number;
@@ -78,6 +81,17 @@ export class UploadsService {
     const image = await this.requireEventImage(imageId);
     await this.cloudinaryService.deleteImage(image.publicId);
     await this.eventImagesRepository.deleteById(image.id);
+  }
+
+  async getGuestGallery(
+    publicId: string,
+    guestToken: string | undefined,
+  ): Promise<GuestGalleryImage[]> {
+    const { event } = await this.guestAccessService.authenticate(
+      publicId,
+      guestToken,
+    );
+    return this.eventImagesRepository.findAllByEventId(event.id);
   }
 
   async getEventImageDownloadUrl(imageId: number): Promise<string> {
