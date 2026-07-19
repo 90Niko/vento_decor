@@ -87,11 +87,46 @@ export class UploadsService {
     publicId: string,
     guestToken: string | undefined,
   ): Promise<GuestGalleryImage[]> {
+    const { event, guest } = await this.guestAccessService.authenticate(
+      publicId,
+      guestToken,
+    );
+    return this.eventImagesRepository.findAllByEventId(event.id, guest.id);
+  }
+
+  async toggleImageLike(
+    publicId: string,
+    imageId: number,
+    guestToken: string | undefined,
+  ): Promise<{ liked: boolean; likeCount: number }> {
+    const { event, guest } = await this.guestAccessService.authenticate(
+      publicId,
+      guestToken,
+    );
+    const result = await this.eventImagesRepository.toggleLike({
+      imageId,
+      eventId: event.id,
+      guestId: guest.id,
+    });
+    if (!result) throw new NotFoundException('Снимката не е намерена.');
+    return result;
+  }
+
+  async getGuestImageDownloadUrl(
+    publicId: string,
+    imageId: number,
+    guestToken: string | undefined,
+  ): Promise<string> {
     const { event } = await this.guestAccessService.authenticate(
       publicId,
       guestToken,
     );
-    return this.eventImagesRepository.findAllByEventId(event.id);
+    const image = await this.eventImagesRepository.findByIdForEvent(
+      imageId,
+      event.id,
+    );
+    if (!image) throw new NotFoundException('Снимката не е намерена.');
+    return this.cloudinaryService.getDownloadUrl(image.url);
   }
 
   async getEventImageDownloadUrl(imageId: number): Promise<string> {

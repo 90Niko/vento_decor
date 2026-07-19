@@ -5,6 +5,7 @@ import {
   Headers,
   MaxFileSizeValidator,
   Param,
+  ParseIntPipe,
   ParseFilePipe,
   ParseUUIDPipe,
   Post,
@@ -32,6 +33,40 @@ export class EventUploadsController {
       ? authorization.slice(7).trim()
       : undefined;
     return this.uploadsService.getGuestGallery(publicId, token || undefined);
+  }
+
+  @Post(':imageId/like')
+  toggleLike(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Param('imageId', ParseIntPipe) imageId: number,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<{ liked: boolean; likeCount: number }> {
+    const token = authorization?.startsWith('Bearer ')
+      ? authorization.slice(7).trim()
+      : undefined;
+    return this.uploadsService.toggleImageLike(
+      publicId,
+      imageId,
+      token || undefined,
+    );
+  }
+
+  @Get(':imageId/download')
+  async downloadImage(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Param('imageId', ParseIntPipe) imageId: number,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<{ url: string }> {
+    const token = authorization?.startsWith('Bearer ')
+      ? authorization.slice(7).trim()
+      : undefined;
+    return {
+      url: await this.uploadsService.getGuestImageDownloadUrl(
+        publicId,
+        imageId,
+        token || undefined,
+      ),
+    };
   }
 
   @Post()

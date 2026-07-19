@@ -22,6 +22,8 @@ export interface GuestGalleryImage {
   originalName: string | null;
   guestName: string | null;
   createdAt: Date;
+  likeCount: number;
+  likedByGuest: boolean;
 }
 
 export abstract class EventImagesRepository {
@@ -31,6 +33,18 @@ export abstract class EventImagesRepository {
     images: EventImageUploadData[];
   }): Promise<PersistedEventImage[]>;
   abstract findById(id: number): Promise<StoredEventImage | null>;
-  abstract findAllByEventId(eventId: number): Promise<GuestGalleryImage[]>;
+  abstract findByIdForEvent(
+    id: number,
+    eventId: number,
+  ): Promise<StoredEventImage | null>;
+  abstract findAllByEventId(
+    eventId: number,
+    guestId: number,
+  ): Promise<GuestGalleryImage[]>;
+  abstract toggleLike(data: {
+    imageId: number;
+    eventId: number;
+    guestId: number;
+  }): Promise<{ liked: boolean; likeCount: number } | null>;
   abstract deleteById(id: number): Promise<void>;
 }

@@ -60,11 +60,34 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
       : null;
   }
 
-  async findAllByEventId(eventId: number): Promise<GuestGalleryImage[]> {
+  async findByIdForEvent(
+    id: number,
+    eventId: number,
+  ): Promise<StoredEventImage | null> {
+    const image = await this.prisma.event_images.findFirst({
+      where: { id, event_id: eventId },
+      select: { id: true, url: true, public_id: true },
+    });
+    return image
+      ? { id: image.id, url: image.url, publicId: image.public_id }
+      : null;
+  }
+
+  async findAllByEventId(
+    eventId: number,
+    guestId: number,
+  ): Promise<GuestGalleryImage[]> {
     const images = await this.prisma.event_images.findMany({
       where: { event_id: eventId },
       orderBy: { created_at: 'desc' },
-      include: { event_guests: { select: { name: true } } },
+      include: {
+        event_guests: { select: { name: true } },
+        _count: { select: { event_image_likes: true } },
+        event_image_likes: {
+          where: { guest_id: guestId },
+          select: { id: true },
+        },
+      },
     });
 
     return images.map((image) => ({
@@ -74,7 +97,45 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
       originalName: image.alt_text,
       guestName: image.event_guests?.name ?? null,
       createdAt: image.created_at,
+      likeCount: image._count.event_image_likes,
+      likedByGuest: image.event_image_likes.length > 0,
     }));
+  }
+
+  async toggleLike(data: {
+    imageId: number;
+    eventId: number;
+    guestId: number;
+  }): Promise<{ liked: boolean; likeCount: number } | null> {
+    const image = await this.prisma.event_images.findFirst({
+      where: { id: data.imageId, event_id: data.eventId },
+      select: { id: true },
+    });
+    if (!image) return null;
+
+    const existing = await this.prisma.event_image_likes.findUnique({
+      where: {
+        image_id_guest_id: {
+          image_id: data.imageId,
+          guest_id: data.guestId,
+        },
+      },
+    });
+
+    if (existing) {
+      await this.prisma.event_image_likes.delete({
+        where: { id: existing.id },
+      });
+    } else {
+      await this.prisma.event_image_likes.create({
+        data: { image_id: data.imageId, guest_id: data.guestId },
+      });
+    }
+
+    const likeCount = await this.prisma.event_image_likes.count({
+      where: { image_id: data.imageId },
+    });
+    return { liked: !existing, likeCount };
   }
 
   async deleteById(id: number): Promise<void> {

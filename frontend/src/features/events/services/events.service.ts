@@ -94,6 +94,31 @@ export const eventsService = {
     });
   },
 
+  toggleGuestImageLikeResponse(
+    publicId: string,
+    imageId: number,
+    guestToken: string,
+  ): Promise<Response> {
+    return fetch(
+      `${getApiUrl()}/events/public/${publicId}/images/${imageId}/like`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${guestToken}` },
+      },
+    );
+  },
+
+  getGuestImageDownloadResponse(
+    publicId: string,
+    imageId: number,
+    guestToken: string,
+  ): Promise<Response> {
+    return fetch(
+      `${getApiUrl()}/events/public/${publicId}/images/${imageId}/download`,
+      { headers: { Authorization: `Bearer ${guestToken}` } },
+    );
+  },
+
   deleteImageResponse(imageId: number): Promise<Response> {
     return fetch(`${getApiUrl()}/admin/event-images/${imageId}`, {
       method: "DELETE",
