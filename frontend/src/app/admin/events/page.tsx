@@ -57,6 +57,7 @@ export default function AdminEventsPage() {
       </div>
       <Link
         href="/admin/events/new"
+        data-mobile-action="create-event"
         className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-50 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98] lg:hidden"
       >
         <PlusIcon />
