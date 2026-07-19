@@ -31,20 +31,12 @@ export default function AdminEventsPage() {
                 <p className="mt-0.5 text-xs text-[#173b57]/50">Управление на събития и галерии</p>
               </div>
               <div className="flex items-center gap-3">
-                <Link
-                  href="/admin/events/new"
-                  className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#173b57] px-3.5 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/15 transition active:scale-[0.98] lg:hidden"
-                  aria-label="Създай събитие"
-                >
-                  <PlusIcon />
-                  <span className="hidden sm:inline">Създай</span>
-                </Link>
                 <LogoutButton />
               </div>
             </div>
           </header>
 
-          <div className="px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+          <div className="px-5 pt-8 pb-28 sm:px-8 lg:px-10 lg:py-10">
             <section id="overview" className="mb-8 scroll-mt-28">
               <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">Общ преглед</p>
               <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
@@ -63,6 +55,13 @@ export default function AdminEventsPage() {
           </div>
         </div>
       </div>
+      <Link
+        href="/admin/events/new"
+        className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-50 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98] lg:hidden"
+      >
+        <PlusIcon />
+        Създай събитие
+      </Link>
     </main>
   );
 }
