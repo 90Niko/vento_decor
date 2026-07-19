@@ -45,6 +45,13 @@ export default function AdminEventsPage() {
                   <p className="mt-2 text-sm text-[#173b57]/55 sm:text-base">
                     Следи всички събития, гости и споделени моменти на едно място.
                   </p>
+                  <Link
+                    href="/admin/events/new"
+                    className="mt-5 inline-flex h-12 items-center gap-2 rounded-xl bg-[#173b57] px-5 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/15 lg:hidden"
+                  >
+                    <PlusIcon />
+                    Създай събитие
+                  </Link>
                 </div>
                 <p className="rounded-full border border-[#173b57]/10 bg-white/60 px-4 py-2 text-xs font-semibold text-[#173b57]/60">
                   {new Intl.DateTimeFormat("bg-BG", { day: "numeric", month: "long", year: "numeric" }).format(new Date())}
@@ -58,7 +65,7 @@ export default function AdminEventsPage() {
       <Link
         href="/admin/events/new"
         data-mobile-action="create-event"
-        className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-50 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98] lg:hidden"
+        className="fixed right-4 bottom-4 left-4 z-50 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98] lg:hidden"
       >
         <PlusIcon />
         Създай събитие
