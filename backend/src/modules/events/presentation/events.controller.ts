@@ -6,7 +6,9 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { CreatorAuthGuard } from '../../auth/creator-auth.guard';
 import {
   CreatedEvent,
   EventsService,
@@ -32,16 +34,19 @@ export class EventsController {
   ) {}
 
   @Post()
+  @UseGuards(CreatorAuthGuard)
   create(@Body() dto: CreateEventDto): Promise<CreatedEvent> {
     return this.eventsService.create(dto);
   }
 
   @Get('admin')
+  @UseGuards(CreatorAuthGuard)
   findAllForAdmin(): Promise<AdminEventRecord[]> {
     return this.eventsService.findAllForAdmin();
   }
 
   @Delete('admin/:publicId')
+  @UseGuards(CreatorAuthGuard)
   async delete(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
   ): Promise<{ deleted: true }> {
@@ -50,6 +55,7 @@ export class EventsController {
   }
 
   @Get('admin/:publicId')
+  @UseGuards(CreatorAuthGuard)
   findForAdmin(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
   ): Promise<AdminEventDetailsRecord> {

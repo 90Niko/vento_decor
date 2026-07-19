@@ -5,10 +5,13 @@ import {
   Param,
   ParseIntPipe,
   Redirect,
+  UseGuards,
 } from '@nestjs/common';
 import { UploadsService } from './uploads.service';
+import { CreatorAuthGuard } from '../modules/auth/creator-auth.guard';
 
 @Controller('admin/event-images')
+@UseGuards(CreatorAuthGuard)
 export class AdminEventImagesController {
   constructor(private readonly uploadsService: UploadsService) {}
 

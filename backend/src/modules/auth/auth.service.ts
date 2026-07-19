@@ -36,6 +36,11 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
+    if ((await this.prisma.creators.count()) > 0) {
+      throw new ConflictException(
+        'Регистрацията е затворена. Влезте със съществуващия администраторски профил.',
+      );
+    }
     const email = dto.email.trim().toLowerCase();
     if (await this.prisma.creators.findUnique({ where: { email } })) {
       throw new ConflictException('Вече има профил с този имейл.');

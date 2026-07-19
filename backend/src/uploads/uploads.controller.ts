@@ -5,12 +5,14 @@ import {
   ParseFilePipe,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadedImage } from '../infrastructure/storage/cloudinary/cloudinary.service';
 import { UploadsService } from './uploads.service';
+import { CreatorAuthGuard } from '../modules/auth/creator-auth.guard';
 
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -20,6 +22,7 @@ export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
   @Post('images')
+  @UseGuards(CreatorAuthGuard)
   @UseInterceptors(
     FilesInterceptor('images', MAX_FILES, {
       storage: memoryStorage(),
