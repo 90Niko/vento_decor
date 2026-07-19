@@ -81,11 +81,16 @@ export class GuestAccessService {
     return { guest: { id: guest.id, name: guest.name }, token };
   }
 
-  async register(publicId: string, name: string): Promise<RegisteredGuest> {
+  async register(
+    publicId: string,
+    name: string,
+    email: string,
+  ): Promise<RegisteredGuest> {
     const event = await this.requireActiveEvent(publicId);
     const token = randomBytes(32).toString('hex');
-    const guest = await this.eventsRepository.createGuest({
+    const guest = await this.eventsRepository.upsertGuest({
       eventId: event.id,
+      email: email.trim().toLowerCase(),
       name: name.trim(),
       sessionTokenHash: this.hashToken(token),
     });

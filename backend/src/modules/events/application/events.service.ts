@@ -69,6 +69,33 @@ export class EventsService {
     };
   }
 
+  async update(publicId: string, dto: CreateEventDto): Promise<EventRecord> {
+    const startAt = dto.startAt ? new Date(dto.startAt) : null;
+    const endAt = dto.endAt ? new Date(dto.endAt) : null;
+    if (startAt && endAt && endAt < startAt) {
+      throw new BadRequestException(
+        'Крайната дата трябва да бъде след началната дата.',
+      );
+    }
+    const existing = await this.eventsRepository.findByPublicIdForAdmin(publicId);
+    if (!existing) throw new NotFoundException('Събитието не е намерено.');
+    const updated = await this.eventsRepository.updateByPublicId(publicId, {
+      title: dto.title.trim(),
+      description: dto.description?.trim() || null,
+      startAt,
+      endAt,
+      location: dto.location.trim(),
+      eventType: dto.eventType ?? 'other',
+      uploadDeadline: dto.uploadDeadline ? new Date(dto.uploadDeadline) : null,
+      coverImageUrl: dto.coverImageUrl?.trim() || existing.coverImageUrl,
+      coverImagePublicId:
+        dto.coverImagePublicId?.trim() || existing.coverImagePublicId,
+      themeColor: dto.themeColor ?? 'ocean',
+    });
+    if (!updated) throw new NotFoundException('Събитието не е намерено.');
+    return updated;
+  }
+
   async findPublic(publicId: string): Promise<PublicEvent> {
     const event = await this.eventsRepository.findActiveByPublicId(publicId);
     if (!event) {

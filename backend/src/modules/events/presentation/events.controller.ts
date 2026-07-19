@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Put,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +24,7 @@ import {
   AdminEventRecord,
 } from '../domain/repositories/events.repository';
 import { CreateEventDto } from './dto/create-event.dto';
+import { RegisterGuestDto } from './dto/register-guest.dto';
 import { RequestGuestOtpDto } from './dto/request-guest-otp.dto';
 import { VerifyGuestOtpDto } from './dto/verify-guest-otp.dto';
 
@@ -54,6 +56,15 @@ export class EventsController {
     return { deleted: true };
   }
 
+  @Put('admin/:publicId')
+  @UseGuards(CreatorAuthGuard)
+  update(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Body() dto: CreateEventDto,
+  ) {
+    return this.eventsService.update(publicId, dto);
+  }
+
   @Get('admin/:publicId')
   @UseGuards(CreatorAuthGuard)
   findForAdmin(
@@ -67,6 +78,14 @@ export class EventsController {
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
   ): Promise<PublicEvent> {
     return this.eventsService.findPublic(publicId);
+  }
+
+  @Post('public/:publicId/guests')
+  registerGuest(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Body() dto: RegisterGuestDto,
+  ): Promise<RegisteredGuest> {
+    return this.guestAccessService.register(publicId, dto.name, dto.email);
   }
 
   @Post('public/:publicId/guest-otp')

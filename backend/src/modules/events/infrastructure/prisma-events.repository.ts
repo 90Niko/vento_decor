@@ -32,6 +32,32 @@ export class PrismaEventsRepository implements EventsRepository {
     return this.toEventRecord(event);
   }
 
+  async updateByPublicId(
+    publicId: string,
+    data: CreateEventRecord,
+  ): Promise<EventRecord | null> {
+    const result = await this.prisma.events.updateMany({
+      where: { public_id: publicId },
+      data: {
+        title: data.title,
+        description: data.description,
+        start_at: data.startAt,
+        end_at: data.endAt,
+        location: data.location,
+        event_type: data.eventType,
+        upload_deadline: data.uploadDeadline,
+        cover_image_url: data.coverImageUrl,
+        cover_image_public_id: data.coverImagePublicId,
+        theme_color: data.themeColor,
+      },
+    });
+    if (result.count !== 1) return null;
+    const event = await this.prisma.events.findUnique({
+      where: { public_id: publicId },
+    });
+    return event ? this.toEventRecord(event) : null;
+  }
+
   async deleteByPublicId(publicId: string): Promise<boolean> {
     const result = await this.prisma.events.deleteMany({
       where: { public_id: publicId },

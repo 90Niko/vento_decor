@@ -49,6 +49,10 @@ export interface AdminEventDetailsRecord extends AdminEventRecord {
 
 export abstract class EventsRepository {
   abstract create(data: CreateEventRecord): Promise<EventRecord>;
+  abstract updateByPublicId(
+    publicId: string,
+    data: CreateEventRecord,
+  ): Promise<EventRecord | null>;
   abstract deleteByPublicId(publicId: string): Promise<boolean>;
   abstract findAllForAdmin(): Promise<AdminEventRecord[]>;
   abstract findByPublicIdForAdmin(

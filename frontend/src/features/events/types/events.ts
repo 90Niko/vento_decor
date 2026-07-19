@@ -41,6 +41,10 @@ export interface AdminEventSummary {
 
 export interface AdminEventDetails extends AdminEventSummary {
   endAt: string | null;
+  eventType: string;
+  uploadDeadline: string | null;
+  coverImageUrl: string | null;
+  themeColor: string;
   images: EventImage[];
 }
 

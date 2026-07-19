@@ -217,16 +217,26 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
                   </span>
                 </div>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => void deleteEvent(event)}
-                  disabled={deletingId === event.id}
-                  aria-label={`Изтрий ${event.title}`}
-                  title="Изтрий събитието"
-                  className="ml-16 grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-500 transition hover:border-red-500 hover:bg-red-500 hover:text-white disabled:cursor-wait disabled:opacity-40 sm:ml-0"
-                >
-                  <TrashIcon />
-                </button>
+                <div className="ml-16 flex items-center gap-2 sm:ml-0">
+                  <Link
+                    href={`/admin/events/${event.publicId}/edit`}
+                    aria-label={`Редактирай ${event.title}`}
+                    title="Редактирай събитието"
+                    className="grid h-9 w-9 place-items-center rounded-full border border-[#5aa9d6]/40 text-[#5aa9d6] transition hover:border-[#5aa9d6] hover:bg-[#5aa9d6] hover:text-white"
+                  >
+                    <EditIcon />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => void deleteEvent(event)}
+                    disabled={deletingId === event.id}
+                    aria-label={`Изтрий ${event.title}`}
+                    title="Изтрий събитието"
+                    className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-500 transition hover:border-red-500 hover:bg-red-500 hover:text-white disabled:cursor-wait disabled:opacity-40"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -285,4 +295,5 @@ function PulseIcon() { return <svg width="19" height="19" viewBox="0 0 24 24" fi
 function UsersIcon() { return <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.7" /><path d="M3.5 19c.5-4 2.5-6 5.5-6s5 2 5.5 6M16 5.5a3 3 0 0 1 0 5.5m1.5 2c2 .7 3 2.7 3 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>; }
 function ImageIcon() { return <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.7" /><circle cx="9" cy="9" r="2" stroke="currentColor" strokeWidth="1.7" /><path d="m4 17 5-4 3 2 3-3 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" /></svg>; }
 function SearchIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" /><path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
+function EditIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="m14.5 6.7 2.8 2.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
 function TrashIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>; }

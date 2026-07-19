@@ -22,11 +22,15 @@ export const eventsService = {
     return fetch(`${getApiUrl()}/events/public/${publicId}`, { signal });
   },
 
-  registerGuestResponse(publicId: string, name: string): Promise<Response> {
+  registerGuestResponse(
+    publicId: string,
+    name: string,
+    email: string,
+  ): Promise<Response> {
     return fetch(`${getApiUrl()}/events/public/${publicId}/guests`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, email }),
     });
   },
 
@@ -69,6 +73,15 @@ export const eventsService = {
   createEventResponse(payload: CreateEventInput): Promise<Response> {
     return fetch(`${getApiUrl()}/events`, {
       method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updateEventResponse(publicId: string, payload: CreateEventInput): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/admin/${publicId}`, {
+      method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

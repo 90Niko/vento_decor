@@ -34,8 +34,6 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const isOtpRequested = false;
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,29 +82,13 @@ export function EventEntry({ publicId }: { publicId: string }) {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await (isOtpRequested
-        ? eventsService.verifyGuestOtpResponse(publicId, email.trim(), otp)
-        : eventsService.requestGuestOtpResponse(
-            publicId,
-            normalizedName,
-            email.trim(),
-          ));
+      const response = await eventsService.registerGuestResponse(
+        publicId,
+        normalizedName,
+        email.trim(),
+      );
       if (!response.ok) {
         throw new Error(await readResponseError(response));
-      }
-
-      if (!isOtpRequested) {
-        const otpResponse = (await response.json()) as { devCode?: string };
-        sessionStorage.setItem(
-          guestOtpKey(publicId),
-          JSON.stringify({
-            name: normalizedName,
-            email: email.trim(),
-            devCode: otpResponse.devCode,
-          }),
-        );
-        router.push(`/event/${publicId}/verify`);
-        return;
       }
 
       const registration = (await response.json()) as GuestRegistration;
@@ -222,29 +204,8 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 onChange={(inputEvent) => setEmail(inputEvent.target.value)}
                 autoComplete="email"
                 required
-                disabled={isOtpRequested}
                 className="field-input mt-3 bg-white"
               />
-              {isOtpRequested && (
-                <>
-                  <label htmlFor="guest-otp" className="mt-5 block text-sm font-bold">
-                    Еднократен код
-                  </label>
-                  <input
-                    id="guest-otp"
-                    name="otp"
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(inputEvent) => setOtp(inputEvent.target.value)}
-                    required
-                    autoFocus
-                    className="field-input mt-3 bg-white"
-                  />
-                </>
-              )}
-
               {error && (
                 <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
                   {error}

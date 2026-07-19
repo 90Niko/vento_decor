@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, Matches, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class RegisterGuestDto {
   @IsString({ message: 'Името трябва да бъде текст.' })
@@ -6,4 +12,8 @@ export class RegisterGuestDto {
   @Matches(/\S/, { message: 'Името трябва да съдържа видими символи.' })
   @MaxLength(100, { message: 'Името може да бъде до 100 символа.' })
   name!: string;
+
+  @IsEmail()
+  @MaxLength(255)
+  email!: string;
 }
