@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "@/shared/components/brand-lockup";
@@ -30,6 +31,14 @@ export default function AdminEventsPage() {
                 <p className="mt-0.5 text-xs text-[#173b57]/50">Управление на събития и галерии</p>
               </div>
               <div className="flex items-center gap-3">
+                <Link
+                  href="/admin/events/new"
+                  className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#173b57] px-3.5 text-sm font-semibold text-white shadow-lg shadow-[#173b57]/15 transition active:scale-[0.98] lg:hidden"
+                  aria-label="Създай събитие"
+                >
+                  <PlusIcon />
+                  <span className="hidden sm:inline">Създай</span>
+                </Link>
                 <LogoutButton />
               </div>
             </div>
