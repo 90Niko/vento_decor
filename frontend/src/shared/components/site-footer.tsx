@@ -21,10 +21,10 @@ export function SiteFooter() {
               Начало
             </Link>
             <Link
-              href="/admin/events"
+              href="/login"
               className="transition hover:text-[#eaf6ff]"
             >
-              Админ панел
+              Вход за creators
             </Link>
           </nav>
           <p className="mt-5 text-xs text-[#eaf6ff]/70">
