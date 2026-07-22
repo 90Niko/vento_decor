@@ -33,6 +33,7 @@ model event_images {
 
 model events {
   id           Int            @id @default(autoincrement()) @db.UnsignedInt
+  creator_id   Int?           @db.UnsignedInt
   public_id    String         @unique(map: "uq_events_public_id") @default(uuid()) @db.Char(36)
   title        String         @db.VarChar(150)
   description  String?        @db.Text
@@ -50,8 +51,10 @@ model events {
   event_guests event_guests[]
   event_images event_images[]
   guest_otp_challenges guest_otp_challenges[]
+  creators     creators?      @relation(fields: [creator_id], references: [id], onDelete: SetNull, map: "fk_events_creator")
 
   @@index([is_active, start_at], map: "idx_events_active_start")
+  @@index([creator_id], map: "idx_events_creator_id")
 }
 
 model creators {
@@ -59,8 +62,11 @@ model creators {
   name          String   @db.VarChar(120)
   email         String   @unique(map: "uq_creators_email") @db.VarChar(255)
   password_hash String   @db.VarChar(255)
+  role          String   @default("CREATOR") @db.VarChar(20)
+  is_active     Boolean  @default(true)
   created_at    DateTime @default(now()) @db.Timestamp(0)
   updated_at    DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  events        events[]
 }
 
 model event_guests {

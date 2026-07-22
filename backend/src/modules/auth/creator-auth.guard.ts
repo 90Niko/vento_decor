@@ -12,7 +12,7 @@ export const CREATOR_COOKIE = 'vento_creator_session';
 export class CreatorAuthGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<{
       headers: { cookie?: string };
       creator?: unknown;
@@ -26,7 +26,9 @@ export class CreatorAuthGuard implements CanActivate {
           return [key, decodeURIComponent(value.join('='))];
         }),
     );
-    const creator = this.authService.verifySession(cookies[CREATOR_COOKIE]);
+    const creator = await this.authService.authenticateSession(
+      cookies[CREATOR_COOKIE],
+    );
     if (!creator)
       throw new UnauthorizedException('Необходимо е да влезете в профила си.');
     request.creator = creator;

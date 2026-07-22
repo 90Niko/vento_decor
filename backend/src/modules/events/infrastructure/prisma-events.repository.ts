@@ -16,6 +16,7 @@ export class PrismaEventsRepository implements EventsRepository {
   async create(data: CreateEventRecord): Promise<EventRecord> {
     const event = await this.prisma.events.create({
       data: {
+        creator_id: data.creatorId,
         title: data.title,
         description: data.description,
         start_at: data.startAt,
@@ -35,9 +36,13 @@ export class PrismaEventsRepository implements EventsRepository {
   async updateByPublicId(
     publicId: string,
     data: CreateEventRecord,
+    ownerId?: number,
   ): Promise<EventRecord | null> {
     const result = await this.prisma.events.updateMany({
-      where: { public_id: publicId },
+      where: {
+        public_id: publicId,
+        ...(ownerId ? { creator_id: ownerId } : {}),
+      },
       data: {
         title: data.title,
         description: data.description,
@@ -53,21 +58,28 @@ export class PrismaEventsRepository implements EventsRepository {
     });
     if (result.count !== 1) return null;
     const event = await this.prisma.events.findUnique({
-      where: { public_id: publicId },
+      where: {
+        public_id: publicId,
+        ...(ownerId ? { creator_id: ownerId } : {}),
+      },
     });
     return event ? this.toEventRecord(event) : null;
   }
 
-  async deleteByPublicId(publicId: string): Promise<boolean> {
+  async deleteByPublicId(publicId: string, ownerId?: number): Promise<boolean> {
     const result = await this.prisma.events.deleteMany({
-      where: { public_id: publicId },
+      where: {
+        public_id: publicId,
+        ...(ownerId ? { creator_id: ownerId } : {}),
+      },
     });
 
     return result.count === 1;
   }
 
-  async findAllForAdmin(): Promise<AdminEventRecord[]> {
+  async findAllForAdmin(ownerId?: number): Promise<AdminEventRecord[]> {
     const events = await this.prisma.events.findMany({
+      where: ownerId ? { creator_id: ownerId } : undefined,
       orderBy: { created_at: 'desc' },
       include: {
         _count: { select: { event_guests: true, event_images: true } },
@@ -83,9 +95,13 @@ export class PrismaEventsRepository implements EventsRepository {
 
   async findByPublicIdForAdmin(
     publicId: string,
+    ownerId?: number,
   ): Promise<AdminEventDetailsRecord | null> {
-    const event = await this.prisma.events.findUnique({
-      where: { public_id: publicId },
+    const event = await this.prisma.events.findFirst({
+      where: {
+        public_id: publicId,
+        ...(ownerId ? { creator_id: ownerId } : {}),
+      },
       include: {
         _count: { select: { event_guests: true, event_images: true } },
         event_images: {
@@ -242,6 +258,7 @@ export class PrismaEventsRepository implements EventsRepository {
 
   private toEventRecord(event: {
     id: number;
+    creator_id: number | null;
     public_id: string;
     title: string;
     description: string | null;
@@ -259,6 +276,7 @@ export class PrismaEventsRepository implements EventsRepository {
   }): EventRecord {
     return {
       id: event.id,
+      creatorId: event.creator_id ?? 0,
       publicId: event.public_id,
       title: event.title,
       description: event.description,

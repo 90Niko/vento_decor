@@ -36,7 +36,8 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
         setMessage(await readAuthError(response));
         return;
       }
-      router.replace("/admin/events");
+      const result = (await response.json()) as { creator: { role: "ADMIN" | "CREATOR" } };
+      router.replace(result.creator.role === "ADMIN" ? "/admin/events" : "/dashboard/events");
       router.refresh();
     } catch {
       setMessage("Няма връзка със сървъра. Опитай отново.");

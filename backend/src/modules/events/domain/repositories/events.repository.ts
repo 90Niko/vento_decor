@@ -1,4 +1,5 @@
 export interface CreateEventRecord {
+  creatorId: number;
   title: string;
   description: string | null;
   startAt: Date | null;
@@ -52,11 +53,16 @@ export abstract class EventsRepository {
   abstract updateByPublicId(
     publicId: string,
     data: CreateEventRecord,
+    ownerId?: number,
   ): Promise<EventRecord | null>;
-  abstract deleteByPublicId(publicId: string): Promise<boolean>;
-  abstract findAllForAdmin(): Promise<AdminEventRecord[]>;
+  abstract deleteByPublicId(
+    publicId: string,
+    ownerId?: number,
+  ): Promise<boolean>;
+  abstract findAllForAdmin(ownerId?: number): Promise<AdminEventRecord[]>;
   abstract findByPublicIdForAdmin(
     publicId: string,
+    ownerId?: number,
   ): Promise<AdminEventDetailsRecord | null>;
   abstract findActiveByPublicId(publicId: string): Promise<EventRecord | null>;
   abstract createGuest(data: {

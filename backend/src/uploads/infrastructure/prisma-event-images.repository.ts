@@ -52,11 +52,21 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
   async findById(id: number): Promise<StoredEventImage | null> {
     const image = await this.prisma.event_images.findUnique({
       where: { id },
-      select: { id: true, url: true, public_id: true },
+      select: {
+        id: true,
+        url: true,
+        public_id: true,
+        events: { select: { creator_id: true } },
+      },
     });
 
     return image
-      ? { id: image.id, url: image.url, publicId: image.public_id }
+      ? {
+          id: image.id,
+          url: image.url,
+          publicId: image.public_id,
+          creatorId: image.events.creator_id,
+        }
       : null;
   }
 
@@ -66,10 +76,20 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
   ): Promise<StoredEventImage | null> {
     const image = await this.prisma.event_images.findFirst({
       where: { id, event_id: eventId },
-      select: { id: true, url: true, public_id: true },
+      select: {
+        id: true,
+        url: true,
+        public_id: true,
+        events: { select: { creator_id: true } },
+      },
     });
     return image
-      ? { id: image.id, url: image.url, publicId: image.public_id }
+      ? {
+          id: image.id,
+          url: image.url,
+          publicId: image.public_id,
+          creatorId: image.events.creator_id,
+        }
       : null;
   }
 

@@ -8,6 +8,7 @@ import {
   Put,
   Post,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CreatorAuthGuard } from '../../auth/creator-auth.guard';
 import {
@@ -27,6 +28,8 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { RegisterGuestDto } from './dto/register-guest.dto';
 import { RequestGuestOtpDto } from './dto/request-guest-otp.dto';
 import { VerifyGuestOtpDto } from './dto/verify-guest-otp.dto';
+import type { Request } from 'express';
+import { CreatorSession } from '../../auth/auth.service';
 
 @Controller('events')
 export class EventsController {
@@ -37,22 +40,28 @@ export class EventsController {
 
   @Post()
   @UseGuards(CreatorAuthGuard)
-  create(@Body() dto: CreateEventDto): Promise<CreatedEvent> {
-    return this.eventsService.create(dto);
+  create(
+    @Body() dto: CreateEventDto,
+    @Req() req: Request & { creator: CreatorSession },
+  ): Promise<CreatedEvent> {
+    return this.eventsService.create(dto, req.creator);
   }
 
   @Get('admin')
   @UseGuards(CreatorAuthGuard)
-  findAllForAdmin(): Promise<AdminEventRecord[]> {
-    return this.eventsService.findAllForAdmin();
+  findAllForAdmin(
+    @Req() req: Request & { creator: CreatorSession },
+  ): Promise<AdminEventRecord[]> {
+    return this.eventsService.findAllForAdmin(req.creator);
   }
 
   @Delete('admin/:publicId')
   @UseGuards(CreatorAuthGuard)
   async delete(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Req() req: Request & { creator: CreatorSession },
   ): Promise<{ deleted: true }> {
-    await this.eventsService.delete(publicId);
+    await this.eventsService.delete(publicId, req.creator);
     return { deleted: true };
   }
 
@@ -61,16 +70,18 @@ export class EventsController {
   update(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
     @Body() dto: CreateEventDto,
+    @Req() req: Request & { creator: CreatorSession },
   ) {
-    return this.eventsService.update(publicId, dto);
+    return this.eventsService.update(publicId, dto, req.creator);
   }
 
   @Get('admin/:publicId')
   @UseGuards(CreatorAuthGuard)
   findForAdmin(
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Req() req: Request & { creator: CreatorSession },
   ): Promise<AdminEventDetailsRecord> {
-    return this.eventsService.findForAdmin(publicId);
+    return this.eventsService.findForAdmin(publicId, req.creator);
   }
 
   @Get('public/:publicId')

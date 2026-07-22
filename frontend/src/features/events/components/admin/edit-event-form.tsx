@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
 
-export function EditEventForm({ publicId }: { publicId: string }) {
+export function EditEventForm({ publicId, basePath = "/admin/events" }: { publicId: string; basePath?: string }) {
   const router = useRouter();
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function EditEventForm({ publicId }: { publicId: string }) {
     });
     setSaving(false);
     if (!response.ok) return setError("Промените не могат да бъдат запазени.");
-    router.push(`/admin/events/${publicId}`);
+    router.push(`${basePath}/${publicId}`);
     router.refresh();
   }
 

@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { GuestAccessService } from '../modules/events/application/guest-access.service';
 import {
@@ -12,6 +13,7 @@ import {
   EventImagesRepository,
   GuestGalleryImage,
 } from './domain/event-images.repository';
+import { CreatorSession } from '../modules/auth/auth.service';
 
 export interface UploadedEventImage extends UploadedImage {
   id: number;
@@ -77,8 +79,11 @@ export class UploadsService {
     }
   }
 
-  async deleteEventImage(imageId: number): Promise<void> {
-    const image = await this.requireEventImage(imageId);
+  async deleteEventImage(
+    imageId: number,
+    creator: CreatorSession,
+  ): Promise<void> {
+    const image = await this.requireOwnedEventImage(imageId, creator);
     await this.cloudinaryService.deleteImage(image.publicId);
     await this.eventImagesRepository.deleteById(image.id);
   }
@@ -129,8 +134,11 @@ export class UploadsService {
     return this.cloudinaryService.getDownloadUrl(image.url);
   }
 
-  async getEventImageDownloadUrl(imageId: number): Promise<string> {
-    const image = await this.requireEventImage(imageId);
+  async getEventImageDownloadUrl(
+    imageId: number,
+    creator: CreatorSession,
+  ): Promise<string> {
+    const image = await this.requireOwnedEventImage(imageId, creator);
     return this.cloudinaryService.getDownloadUrl(image.url);
   }
 
@@ -146,6 +154,17 @@ export class UploadsService {
       throw new NotFoundException('Снимката от събитието не е намерена.');
     }
 
+    return image;
+  }
+
+  private async requireOwnedEventImage(
+    imageId: number,
+    creator: CreatorSession,
+  ) {
+    const image = await this.requireEventImage(imageId);
+    if (creator.role !== 'ADMIN' && image.creatorId !== creator.id) {
+      throw new ForbiddenException('Нямате достъп до тази снимка.');
+    }
     return image;
   }
 }

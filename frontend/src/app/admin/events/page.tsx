@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "@/shared/components/brand-lockup";
+import { CreatorsAdminPanel } from "@/features/auth/components/creators-admin-panel";
 
 export default function AdminEventsPage() {
   return (
@@ -12,6 +13,7 @@ export default function AdminEventsPage() {
           <nav className="mt-12 space-y-2" aria-label="Админ навигация">
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />
             <NavItem href="#events" label="Събития" icon={<CalendarIcon />} />
+            <NavItem href="#creators" label="Creators" icon={<DashboardIcon />} />
             <NavItem href="/admin/events/new" label="Създай събитие" icon={<PlusIcon />} />
           </nav>
           <div className="mt-auto rounded-2xl bg-[#173b57] p-4 text-white">
@@ -51,6 +53,7 @@ export default function AdminEventsPage() {
                 </p>
               </div>
             </section>
+            <CreatorsAdminPanel />
             <AdminEventsDashboard />
           </div>
         </div>

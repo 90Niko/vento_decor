@@ -26,7 +26,7 @@ const COLOR_THEMES = [
   ["midnight", "#171b2e", "#59658f", "Полунощ"],
 ] as const;
 
-export function CreateEventForm() {
+export function CreateEventForm({ basePath = "/admin/events" }: { basePath?: string }) {
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,8 +111,8 @@ export function CreateEventForm() {
           </p>
           <p className="mt-5 break-all rounded-xl bg-[#173b57]/5 px-4 py-3 text-sm">{publicUrl}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/admin/events" className="primary-action">Към дашборда</Link>
-            <Link href={`/admin/events/${created.publicId}`} className="secondary-action">Отвори събитието</Link>
+            <Link href={basePath} className="primary-action">Към дашборда</Link>
+            <Link href={`${basePath}/${created.publicId}`} className="secondary-action">Отвори събитието</Link>
           </div>
         </div>
         <div className="rounded-2xl bg-white p-4 shadow-xl">

@@ -11,6 +11,7 @@ import {
   EventsRepository,
 } from '../domain/repositories/events.repository';
 import { CreateEventDto } from '../presentation/dto/create-event.dto';
+import { CreatorSession } from '../../auth/auth.service';
 
 export interface CreatedEvent extends EventRecord {
   publicUrl: string;
@@ -37,7 +38,10 @@ export class EventsService {
     private readonly configService: ConfigService,
   ) {}
 
-  async create(dto: CreateEventDto): Promise<CreatedEvent> {
+  async create(
+    dto: CreateEventDto,
+    creator: CreatorSession,
+  ): Promise<CreatedEvent> {
     const startAt = dto.startAt ? new Date(dto.startAt) : null;
     const endAt = dto.endAt ? new Date(dto.endAt) : null;
 
@@ -48,6 +52,7 @@ export class EventsService {
     }
 
     const event = await this.eventsRepository.create({
+      creatorId: creator.id,
       title: dto.title.trim(),
       description: dto.description?.trim() || null,
       startAt,
@@ -69,7 +74,11 @@ export class EventsService {
     };
   }
 
-  async update(publicId: string, dto: CreateEventDto): Promise<EventRecord> {
+  async update(
+    publicId: string,
+    dto: CreateEventDto,
+    creator: CreatorSession,
+  ): Promise<EventRecord> {
     const startAt = dto.startAt ? new Date(dto.startAt) : null;
     const endAt = dto.endAt ? new Date(dto.endAt) : null;
     if (startAt && endAt && endAt < startAt) {
@@ -77,21 +86,32 @@ export class EventsService {
         'Крайната дата трябва да бъде след началната дата.',
       );
     }
-    const existing = await this.eventsRepository.findByPublicIdForAdmin(publicId);
+    const ownerId = creator.role === 'ADMIN' ? undefined : creator.id;
+    const existing = await this.eventsRepository.findByPublicIdForAdmin(
+      publicId,
+      ownerId,
+    );
     if (!existing) throw new NotFoundException('Събитието не е намерено.');
-    const updated = await this.eventsRepository.updateByPublicId(publicId, {
-      title: dto.title.trim(),
-      description: dto.description?.trim() || null,
-      startAt,
-      endAt,
-      location: dto.location.trim(),
-      eventType: dto.eventType ?? 'other',
-      uploadDeadline: dto.uploadDeadline ? new Date(dto.uploadDeadline) : null,
-      coverImageUrl: dto.coverImageUrl?.trim() || existing.coverImageUrl,
-      coverImagePublicId:
-        dto.coverImagePublicId?.trim() || existing.coverImagePublicId,
-      themeColor: dto.themeColor ?? 'ocean',
-    });
+    const updated = await this.eventsRepository.updateByPublicId(
+      publicId,
+      {
+        creatorId: existing.creatorId,
+        title: dto.title.trim(),
+        description: dto.description?.trim() || null,
+        startAt,
+        endAt,
+        location: dto.location.trim(),
+        eventType: dto.eventType ?? 'other',
+        uploadDeadline: dto.uploadDeadline
+          ? new Date(dto.uploadDeadline)
+          : null,
+        coverImageUrl: dto.coverImageUrl?.trim() || existing.coverImageUrl,
+        coverImagePublicId:
+          dto.coverImagePublicId?.trim() || existing.coverImagePublicId,
+        themeColor: dto.themeColor ?? 'ocean',
+      },
+      ownerId,
+    );
     if (!updated) throw new NotFoundException('Събитието не е намерено.');
     return updated;
   }
@@ -116,19 +136,30 @@ export class EventsService {
     };
   }
 
-  findAllForAdmin(): Promise<AdminEventRecord[]> {
-    return this.eventsRepository.findAllForAdmin();
+  findAllForAdmin(creator: CreatorSession): Promise<AdminEventRecord[]> {
+    return this.eventsRepository.findAllForAdmin(
+      creator.role === 'ADMIN' ? undefined : creator.id,
+    );
   }
 
-  async delete(publicId: string): Promise<void> {
-    const deleted = await this.eventsRepository.deleteByPublicId(publicId);
+  async delete(publicId: string, creator: CreatorSession): Promise<void> {
+    const deleted = await this.eventsRepository.deleteByPublicId(
+      publicId,
+      creator.role === 'ADMIN' ? undefined : creator.id,
+    );
     if (!deleted) {
       throw new NotFoundException('Събитието не е намерено.');
     }
   }
 
-  async findForAdmin(publicId: string): Promise<AdminEventDetailsRecord> {
-    const event = await this.eventsRepository.findByPublicIdForAdmin(publicId);
+  async findForAdmin(
+    publicId: string,
+    creator: CreatorSession,
+  ): Promise<AdminEventDetailsRecord> {
+    const event = await this.eventsRepository.findByPublicIdForAdmin(
+      publicId,
+      creator.role === 'ADMIN' ? undefined : creator.id,
+    );
     if (!event) {
       throw new NotFoundException('Събитието не е намерено.');
     }

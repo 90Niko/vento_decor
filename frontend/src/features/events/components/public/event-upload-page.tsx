@@ -40,7 +40,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
 
   useEffect(() => {
     let isActive = true;
-    const stored = sessionStorage.getItem(guestSessionKey(publicId));
+    const stored = localStorage.getItem(guestSessionKey(publicId));
     if (!stored) {
       router.replace(`/event/${publicId}`);
       return () => {
@@ -57,7 +57,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         if (isActive) setSession({ token: parsed.token!, name: parsed.name! });
       });
     } catch {
-      sessionStorage.removeItem(guestSessionKey(publicId));
+      localStorage.removeItem(guestSessionKey(publicId));
       router.replace(`/event/${publicId}`);
     }
 
@@ -87,11 +87,14 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       );
       if (response.ok) {
         setGallery((await response.json()) as GalleryImage[]);
+      } else if (response.status === 401) {
+        localStorage.removeItem(guestSessionKey(publicId));
+        router.replace(`/event/${publicId}`);
       }
     } finally {
       setIsGalleryLoading(false);
     }
-  }, [publicId, session]);
+  }, [publicId, router, session]);
 
   useEffect(() => {
     queueMicrotask(() => void loadGallery());

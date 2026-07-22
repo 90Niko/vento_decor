@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,10 +18,11 @@ export interface CreatorSession {
   id: number;
   name: string;
   email: string;
+  role: 'ADMIN' | 'CREATOR';
 }
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   private readonly secret: string;
 
   constructor(
@@ -35,12 +37,32 @@ export class AuthService {
       configuredSecret || 'vento-decor-development-secret-change-in-production';
   }
 
+  async onModuleInit(): Promise<void> {
+    const admin = await this.prisma.creators.findFirst({
+      where: { role: 'ADMIN' },
+      select: { id: true },
+    });
+    if (admin) return;
+
+    const firstCreator = await this.prisma.creators.findFirst({
+      orderBy: { id: 'asc' },
+      select: { id: true },
+    });
+    if (!firstCreator) return;
+
+    await this.prisma.$transaction([
+      this.prisma.creators.update({
+        where: { id: firstCreator.id },
+        data: { role: 'ADMIN', is_active: true },
+      }),
+      this.prisma.events.updateMany({
+        where: { creator_id: null },
+        data: { creator_id: firstCreator.id },
+      }),
+    ]);
+  }
+
   async register(dto: RegisterDto) {
-    if ((await this.prisma.creators.count()) > 0) {
-      throw new ConflictException(
-        'Регистрацията е затворена. Влезте със съществуващия администраторски профил.',
-      );
-    }
     const email = dto.email.trim().toLowerCase();
     if (await this.prisma.creators.findUnique({ where: { email } })) {
       throw new ConflictException('Вече има профил с този имейл.');
@@ -50,6 +72,7 @@ export class AuthService {
         name: dto.name.trim(),
         email,
         password_hash: await this.hashPassword(dto.password),
+        role: 'CREATOR',
       },
     });
     return this.createSession(creator);
@@ -61,6 +84,7 @@ export class AuthService {
     });
     if (
       !creator ||
+      !creator.is_active ||
       !(await this.verifyPassword(dto.password, creator.password_hash))
     ) {
       throw new UnauthorizedException('Невалиден имейл или парола.');
@@ -81,17 +105,50 @@ export class AuthService {
         Buffer.from(payload, 'base64url').toString(),
       ) as CreatorSession & { exp: number };
       if (data.exp < Math.floor(Date.now() / 1000)) return null;
-      return { id: data.id, name: data.name, email: data.email };
+      return {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role === 'ADMIN' ? 'ADMIN' : 'CREATOR',
+      };
     } catch {
       return null;
     }
   }
 
-  private createSession(creator: CreatorSession) {
+  async authenticateSession(
+    token: string | undefined,
+  ): Promise<CreatorSession | null> {
+    const session = this.verifySession(token);
+    if (!session) return null;
+    const creator = await this.prisma.creators.findUnique({
+      where: { id: session.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        is_active: true,
+      },
+    });
+    if (!creator?.is_active) return null;
+    return {
+      id: creator.id,
+      name: creator.name,
+      email: creator.email,
+      role: creator.role === 'ADMIN' ? 'ADMIN' : 'CREATOR',
+    };
+  }
+
+  private createSession(
+    creator: Omit<CreatorSession, 'role'> & { role: string },
+  ) {
     const safeCreator = {
       id: creator.id,
       name: creator.name,
       email: creator.email,
+      role:
+        creator.role === 'ADMIN' ? ('ADMIN' as const) : ('CREATOR' as const),
     };
     const payload = Buffer.from(
       JSON.stringify({

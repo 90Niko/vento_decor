@@ -40,6 +40,12 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const theme = getTheme(event?.themeColor);
 
   useEffect(() => {
+    const savedSession = localStorage.getItem(guestSessionKey(publicId));
+    if (savedSession) {
+      router.replace(`/event/${publicId}/upload`);
+      return;
+    }
+
     const controller = new AbortController();
 
     async function loadEvent() {
@@ -69,7 +75,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
 
     void loadEvent();
     return () => controller.abort();
-  }, [publicId]);
+  }, [publicId, router]);
 
   async function handleSubmit(submitEvent: FormEvent<HTMLFormElement>) {
     submitEvent.preventDefault();
@@ -92,7 +98,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
       }
 
       const registration = (await response.json()) as GuestRegistration;
-      sessionStorage.setItem(
+      localStorage.setItem(
         guestSessionKey(publicId),
         JSON.stringify({
           token: registration.token,

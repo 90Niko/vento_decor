@@ -19,7 +19,7 @@ interface AdminEvent {
 
 type EventFilter = "all" | "active" | "inactive";
 
-export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
+export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: { refreshVersion: number; basePath?: string }) {
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,7 +186,7 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
                 key={event.id}
                 className="group grid gap-4 p-5 transition hover:bg-[#eaf6ff]/55 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7"
               >
-                <Link href={`/admin/events/${event.publicId}`} className="contents">
+                <Link href={`${basePath}/${event.publicId}`} className="contents">
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#173b57] text-sm font-bold text-white shadow-lg shadow-[#173b57]/10">
                     {getInitials(event.title)}
@@ -219,7 +219,7 @@ export function AllEventsPanel({ refreshVersion }: { refreshVersion: number }) {
                 </Link>
                 <div className="ml-16 flex items-center gap-2 sm:ml-0">
                   <Link
-                    href={`/admin/events/${event.publicId}/edit`}
+                    href={`${basePath}/${event.publicId}/edit`}
                     aria-label={`Редактирай ${event.title}`}
                     title="Редактирай събитието"
                     className="grid h-9 w-9 place-items-center rounded-full border border-[#5aa9d6]/40 text-[#5aa9d6] transition hover:border-[#5aa9d6] hover:bg-[#5aa9d6] hover:text-white"

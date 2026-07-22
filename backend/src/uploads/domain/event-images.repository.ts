@@ -13,6 +13,7 @@ export interface StoredEventImage {
   id: number;
   url: string;
   publicId: string;
+  creatorId: number | null;
 }
 
 export interface GuestGalleryImage {
