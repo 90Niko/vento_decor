@@ -6,12 +6,8 @@ export default function Home() {
     <main className="page-canvas min-h-screen pb-20 text-[#173b57]">
       <div className="page-container relative">
         <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
-          <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
+          <div className="surface-card flex items-center rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
             <BrandLockup subtitle="Галерия за красиви моменти" />
-            <Link href="/login" className="secondary-action px-4 py-2.5 text-xs sm:text-sm">
-              Вход за създатели
-              <span aria-hidden="true">→</span>
-            </Link>
           </div>
         </header>
 
