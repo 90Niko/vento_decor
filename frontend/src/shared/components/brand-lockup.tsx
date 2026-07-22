@@ -4,12 +4,14 @@ interface BrandLockupProps {
   subtitle: string;
   href?: string;
   inverse?: boolean;
+  iconOnly?: boolean;
 }
 
 export function BrandLockup({
   subtitle,
   href = "/",
   inverse = false,
+  iconOnly = false,
 }: BrandLockupProps) {
   return (
     <Link href={href} className="group inline-flex items-center gap-3.5">
@@ -23,7 +25,7 @@ export function BrandLockup({
         <span className="absolute -right-3 -bottom-3 h-7 w-7 rounded-full bg-[#5aa9d6]/70" />
         <span className="relative text-sm font-bold">V</span>
       </span>
-      <span>
+      {!iconOnly && <span>
         <span className="block text-sm font-bold tracking-[0.16em] uppercase">
           Vento Decor
         </span>
@@ -32,7 +34,7 @@ export function BrandLockup({
         >
           {subtitle}
         </span>
-      </span>
+      </span>}
     </Link>
   );
 }
