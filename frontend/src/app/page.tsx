@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BrandLockup } from "@/shared/components/brand-lockup";
-import { SiteFooter } from "@/shared/components/site-footer";
 
 export default function Home() {
   return (
@@ -122,17 +121,13 @@ export default function Home() {
           <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.045em] text-balance sm:text-5xl">
             Създай място за спомените от твоето събитие.
           </h2>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-8 flex justify-center">
             <Link href="/register" className="rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#173b57] transition hover:-translate-y-0.5 hover:bg-[#eaf6ff]">
-              Създай профил →
-            </Link>
-            <Link href="/login" className="rounded-full border border-white/20 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10">
-              Вече имам профил
+              Започни сега →
             </Link>
           </div>
         </section>
       </div>
-      <SiteFooter />
     </main>
   );
 }
