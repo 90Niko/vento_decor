@@ -23,7 +23,7 @@ export function RouteChrome() {
 function PublicBottomNavigation({ pathname }: { pathname: string }) {
   const items = [
     { href: "/", label: "Начало", icon: <HomeIcon /> },
-    { href: "/register", label: "Регистрация", icon: <PlusIcon />, primary: true },
+    { href: "/register", label: "Регистрация", icon: <PlusIcon /> },
     { href: "/login", label: "Вход", icon: <LoginIcon /> },
   ];
 
@@ -32,7 +32,7 @@ function PublicBottomNavigation({ pathname }: { pathname: string }) {
       <div className="h-24 md:hidden" aria-hidden="true" />
       <nav
         aria-label="Основна мобилна навигация"
-        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid grid-cols-3 items-end rounded-[1.4rem] border border-white/80 bg-white/90 px-2 py-2 shadow-[0_18px_55px_rgb(23_59_87/24%)] backdrop-blur-xl md:hidden"
+        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] grid-cols-3 items-center rounded-[1.4rem] border border-white/80 bg-white/90 px-4 shadow-[0_18px_55px_rgb(23_59_87/24%)] backdrop-blur-xl md:hidden"
       >
         {items.map((item) => {
           const active = pathname === item.href;
@@ -40,17 +40,19 @@ function PublicBottomNavigation({ pathname }: { pathname: string }) {
             <Link
               key={item.href}
               href={item.href}
+              aria-label={item.label}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-bold transition active:scale-95 ${
-                item.primary
-                  ? "mx-auto -mt-6 h-16 w-16 bg-[#173b57] text-white shadow-[0_10px_26px_rgb(23_59_87/30%)]"
-                  : active
-                    ? "bg-[#5aa9d6]/12 text-[#173b57]"
-                    : "text-[#173b57]/52 hover:bg-[#173b57]/5 hover:text-[#173b57]"
+              className={`relative mx-auto grid h-12 w-12 place-items-center transition active:scale-90 ${
+                active ? "text-[#173b57]" : "text-[#173b57]/38 hover:text-[#5aa9d6]"
               }`}
             >
-              <span className={item.primary ? "text-white" : "text-[#5aa9d6]"}>{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="transition-transform duration-300">{item.icon}</span>
+              <span
+                aria-hidden="true"
+                className={`absolute -bottom-1 h-0.5 rounded-full bg-[#5aa9d6] transition-all duration-300 ${
+                  active ? "w-6 opacity-100" : "w-0 opacity-0"
+                }`}
+              />
             </Link>
           );
         })}
