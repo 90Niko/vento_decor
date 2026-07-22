@@ -10,7 +10,7 @@ export default function CreatorDashboardPage() {
         <div className="mx-auto flex h-[76px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
           <BrandLockup subtitle="Creator dashboard" />
           <div className="flex items-center gap-3">
-            <Link href="/dashboard/events/new" className="primary-action hidden px-4 py-2.5 text-sm sm:inline-flex">+ Ново събитие</Link>
+            <Link href="/dashboard/events/new" className="primary-action px-4 py-2.5 text-sm">+ Ново събитие</Link>
             <LogoutButton />
           </div>
         </div>

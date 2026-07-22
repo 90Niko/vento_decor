@@ -24,16 +24,7 @@ export default function Home() {
             <p className="mt-6 max-w-2xl text-base leading-7 text-[#173b57]/68 sm:text-lg sm:leading-8">
               Създай събитие, сподели личния му линк и събери снимките на всички гости в една подредена галерия.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/register" className="primary-action">
-                Създай профил
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link href="/login" className="secondary-action">
-                Вече имам профил
-              </Link>
-            </div>
-            <p className="mt-5 text-xs leading-5 text-[#173b57]/52">
+            <p className="mt-7 text-xs leading-5 text-[#173b57]/52">
               Гостите не се регистрират — те качват снимки през линка на конкретното събитие.
             </p>
           </div>
