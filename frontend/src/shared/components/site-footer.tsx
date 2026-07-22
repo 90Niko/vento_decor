@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BrandLockup } from "./brand-lockup";
 
 export function SiteFooter() {
@@ -16,22 +15,41 @@ export function SiteFooter() {
         </div>
 
         <div className="sm:text-right">
-          <nav aria-label="Навигация във футъра" className="flex gap-5 text-sm font-semibold sm:justify-end">
-            <Link href="/" className="transition hover:text-[#eaf6ff]">
-              Начало
-            </Link>
-            <Link
-              href="/login"
-              className="transition hover:text-[#eaf6ff]"
-            >
-              Вход за creators
-            </Link>
-          </nav>
+          <p className="text-xs font-bold tracking-[0.14em] text-[#8ed3f4] uppercase">
+            Последвай ни
+          </p>
+          <div className="mt-3 flex gap-2 sm:justify-end" aria-label="Социални мрежи">
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/[0.07] text-white" title="Instagram">
+              <InstagramIcon />
+            </span>
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/[0.07] text-white" title="TikTok">
+              <TikTokIcon />
+            </span>
+          </div>
           <p className="mt-5 text-xs text-[#eaf6ff]/70">
             © {new Date().getFullYear()} Vento Decor. Всички права запазени.
           </p>
         </div>
       </div>
     </footer>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="17.4" cy="6.7" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function TikTokIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M14.5 3v11.1a4.8 4.8 0 1 1-4.1-4.75" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="M14.5 3c.6 3.1 2.3 4.8 5.5 5.2" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
   );
 }
