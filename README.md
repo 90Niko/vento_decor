@@ -44,9 +44,9 @@ The frontend runs at `http://localhost:3002` and the backend runs at
 
 ## Database changes
 
-Versioned production SQL files are kept in `backend/prisma/sql`. The Railway
-start command runs the idempotent deployment scripts before starting the API.
-For other environments, run `npm --prefix backend run db:deploy` explicitly.
+Versioned SQL references are kept in `backend/prisma/sql`. Railway synchronizes
+the additive Prisma schema changes before starting the API. For other
+environments, run `npm --prefix backend run db:deploy` explicitly.
 
 ## Commands
 
