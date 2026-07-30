@@ -324,18 +324,17 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                 >
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.matchMedia("(max-width: 767px)").matches) {
-                        setActiveImageIndex(index);
-                      }
-                    }}
+                    onClick={() => setActiveImageIndex(index)}
                     onDoubleClick={() => {
-                      if (window.matchMedia("(min-width: 768px)").matches) {
+                      if (
+                        window.matchMedia("(min-width: 768px)").matches &&
+                        !isVideoUrl(image.url)
+                      ) {
                         void toggleLike(image.id);
                       }
                     }}
-                    className="relative block aspect-square w-full overflow-hidden bg-black/5 md:cursor-default"
-                    aria-label={`Отвори снимка от ${image.guestName ?? "гост"}`}
+                    className="relative block aspect-square w-full overflow-hidden bg-black/5"
+                    aria-label={`${isVideoUrl(image.url) ? "Пусни видео" : "Отвори снимка"} от ${image.guestName ?? "гост"}`}
                   >
                     {isVideoUrl(image.url) ? (
                       <>
@@ -435,6 +434,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                     className="absolute inset-0 h-full w-full object-contain"
                     controls
                     autoPlay
+                    muted
                     playsInline
                   />
                 ) : (
