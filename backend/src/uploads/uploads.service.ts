@@ -1,8 +1,10 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ServiceUnavailableException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { GuestAccessService } from '../modules/events/application/guest-access.service';
 import {
@@ -22,6 +24,8 @@ export interface UploadedEventImage extends UploadedImage {
 
 @Injectable()
 export class UploadsService {
+  private readonly logger = new Logger(UploadsService.name);
+
   constructor(
     private readonly cloudinaryService: CloudinaryService,
     private readonly guestAccessService: GuestAccessService,
@@ -43,6 +47,16 @@ export class UploadsService {
       publicId,
       guestToken,
     );
+    if (event.uploadDeadline && event.uploadDeadline < new Date()) {
+      throw new ForbiddenException('The upload deadline has passed.');
+    }
+    for (const file of files) {
+      if (!hasAllowedFileSignature(file)) {
+        throw new BadRequestException(
+          `The file "${file.originalname}" does not match an allowed media format.`,
+        );
+      }
+    }
     const uploadResults = await Promise.allSettled(
       files.map((file) => this.cloudinaryService.uploadImage(file)),
     );
@@ -84,11 +98,17 @@ export class UploadsService {
     creator: CreatorSession,
   ): Promise<void> {
     const image = await this.requireOwnedEventImage(imageId, creator);
-    await this.cloudinaryService.deleteImage(
-      image.publicId,
-      this.getResourceType(image.url),
-    );
     await this.eventImagesRepository.deleteById(image.id);
+    try {
+      await this.cloudinaryService.deleteImage(
+        image.publicId,
+        this.getResourceType(image.url),
+      );
+    } catch {
+      this.logger.warn(
+        `Database image ${image.id} was deleted, but Cloudinary cleanup must be retried for ${image.publicId}.`,
+      );
+    }
   }
 
   async getGuestGallery(
@@ -176,4 +196,36 @@ export class UploadsService {
     }
     return image;
   }
+}
+
+function hasAllowedFileSignature(file: Express.Multer.File): boolean {
+  const bytes = file.buffer;
+  if (bytes.length < 12) return false;
+  const hex = bytes.subarray(0, 12).toString('hex');
+  const ascii = bytes.subarray(4, 12).toString('ascii');
+
+  if (file.mimetype.startsWith('image/')) {
+    return (
+      hex.startsWith('ffd8ff') ||
+      hex.startsWith('89504e470d0a1a0a') ||
+      hex.startsWith('474946383761') ||
+      hex.startsWith('474946383961') ||
+      (hex.startsWith('52494646') && ascii.endsWith('WEBP')) ||
+      ascii.startsWith('ftypavif') ||
+      ascii.startsWith('ftypheic') ||
+      ascii.startsWith('ftypheif') ||
+      ascii.startsWith('ftypmif1')
+    );
+  }
+
+  if (file.mimetype.startsWith('video/')) {
+    return (
+      ascii.startsWith('ftyp') ||
+      hex.startsWith('1a45dfa3') ||
+      hex.startsWith('000001ba') ||
+      hex.startsWith('000001b3')
+    );
+  }
+
+  return false;
 }

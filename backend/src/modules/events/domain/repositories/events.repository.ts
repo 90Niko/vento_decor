@@ -10,6 +10,7 @@ export interface CreateEventRecord {
   coverImageUrl: string | null;
   coverImagePublicId: string | null;
   themeColor: string;
+  requireGuestOtp: boolean;
 }
 
 export interface EventRecord extends CreateEventRecord {
@@ -27,6 +28,7 @@ export interface GuestRecord {
   email: string | null;
   sessionTokenHash: string;
   createdAt: Date;
+  sessionExpiresAt: Date;
 }
 
 export interface AdminEventRecord extends EventRecord {
@@ -65,16 +67,12 @@ export abstract class EventsRepository {
     ownerId?: number,
   ): Promise<AdminEventDetailsRecord | null>;
   abstract findActiveByPublicId(publicId: string): Promise<EventRecord | null>;
-  abstract createGuest(data: {
-    eventId: number;
-    name: string;
-    sessionTokenHash: string;
-  }): Promise<GuestRecord>;
   abstract upsertGuest(data: {
     eventId: number;
     email: string;
     name: string;
     sessionTokenHash: string;
+    sessionExpiresAt: Date;
   }): Promise<GuestRecord>;
   abstract createOtpChallenge(data: {
     eventId: number;
@@ -87,7 +85,7 @@ export abstract class EventsRepository {
     eventId: number;
     email: string;
     codeHash: string;
-  }): Promise<{ name: string } | null>;
+  }): Promise<{ name: string; matched: boolean } | null>;
   abstract findGuestBySession(data: {
     eventId: number;
     sessionTokenHash: string;

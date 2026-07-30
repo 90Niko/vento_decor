@@ -29,6 +29,7 @@ export type PublicEvent = Pick<
   | 'uploadDeadline'
   | 'coverImageUrl'
   | 'themeColor'
+  | 'requireGuestOtp'
 >;
 
 @Injectable()
@@ -63,6 +64,8 @@ export class EventsService {
       coverImageUrl: dto.coverImageUrl?.trim() || null,
       coverImagePublicId: dto.coverImagePublicId?.trim() || null,
       themeColor: dto.themeColor ?? 'ocean',
+      requireGuestOtp:
+        creator.role === 'ADMIN' ? (dto.requireGuestOtp ?? false) : false,
     });
     const publicAppUrl = this.configService
       .get<string>('PUBLIC_APP_URL', 'http://localhost:3002')
@@ -109,6 +112,10 @@ export class EventsService {
         coverImagePublicId:
           dto.coverImagePublicId?.trim() || existing.coverImagePublicId,
         themeColor: dto.themeColor ?? 'ocean',
+        requireGuestOtp:
+          creator.role === 'ADMIN'
+            ? (dto.requireGuestOtp ?? existing.requireGuestOtp)
+            : existing.requireGuestOtp,
       },
       ownerId,
     );
@@ -133,6 +140,7 @@ export class EventsService {
       uploadDeadline: event.uploadDeadline,
       coverImageUrl: event.coverImageUrl,
       themeColor: event.themeColor,
+      requireGuestOtp: event.requireGuestOtp,
     };
   }
 

@@ -23,7 +23,9 @@ export class ResendGuestOtpEmailService {
     );
 
     if (!isConfigured && process.env.NODE_ENV !== 'production') {
-      this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+      if (process.env.NODE_ENV !== 'production') {
+        this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+      }
       return false;
     }
     if (!isConfigured) {
@@ -51,7 +53,9 @@ export class ResendGuestOtpEmailService {
         `Resend rejected OTP email with status ${response.status}.`,
       );
       if (process.env.NODE_ENV !== 'production') {
-        this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+        if (process.env.NODE_ENV !== 'production') {
+          this.logger.warn(`Development OTP for ${input.to}: ${input.code}`);
+        }
         return false;
       }
       throw new ServiceUnavailableException(

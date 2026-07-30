@@ -17,8 +17,8 @@ import { memoryStorage } from 'multer';
 import { UploadedEventImage, UploadsService } from './uploads.service';
 import { GuestGalleryImage } from './domain/event-images.repository';
 
-const MAX_FILES = 10;
-const MAX_FILE_SIZE = 100 * 1024 * 1024;
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
 @Controller('events/public/:publicId/images')
 export class EventUploadsController {
@@ -86,7 +86,7 @@ export class EventUploadsController {
           new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE }),
           new FileTypeValidator({
             fileType:
-              /^(image\/(jpeg|png|webp|gif|avif|heic|heif|svg\+xml)|video\/(mp4|quicktime|webm|x-m4v|mpeg))$/,
+              /^(image\/(jpeg|png|webp|gif|avif|heic|heif)|video\/(mp4|quicktime|webm|x-m4v|mpeg))$/,
             fallbackToMimetype: true,
             errorMessage:
               'Файлът трябва да бъде изображение или MP4, MOV, WebM, M4V или MPEG видео.',

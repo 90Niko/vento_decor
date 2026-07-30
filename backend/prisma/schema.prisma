@@ -11,18 +11,18 @@ datasource db {
 }
 
 model event_images {
-  id           Int           @id @default(autoincrement()) @db.UnsignedInt
-  event_id     Int           @db.UnsignedInt
-  guest_id     Int?          @db.UnsignedInt
-  url          String        @db.Text
-  public_id    String        @unique(map: "uq_event_images_public_id") @db.VarChar(255)
-  alt_text     String?       @db.VarChar(255)
-  position     Int           @default(0) @db.UnsignedInt
-  is_cover     Boolean       @default(false)
-  created_at   DateTime      @default(now()) @db.Timestamp(0)
-  updated_at   DateTime      @default(now()) @db.Timestamp(0)
-  events       events        @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_event_images_event")
-  event_guests event_guests? @relation(fields: [guest_id], references: [id], onUpdate: Restrict, map: "fk_event_images_guest")
+  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
+  event_id          Int                 @db.UnsignedInt
+  guest_id          Int?                @db.UnsignedInt
+  url               String              @db.Text
+  public_id         String              @unique(map: "uq_event_images_public_id") @db.VarChar(255)
+  alt_text          String?             @db.VarChar(255)
+  position          Int                 @default(0) @db.UnsignedInt
+  is_cover          Boolean             @default(false)
+  created_at        DateTime            @default(now()) @db.Timestamp(0)
+  updated_at        DateTime            @default(now()) @db.Timestamp(0)
+  events            events              @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_event_images_event")
+  event_guests      event_guests?       @relation(fields: [guest_id], references: [id], onUpdate: Restrict, map: "fk_event_images_guest")
   event_image_likes event_image_likes[]
 
   @@index([event_id, is_cover], map: "idx_event_images_event_cover")
@@ -32,26 +32,27 @@ model event_images {
 }
 
 model events {
-  id           Int            @id @default(autoincrement()) @db.UnsignedInt
-  creator_id   Int?           @db.UnsignedInt
-  public_id    String         @unique(map: "uq_events_public_id") @default(uuid()) @db.Char(36)
-  title        String         @db.VarChar(150)
-  description  String?        @db.Text
-  start_at     DateTime?      @db.DateTime(0)
-  end_at       DateTime?      @db.DateTime(0)
-  location     String?        @db.VarChar(255)
-  event_type   String         @default("other") @db.VarChar(40)
-  upload_deadline DateTime?   @db.DateTime(0)
-  cover_image_url String?     @db.Text
-  cover_image_public_id String? @db.VarChar(255)
-  theme_color String          @default("ocean") @db.VarChar(30)
-  is_active    Boolean        @default(true)
-  created_at   DateTime       @default(now()) @db.Timestamp(0)
-  updated_at   DateTime       @default(now()) @db.Timestamp(0)
-  event_guests event_guests[]
-  event_images event_images[]
-  guest_otp_challenges guest_otp_challenges[]
-  creators     creators?      @relation(fields: [creator_id], references: [id], onDelete: SetNull, map: "fk_events_creator")
+  id                    Int                    @id @default(autoincrement()) @db.UnsignedInt
+  creator_id            Int?                   @db.UnsignedInt
+  public_id             String                 @unique(map: "uq_events_public_id") @default(uuid()) @db.Char(36)
+  title                 String                 @db.VarChar(150)
+  description           String?                @db.Text
+  start_at              DateTime?              @db.DateTime(0)
+  end_at                DateTime?              @db.DateTime(0)
+  location              String?                @db.VarChar(255)
+  event_type            String                 @default("other") @db.VarChar(40)
+  upload_deadline       DateTime?              @db.DateTime(0)
+  cover_image_url       String?                @db.Text
+  cover_image_public_id String?                @db.VarChar(255)
+  theme_color           String                 @default("ocean") @db.VarChar(30)
+  require_guest_otp     Boolean                @default(false)
+  is_active             Boolean                @default(true)
+  created_at            DateTime               @default(now()) @db.Timestamp(0)
+  updated_at            DateTime               @default(now()) @db.Timestamp(0)
+  event_guests          event_guests[]
+  event_images          event_images[]
+  guest_otp_challenges  guest_otp_challenges[]
+  creators              creators?              @relation(fields: [creator_id], references: [id], onDelete: SetNull, map: "fk_events_creator")
 
   @@index([is_active, start_at], map: "idx_events_active_start")
   @@index([creator_id], map: "idx_events_creator_id")
@@ -70,27 +71,28 @@ model creators {
 }
 
 model event_guests {
-  id                 Int            @id @default(autoincrement()) @db.UnsignedInt
-  event_id           Int            @db.UnsignedInt
-  name               String         @db.VarChar(100)
-  email              String?        @db.VarChar(255)
-  session_token_hash String         @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
-  created_at         DateTime       @default(now()) @db.Timestamp(0)
-  updated_at         DateTime       @default(now()) @db.Timestamp(0)
-  events             events         @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_event_guests_event")
+  id                 Int                 @id @default(autoincrement()) @db.UnsignedInt
+  event_id           Int                 @db.UnsignedInt
+  name               String              @db.VarChar(100)
+  email              String?             @db.VarChar(255)
+  session_token_hash String              @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
+  session_expires_at DateTime            @db.DateTime(0)
+  created_at         DateTime            @default(now()) @db.Timestamp(0)
+  updated_at         DateTime            @default(now()) @db.Timestamp(0)
+  events             events              @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_event_guests_event")
   event_images       event_images[]
   event_image_likes  event_image_likes[]
 
+  @@unique([event_id, email], map: "uq_event_guests_event_email")
   @@index([event_id, created_at], map: "idx_event_guests_event_created")
   @@index([event_id], map: "idx_event_guests_event_id")
-  @@unique([event_id, email], map: "uq_event_guests_event_email")
 }
 
 model event_image_likes {
-  id         Int          @id @default(autoincrement()) @db.UnsignedInt
-  image_id   Int          @db.UnsignedInt
-  guest_id   Int          @db.UnsignedInt
-  created_at DateTime     @default(now()) @db.Timestamp(0)
+  id           Int          @id @default(autoincrement()) @db.UnsignedInt
+  image_id     Int          @db.UnsignedInt
+  guest_id     Int          @db.UnsignedInt
+  created_at   DateTime     @default(now()) @db.Timestamp(0)
   event_images event_images @relation(fields: [image_id], references: [id], onDelete: Cascade, map: "fk_event_image_likes_image")
   event_guests event_guests @relation(fields: [guest_id], references: [id], onDelete: Cascade, map: "fk_event_image_likes_guest")
 

@@ -80,7 +80,9 @@ export class CloudinaryService {
     publicId: string,
     resourceType: 'image' | 'video' = 'image',
   ): Promise<void> {
-    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+    });
   }
 
   getDownloadUrl(imageUrl: string): string {

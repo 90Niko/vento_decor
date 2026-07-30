@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -22,7 +21,7 @@ export interface CreatorSession {
 }
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   private readonly secret: string;
 
   constructor(
@@ -35,31 +34,6 @@ export class AuthService implements OnModuleInit {
     }
     this.secret =
       configuredSecret || 'vento-decor-development-secret-change-in-production';
-  }
-
-  async onModuleInit(): Promise<void> {
-    const admin = await this.prisma.creators.findFirst({
-      where: { role: 'ADMIN' },
-      select: { id: true },
-    });
-    if (admin) return;
-
-    const firstCreator = await this.prisma.creators.findFirst({
-      orderBy: { id: 'asc' },
-      select: { id: true },
-    });
-    if (!firstCreator) return;
-
-    await this.prisma.$transaction([
-      this.prisma.creators.update({
-        where: { id: firstCreator.id },
-        data: { role: 'ADMIN', is_active: true },
-      }),
-      this.prisma.events.updateMany({
-        where: { creator_id: null },
-        data: { creator_id: firstCreator.id },
-      }),
-    ]);
   }
 
   async register(dto: RegisterDto) {

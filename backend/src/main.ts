@@ -1,7 +1,9 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import type { NextFunction, Request, Response } from 'express';
 import { AppModule } from './app.module';
+import { securityMiddleware } from './infrastructure/http/security.middleware';
 
 type CorsOriginCallback = (error: Error | null, allow?: boolean) => void;
 
@@ -23,6 +25,10 @@ function isPrivateDevelopmentOrigin(origin: string): boolean {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const expressApp = app.getHttpAdapter().getInstance() as {
+    set(name: string, value: number): void;
+  };
+  expressApp.set('trust proxy', 1);
   const configService = app.get(ConfigService);
   const frontendOrigin = configService.get<string>(
     'FRONTEND_URL',
@@ -30,17 +36,20 @@ async function bootstrap() {
   );
   const allowedOrigins = new Set([
     frontendOrigin,
-    'http://localhost:3000',
-    'http://localhost:3002',
+    ...(process.env.NODE_ENV === 'production'
+      ? []
+      : ['http://localhost:3000', 'http://localhost:3002']),
   ]);
 
+  app.use(securityMiddleware);
   app.enableCors({
     credentials: true,
     origin: (origin: string | undefined, callback: CorsOriginCallback) => {
       if (
         !origin ||
         allowedOrigins.has(origin) ||
-        isPrivateDevelopmentOrigin(origin)
+        (process.env.NODE_ENV !== 'production' &&
+          isPrivateDevelopmentOrigin(origin))
       ) {
         callback(null, true);
         return;
@@ -48,6 +57,25 @@ async function bootstrap() {
 
       callback(new Error('Origin is not allowed by CORS.'), false);
     },
+  });
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    const origin = request.headers.origin;
+    const isStateChanging = !['GET', 'HEAD', 'OPTIONS'].includes(
+      request.method,
+    );
+    const isAllowed =
+      !origin ||
+      allowedOrigins.has(origin) ||
+      (process.env.NODE_ENV !== 'production' &&
+        isPrivateDevelopmentOrigin(origin));
+    if (isStateChanging && !isAllowed) {
+      response.status(403).json({
+        statusCode: 403,
+        message: 'Request origin is not allowed.',
+      });
+      return;
+    }
+    next();
   });
   app.useGlobalPipes(
     new ValidationPipe({

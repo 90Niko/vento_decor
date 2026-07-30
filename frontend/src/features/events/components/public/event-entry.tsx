@@ -14,6 +14,7 @@ interface PublicEvent {
   location: string | null;
   coverImageUrl: string | null;
   themeColor: string;
+  requireGuestOtp: boolean;
 }
 
 interface GuestRegistration {
@@ -40,7 +41,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const theme = getTheme(event?.themeColor);
 
   useEffect(() => {
-    const savedSession = localStorage.getItem(guestSessionKey(publicId));
+    const savedSession = sessionStorage.getItem(guestSessionKey(publicId));
     if (savedSession) {
       router.replace(`/event/${publicId}/upload`);
       return;
@@ -50,7 +51,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
 
     async function loadEvent() {
       try {
-        const response = await eventsService.getPublicEventResponse(publicId, controller.signal);
+        const response = await eventsService.getPublicEventResponse(
+          publicId,
+          controller.signal,
+        );
         if (!response.ok) {
           throw new Error(
             response.status === 404
@@ -60,7 +64,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
         }
         setEvent((await response.json()) as PublicEvent);
       } catch (loadError) {
-        if (loadError instanceof DOMException && loadError.name === "AbortError") {
+        if (
+          loadError instanceof DOMException &&
+          loadError.name === "AbortError"
+        ) {
           return;
         }
         setError(
@@ -87,32 +94,53 @@ export function EventEntry({ publicId }: { publicId: string }) {
 
     setIsSubmitting(true);
     setError(null);
+    const requiresOtp = event?.requireGuestOtp ?? false;
     try {
-      const response = await eventsService.registerGuestResponse(
-        publicId,
-        normalizedName,
-        email.trim(),
-      );
+      const response = requiresOtp
+        ? await eventsService.requestGuestOtpResponse(
+            publicId,
+            normalizedName,
+            email.trim(),
+          )
+        : await eventsService.registerGuestResponse(
+            publicId,
+            normalizedName,
+            email.trim(),
+          );
       if (!response.ok) {
         throw new Error(await readResponseError(response));
       }
 
-      const registration = (await response.json()) as GuestRegistration;
-      localStorage.setItem(
-        guestSessionKey(publicId),
-        JSON.stringify({
-          token: registration.token,
-          name: registration.guest.name,
-        }),
-      );
-      router.push(`/event/${publicId}/upload`);
+      if (requiresOtp) {
+        const result = (await response.json()) as { devCode?: string };
+        sessionStorage.setItem(
+          guestOtpKey(publicId),
+          JSON.stringify({
+            name: normalizedName,
+            email: email.trim().toLowerCase(),
+            ...(result.devCode ? { devCode: result.devCode } : {}),
+          }),
+        );
+        router.push(`/event/${publicId}/verify`);
+      } else {
+        const registration = (await response.json()) as GuestRegistration;
+        sessionStorage.setItem(
+          guestSessionKey(publicId),
+          JSON.stringify({
+            token: registration.token,
+            name: registration.guest.name,
+          }),
+        );
+        router.push(`/event/${publicId}/upload`);
+      }
     } catch (submitError) {
       setError(
-        submitError instanceof TypeError && submitError.message === "Failed to fetch"
+        submitError instanceof TypeError &&
+          submitError.message === "Failed to fetch"
           ? "Няма връзка със сървъра. Провери интернет връзката си и опитай отново."
           : submitError instanceof Error
-          ? submitError.message
-          : "Възникна неочаквана грешка.",
+            ? submitError.message
+            : "Възникна неочаквана грешка.",
       );
       setIsSubmitting(false);
     }
@@ -123,7 +151,9 @@ export function EventEntry({ publicId }: { publicId: string }) {
       {isLoading ? (
         <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
           <span className="mx-auto block h-10 w-10 animate-spin rounded-full border-2 border-[#173b57]/15 border-t-[#173b57]" />
-          <p className="mt-5 text-sm font-medium text-[#173b57]/68">Зареждаме събитието…</p>
+          <p className="mt-5 text-sm font-medium text-[#173b57]/68">
+            Зареждаме събитието…
+          </p>
         </section>
       ) : event ? (
         <section className="surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
@@ -179,7 +209,8 @@ export function EventEntry({ publicId }: { publicId: string }) {
               Представи се на домакините
             </h2>
             <p className="mt-3 text-sm leading-6 text-[#173b57]/68">
-              След това ще можеш да добавиш любимите си снимки към общата галерия.
+              След това ще можеш да добавиш любимите си снимки към общата
+              галерия.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8">
@@ -199,7 +230,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 placeholder="Напиши името си"
                 className="field-input mt-3 bg-white"
               />
-              <label htmlFor="guest-email" className="mt-5 block text-sm font-bold">
+              <label
+                htmlFor="guest-email"
+                className="mt-5 block text-sm font-bold"
+              >
                 Адрес на електронна поща
               </label>
               <input
@@ -213,7 +247,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 className="field-input mt-3 bg-white"
               />
               {error && (
-                <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
+                <p
+                  className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]"
+                  role="alert"
+                >
                   {error}
                 </p>
               )}
@@ -227,16 +264,21 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 {!isSubmitting && <span aria-hidden="true">→</span>}
               </button>
               <p className="mt-4 text-center text-xs leading-5 text-[#173b57]/58">
-                Не се изисква регистрация. Името се използва само за тази галерия.
+                Не се изисква регистрация. Името се използва само за тази
+                галерия.
               </p>
             </form>
           </div>
         </section>
       ) : (
         <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#5aa9d6]/15 text-2xl">!</span>
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#5aa9d6]/15 text-2xl">
+            !
+          </span>
           <h1 className="mt-6 text-2xl font-semibold">Линкът не е достъпен</h1>
-          <p className="mt-3 text-sm font-medium leading-6 text-[#173b57]">{error}</p>
+          <p className="mt-3 text-sm font-medium leading-6 text-[#173b57]">
+            {error}
+          </p>
         </section>
       )}
     </main>

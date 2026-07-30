@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsISO8601,
   IsIn,
   IsNotEmpty,
@@ -63,4 +64,8 @@ export class CreateEventDto {
   @IsOptional()
   @IsIn(['ocean', 'rose', 'sage', 'lavender', 'terracotta', 'midnight'])
   themeColor?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  requireGuestOtp?: boolean;
 }

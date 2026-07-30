@@ -3,7 +3,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { BadRequestException } from '@nestjs/common';
 import {
   EventRecord,
@@ -39,7 +39,7 @@ export class GuestAccessService {
   ): Promise<string | null> {
     const event = await this.requireActiveEvent(publicId);
     const normalizedEmail = email.trim().toLowerCase();
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(randomInt(100000, 1000000));
     await this.eventsRepository.createOtpChallenge({
       eventId: event.id,
       email: normalizedEmail,
@@ -52,7 +52,7 @@ export class GuestAccessService {
       code,
       eventTitle: event.title,
     });
-    return wasSent ? null : code;
+    return wasSent || process.env.NODE_ENV === 'production' ? null : code;
   }
 
   async verifyOtp(
@@ -67,7 +67,7 @@ export class GuestAccessService {
       email: normalizedEmail,
       codeHash: this.hashToken(code),
     });
-    if (!challenge) {
+    if (!challenge?.matched) {
       throw new BadRequestException('The access code is invalid or expired.');
     }
 
@@ -77,28 +77,32 @@ export class GuestAccessService {
       email: normalizedEmail,
       name: challenge.name,
       sessionTokenHash: this.hashToken(token),
+      sessionExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
     return { guest: { id: guest.id, name: guest.name }, token };
   }
 
-  async register(
+  async registerWithoutOtp(
     publicId: string,
     name: string,
     email: string,
   ): Promise<RegisteredGuest> {
     const event = await this.requireActiveEvent(publicId);
+    if (event.requireGuestOtp) {
+      throw new UnauthorizedException(
+        'An email access code is required for this event.',
+      );
+    }
+
     const token = randomBytes(32).toString('hex');
     const guest = await this.eventsRepository.upsertGuest({
       eventId: event.id,
       email: email.trim().toLowerCase(),
       name: name.trim(),
       sessionTokenHash: this.hashToken(token),
+      sessionExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
-
-    return {
-      guest: { id: guest.id, name: guest.name },
-      token,
-    };
+    return { guest: { id: guest.id, name: guest.name }, token };
   }
 
   async authenticate(

@@ -27,6 +27,7 @@ export class PrismaEventsRepository implements EventsRepository {
         cover_image_url: data.coverImageUrl,
         cover_image_public_id: data.coverImagePublicId,
         theme_color: data.themeColor,
+        require_guest_otp: data.requireGuestOtp,
       },
     });
 
@@ -54,6 +55,7 @@ export class PrismaEventsRepository implements EventsRepository {
         cover_image_url: data.coverImageUrl,
         cover_image_public_id: data.coverImagePublicId,
         theme_color: data.themeColor,
+        require_guest_otp: data.requireGuestOtp,
       },
     });
     if (result.count !== 1) return null;
@@ -81,6 +83,7 @@ export class PrismaEventsRepository implements EventsRepository {
     const events = await this.prisma.events.findMany({
       where: ownerId ? { creator_id: ownerId } : undefined,
       orderBy: { created_at: 'desc' },
+      take: 200,
       include: {
         _count: { select: { event_guests: true, event_images: true } },
       },
@@ -106,6 +109,7 @@ export class PrismaEventsRepository implements EventsRepository {
         _count: { select: { event_guests: true, event_images: true } },
         event_images: {
           orderBy: [{ position: 'asc' }, { created_at: 'desc' }],
+          take: 500,
           include: { event_guests: { select: { name: true } } },
         },
       },
@@ -139,35 +143,12 @@ export class PrismaEventsRepository implements EventsRepository {
     return event ? this.toEventRecord(event) : null;
   }
 
-  async createGuest(data: {
-    eventId: number;
-    name: string;
-    sessionTokenHash: string;
-  }): Promise<GuestRecord> {
-    const guest = await this.prisma.event_guests.create({
-      data: {
-        event_id: data.eventId,
-        name: data.name,
-        email: null,
-        session_token_hash: data.sessionTokenHash,
-      },
-    });
-
-    return {
-      id: guest.id,
-      eventId: guest.event_id,
-      name: guest.name,
-      email: guest.email,
-      sessionTokenHash: guest.session_token_hash,
-      createdAt: guest.created_at,
-    };
-  }
-
   async upsertGuest(data: {
     eventId: number;
     email: string;
     name: string;
     sessionTokenHash: string;
+    sessionExpiresAt: Date;
   }): Promise<GuestRecord> {
     const guest = await this.prisma.event_guests.upsert({
       where: { event_id_email: { event_id: data.eventId, email: data.email } },
@@ -176,8 +157,13 @@ export class PrismaEventsRepository implements EventsRepository {
         email: data.email,
         name: data.name,
         session_token_hash: data.sessionTokenHash,
+        session_expires_at: data.sessionExpiresAt,
       },
-      update: { session_token_hash: data.sessionTokenHash },
+      update: {
+        name: data.name,
+        session_token_hash: data.sessionTokenHash,
+        session_expires_at: data.sessionExpiresAt,
+      },
     });
 
     return {
@@ -187,6 +173,7 @@ export class PrismaEventsRepository implements EventsRepository {
       email: guest.email,
       sessionTokenHash: guest.session_token_hash,
       createdAt: guest.created_at,
+      sessionExpiresAt: guest.session_expires_at,
     };
   }
 
@@ -212,12 +199,11 @@ export class PrismaEventsRepository implements EventsRepository {
     eventId: number;
     email: string;
     codeHash: string;
-  }): Promise<{ name: string } | null> {
+  }): Promise<{ name: string; matched: boolean } | null> {
     const challenge = await this.prisma.guest_otp_challenges.findFirst({
       where: {
         event_id: data.eventId,
         email: data.email,
-        code_hash: data.codeHash,
         consumed_at: null,
         expires_at: { gt: new Date() },
         attempts: { lt: 5 },
@@ -226,11 +212,18 @@ export class PrismaEventsRepository implements EventsRepository {
     });
     if (!challenge) return null;
 
+    const matched = challenge.code_hash === data.codeHash;
     const result = await this.prisma.guest_otp_challenges.updateMany({
-      where: { id: challenge.id, consumed_at: null },
-      data: { consumed_at: new Date() },
+      where: {
+        id: challenge.id,
+        consumed_at: null,
+        attempts: challenge.attempts,
+      },
+      data: matched
+        ? { consumed_at: new Date() }
+        : { attempts: { increment: 1 } },
     });
-    return result.count === 1 ? { name: challenge.name } : null;
+    return result.count === 1 ? { name: challenge.name, matched } : null;
   }
 
   async findGuestBySession(data: {
@@ -241,6 +234,7 @@ export class PrismaEventsRepository implements EventsRepository {
       where: {
         event_id: data.eventId,
         session_token_hash: data.sessionTokenHash,
+        session_expires_at: { gt: new Date() },
       },
     });
 
@@ -252,6 +246,7 @@ export class PrismaEventsRepository implements EventsRepository {
           email: guest.email,
           sessionTokenHash: guest.session_token_hash,
           createdAt: guest.created_at,
+          sessionExpiresAt: guest.session_expires_at,
         }
       : null;
   }
@@ -270,6 +265,7 @@ export class PrismaEventsRepository implements EventsRepository {
     cover_image_url: string | null;
     cover_image_public_id: string | null;
     theme_color: string;
+    require_guest_otp: boolean;
     is_active: boolean;
     created_at: Date;
     updated_at: Date;
@@ -288,6 +284,7 @@ export class PrismaEventsRepository implements EventsRepository {
       coverImageUrl: event.cover_image_url,
       coverImagePublicId: event.cover_image_public_id,
       themeColor: event.theme_color,
+      requireGuestOtp: event.require_guest_otp,
       isActive: event.is_active,
       createdAt: event.created_at,
       updatedAt: event.updated_at,

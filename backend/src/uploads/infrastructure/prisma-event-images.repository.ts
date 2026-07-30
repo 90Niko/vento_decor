@@ -100,6 +100,7 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
     const images = await this.prisma.event_images.findMany({
       where: { event_id: eventId },
       orderBy: { created_at: 'desc' },
+      take: 500,
       include: {
         event_guests: { select: { name: true } },
         _count: { select: { event_image_likes: true } },

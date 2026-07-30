@@ -9,6 +9,7 @@ export interface PublicEvent {
   uploadDeadline: string | null;
   coverImageUrl: string | null;
   themeColor: string;
+  requireGuestOtp: boolean;
 }
 
 export interface GuestRegistration {
@@ -45,6 +46,7 @@ export interface AdminEventDetails extends AdminEventSummary {
   uploadDeadline: string | null;
   coverImageUrl: string | null;
   themeColor: string;
+  requireGuestOtp: boolean;
   images: EventImage[];
 }
 
@@ -67,4 +69,5 @@ export interface CreateEventInput {
   coverImageUrl?: string;
   coverImagePublicId?: string;
   themeColor?: string;
+  requireGuestOtp?: boolean;
 }

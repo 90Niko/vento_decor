@@ -42,6 +42,12 @@ npm run dev:backend
 The frontend runs at `http://localhost:3002` and the backend runs at
 `http://localhost:3001` by default. Set `PORT` to override the backend port.
 
+## Database changes
+
+Apply the versioned SQL files from `backend/prisma/sql` in numeric order before
+deploying a backend version. Database schema changes are intentionally not run
+automatically when the application starts.
+
 ## Commands
 
 ```bash

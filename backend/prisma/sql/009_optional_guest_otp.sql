@@ -1,0 +1,2 @@
+ALTER TABLE events
+  ADD COLUMN require_guest_otp BOOLEAN NOT NULL DEFAULT FALSE;

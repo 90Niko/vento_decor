@@ -1,0 +1,2 @@
+ALTER TABLE events
+  ALTER COLUMN require_guest_otp SET DEFAULT FALSE;

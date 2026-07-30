@@ -11,8 +11,8 @@ import {
 import { uploadImages } from "@/features/uploads/services/uploads.service";
 import type { UploadedImage } from "@/features/uploads/types/uploads";
 
-const MAX_FILES = 10;
-const MAX_FILE_SIZE = 100 * 1024 * 1024;
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = [
   ".jpg",
   ".jpeg",
@@ -23,7 +23,6 @@ const ACCEPTED_EXTENSIONS = [
   ".avif",
   ".heic",
   ".heif",
-  ".svg",
   ".mp4",
   ".mov",
   ".webm",

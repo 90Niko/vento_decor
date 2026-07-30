@@ -96,7 +96,11 @@ export class EventsController {
     @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
     @Body() dto: RegisterGuestDto,
   ): Promise<RegisteredGuest> {
-    return this.guestAccessService.register(publicId, dto.name, dto.email);
+    return this.guestAccessService.registerWithoutOtp(
+      publicId,
+      dto.name,
+      dto.email,
+    );
   }
 
   @Post('public/:publicId/guest-otp')
@@ -113,7 +117,7 @@ export class EventsController {
       message: devCode
         ? 'Тестовият код е генериран.'
         : 'Кодът за достъп е изпратен.',
-      ...(devCode ? { devCode } : {}),
+      ...(devCode && process.env.NODE_ENV !== 'production' ? { devCode } : {}),
     };
   }
 
