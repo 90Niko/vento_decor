@@ -173,7 +173,7 @@ export class PrismaEventsRepository implements EventsRepository {
       email: guest.email,
       sessionTokenHash: guest.session_token_hash,
       createdAt: guest.created_at,
-      sessionExpiresAt: guest.session_expires_at,
+      sessionExpiresAt: guest.session_expires_at ?? new Date(0),
     };
   }
 
@@ -246,7 +246,7 @@ export class PrismaEventsRepository implements EventsRepository {
           email: guest.email,
           sessionTokenHash: guest.session_token_hash,
           createdAt: guest.created_at,
-          sessionExpiresAt: guest.session_expires_at,
+          sessionExpiresAt: guest.session_expires_at ?? new Date(0),
         }
       : null;
   }
