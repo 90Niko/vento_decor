@@ -131,7 +131,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
             name: registration.guest.name,
           }),
         );
-        router.push(`/event/${publicId}/upload`);
+        router.push(`/event/${publicId}/welcome`);
       }
     } catch (submitError) {
       setError(
@@ -166,7 +166,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
             }}
           >
             <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#eaf6ff]/15 blur-2xl" />
-            <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#5aa9d6]/20 blur-3xl" />
+            <div
+              className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full blur-3xl"
+              style={{ backgroundColor: `${theme.accent}33` }}
+            />
             <div className="relative flex h-full min-h-[30rem] flex-col">
               <BrandLockup subtitle="Галерия за гости" inverse />
               <div className="my-auto py-12">
@@ -197,18 +200,26 @@ export function EventEntry({ publicId }: { publicId: string }) {
             </div>
           </div>
 
-          <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
+          <div
+            className="flex flex-col justify-center p-7 sm:p-10 lg:p-12"
+            style={{
+              color: theme.primary,
+              background: `linear-gradient(155deg, #ffffff 35%, ${theme.accent}18)`,
+            }}
+          >
             <span
               className="grid h-12 w-12 place-items-center rounded-2xl text-lg text-white"
               style={{ backgroundColor: theme.accent }}
             >
               ✦
             </span>
-            <p className="eyebrow mt-8">Добре дошли</p>
+            <p className="eyebrow mt-8" style={{ color: theme.accent }}>
+              Добре дошли
+            </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
               Представи се на домакините
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#173b57]/68">
+            <p className="mt-3 text-sm leading-6 opacity-70">
               След това ще можеш да добавиш любимите си снимки към общата
               галерия.
             </p>
@@ -229,6 +240,10 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 required
                 placeholder="Напиши името си"
                 className="field-input mt-3 bg-white"
+                style={{
+                  borderColor: `${theme.accent}66`,
+                  color: theme.primary,
+                }}
               />
               <label
                 htmlFor="guest-email"
@@ -245,10 +260,18 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 autoComplete="email"
                 required
                 className="field-input mt-3 bg-white"
+                style={{
+                  borderColor: `${theme.accent}66`,
+                  color: theme.primary,
+                }}
               />
               {error && (
                 <p
-                  className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]"
+                  className="mt-3 rounded-xl px-4 py-3 text-sm font-medium"
+                  style={{
+                    backgroundColor: `${theme.accent}22`,
+                    color: theme.primary,
+                  }}
                   role="alert"
                 >
                   {error}
@@ -259,11 +282,15 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 type="submit"
                 disabled={isSubmitting}
                 className="primary-action mt-5 w-full py-4 disabled:cursor-not-allowed disabled:opacity-50"
+                style={{
+                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                  boxShadow: `0 14px 30px ${theme.primary}2e`,
+                }}
               >
                 {isSubmitting ? "Продължаване…" : "Продължи към снимките"}
                 {!isSubmitting && <span aria-hidden="true">→</span>}
               </button>
-              <p className="mt-4 text-center text-xs leading-5 text-[#173b57]/58">
+              <p className="mt-4 text-center text-xs leading-5 opacity-60">
                 Не се изисква регистрация. Името се използва само за тази
                 галерия.
               </p>

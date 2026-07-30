@@ -3,10 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
-import {
-  guestOtpKey,
-  guestSessionKey,
-} from "./event-entry";
+import { guestOtpKey, guestSessionKey } from "./event-entry";
 
 interface PendingGuestOtp {
   name: string;
@@ -52,17 +49,23 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
         pending.email,
         code,
       );
-      if (!response.ok) throw new Error("Кодът е грешен или е изтекъл. Опитай отново.");
+      if (!response.ok)
+        throw new Error("Кодът е грешен или е изтекъл. Опитай отново.");
 
       const registration = (await response.json()) as GuestRegistration;
       sessionStorage.setItem(
         guestSessionKey(publicId),
-        JSON.stringify({ token: registration.token, name: registration.guest.name }),
+        JSON.stringify({
+          token: registration.token,
+          name: registration.guest.name,
+        }),
       );
       sessionStorage.removeItem(guestOtpKey(publicId));
-      router.replace(`/event/${publicId}/upload`);
+      router.replace(`/event/${publicId}/welcome`);
     } catch (requestError) {
-      setError(toBulgarianError(requestError, "Кодът не можа да бъде потвърден."));
+      setError(
+        toBulgarianError(requestError, "Кодът не можа да бъде потвърден."),
+      );
       setIsSubmitting(false);
     }
   }
@@ -77,31 +80,49 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
         pending.name,
         pending.email,
       );
-      if (!response.ok) throw new Error("Кодът не можа да бъде изпратен отново.");
+      if (!response.ok)
+        throw new Error("Кодът не можа да бъде изпратен отново.");
       setNotice("Нов код беше изпратен на твоята електронна поща.");
     } catch (requestError) {
-      setError(toBulgarianError(requestError, "Кодът не можа да бъде изпратен отново."));
+      setError(
+        toBulgarianError(
+          requestError,
+          "Кодът не можа да бъде изпратен отново.",
+        ),
+      );
     } finally {
       setIsResending(false);
     }
   }
 
   if (!pending) {
-    return <main className="page-canvas grid min-h-screen place-items-center text-[#173b57]/68">Подготвяме потвърждението…</main>;
+    return (
+      <main className="page-canvas grid min-h-screen place-items-center text-[#173b57]/68">
+        Подготвяме потвърждението…
+      </main>
+    );
   }
 
   return (
     <main className="page-canvas grid min-h-screen place-items-center px-4 py-10 text-[#173b57]">
       <section className="surface-card w-full max-w-lg rounded-[2rem] p-7 sm:p-10">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5aa9d6]/25 text-xl">✉</span>
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5aa9d6]/25 text-xl">
+          ✉
+        </span>
         <p className="eyebrow mt-7">Потвърждение по електронна поща</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">Провери пощата си</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+          Провери пощата си
+        </h1>
         <p className="mt-3 text-sm leading-6 text-[#173b57]/68">
-          Изпратихме 6-цифрен код за достъп на посочения от вас адрес на електронна поща: <strong className="text-[#173b57]">{pending.email}</strong>.
+          Изпратихме 6-цифрен код за достъп на посочения от вас адрес на
+          електронна поща:{" "}
+          <strong className="text-[#173b57]">{pending.email}</strong>.
         </p>
 
         <form onSubmit={verifyCode} className="mt-7">
-          <label htmlFor="otp-code" className="text-sm font-bold">Еднократен код</label>
+          <label htmlFor="otp-code" className="text-sm font-bold">
+            Еднократен код
+          </label>
           <input
             id="otp-code"
             inputMode="numeric"
@@ -121,17 +142,51 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
               error ? "border-red-500 ring-2 ring-red-500/20" : ""
             }`}
           />
-          {error && <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">{error}</p>}
-          {notice && <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm">{notice}</p>}
-          <button type="submit" disabled={isSubmitting || code.length !== 6} className="primary-action mt-5 w-full py-4 disabled:cursor-wait disabled:opacity-60">
-            {isSubmitting ? <LoadingLabel text="Потвърждаване…" /> : "Продължи към качването"}
+          {error && (
+            <p
+              className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
+          {notice && (
+            <p className="mt-3 rounded-xl bg-[#5aa9d6]/15 px-4 py-3 text-sm">
+              {notice}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={isSubmitting || code.length !== 6}
+            className="primary-action mt-5 w-full py-4 disabled:cursor-wait disabled:opacity-60"
+          >
+            {isSubmitting ? (
+              <LoadingLabel text="Потвърждаване…" />
+            ) : (
+              "Продължи към качването"
+            )}
           </button>
         </form>
 
         <div className="mt-5 flex justify-between gap-4 text-sm font-semibold">
-          <button type="button" onClick={() => router.back()} className="text-[#173b57]/68 hover:text-[#173b57]">Смени електронната поща</button>
-          <button type="button" onClick={() => void resendCode()} disabled={isResending} className="rounded-full px-3 py-1.5 text-[#5aa9d6] transition hover:bg-[#5aa9d6]/15 hover:text-[#173b57] disabled:opacity-50">
-            {isResending ? <LoadingLabel text="Изпращане…" compact /> : "Изпрати кода отново"}
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-[#173b57]/68 hover:text-[#173b57]"
+          >
+            Смени електронната поща
+          </button>
+          <button
+            type="button"
+            onClick={() => void resendCode()}
+            disabled={isResending}
+            className="rounded-full px-3 py-1.5 text-[#5aa9d6] transition hover:bg-[#5aa9d6]/15 hover:text-[#173b57] disabled:opacity-50"
+          >
+            {isResending ? (
+              <LoadingLabel text="Изпращане…" compact />
+            ) : (
+              "Изпрати кода отново"
+            )}
           </button>
         </div>
       </section>
@@ -139,10 +194,19 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
   );
 }
 
-function LoadingLabel({ text, compact = false }: { text: string; compact?: boolean }) {
+function LoadingLabel({
+  text,
+  compact = false,
+}: {
+  text: string;
+  compact?: boolean;
+}) {
   return (
     <span className="inline-flex items-center justify-center gap-2">
-      <span className={`${compact ? "h-3.5 w-3.5" : "h-4 w-4"} animate-spin rounded-full border-2 border-current border-t-transparent`} aria-hidden="true" />
+      <span
+        className={`${compact ? "h-3.5 w-3.5" : "h-4 w-4"} animate-spin rounded-full border-2 border-current border-t-transparent`}
+        aria-hidden="true"
+      />
       {text}
     </span>
   );
@@ -165,7 +229,8 @@ function readPendingGuestOtp(publicId: string): PendingGuestOtp | null {
       ? {
           name: parsed.name,
           email: parsed.email,
-          devCode: typeof parsed.devCode === "string" ? parsed.devCode : undefined,
+          devCode:
+            typeof parsed.devCode === "string" ? parsed.devCode : undefined,
         }
       : null;
   } catch {

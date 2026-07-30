@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
+import { EventQuizBuilder } from "./event-quiz-builder";
 
 export function EditEventForm({
   publicId,
@@ -58,109 +59,112 @@ export function EditEventForm({
   if (!event) return <p className="p-8 text-center">Зареждане…</p>;
 
   return (
-    <form
-      onSubmit={submit}
-      className="surface-card space-y-6 rounded-[2rem] p-6 sm:p-9"
-    >
-      <Field label="Име на събитието">
-        <input
-          name="title"
-          required
-          maxLength={150}
-          defaultValue={event.title}
-          className="field-input"
-        />
-      </Field>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Тип">
+    <div className="space-y-8">
+      <form
+        onSubmit={submit}
+        className="surface-card space-y-6 rounded-[2rem] p-6 sm:p-9"
+      >
+        <Field label="Име на събитието">
+          <input
+            name="title"
+            required
+            maxLength={150}
+            defaultValue={event.title}
+            className="field-input"
+          />
+        </Field>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Тип">
+            <select
+              name="eventType"
+              defaultValue={event.eventType}
+              className="field-input"
+            >
+              <option value="wedding">Сватба</option>
+              <option value="birthday">Рожден ден</option>
+              <option value="baptism">Кръщене</option>
+              <option value="prom">Бал</option>
+              <option value="corporate">Корпоративно</option>
+              <option value="other">Друго</option>
+            </select>
+          </Field>
+          <Field label="Локация">
+            <input
+              name="location"
+              required
+              defaultValue={event.location ?? ""}
+              className="field-input"
+            />
+          </Field>
+          <Field label="Начало">
+            <input
+              name="startAt"
+              type="datetime-local"
+              defaultValue={toLocal(event.startAt)}
+              className="field-input"
+            />
+          </Field>
+          <Field label="Краен срок за качване">
+            <input
+              name="uploadDeadline"
+              type="datetime-local"
+              defaultValue={toLocal(event.uploadDeadline)}
+              className="field-input"
+            />
+          </Field>
+        </div>
+        <Field label="Описание">
+          <textarea
+            name="description"
+            rows={5}
+            defaultValue={event.description ?? ""}
+            className="field-input resize-none"
+          />
+        </Field>
+        <Field label="Цветова тема">
           <select
-            name="eventType"
-            defaultValue={event.eventType}
+            name="themeColor"
+            defaultValue={event.themeColor}
             className="field-input"
           >
-            <option value="wedding">Сватба</option>
-            <option value="birthday">Рожден ден</option>
-            <option value="baptism">Кръщене</option>
-            <option value="prom">Бал</option>
-            <option value="corporate">Корпоративно</option>
-            <option value="other">Друго</option>
+            <option value="ocean">Океан</option>
+            <option value="rose">Роза</option>
+            <option value="sage">Градински чай</option>
+            <option value="lavender">Лавандула</option>
+            <option value="terracotta">Теракота</option>
+            <option value="midnight">Полунощ</option>
           </select>
         </Field>
-        <Field label="Локация">
-          <input
-            name="location"
-            required
-            defaultValue={event.location ?? ""}
-            className="field-input"
-          />
-        </Field>
-        <Field label="Начало">
-          <input
-            name="startAt"
-            type="datetime-local"
-            defaultValue={toLocal(event.startAt)}
-            className="field-input"
-          />
-        </Field>
-        <Field label="Краен срок за качване">
-          <input
-            name="uploadDeadline"
-            type="datetime-local"
-            defaultValue={toLocal(event.uploadDeadline)}
-            className="field-input"
-          />
-        </Field>
-      </div>
-      <Field label="Описание">
-        <textarea
-          name="description"
-          rows={5}
-          defaultValue={event.description ?? ""}
-          className="field-input resize-none"
-        />
-      </Field>
-      <Field label="Цветова тема">
-        <select
-          name="themeColor"
-          defaultValue={event.themeColor}
-          className="field-input"
+        {canConfigureGuestOtp && (
+          <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
+            <input
+              name="requireGuestOtp"
+              type="checkbox"
+              defaultChecked={event.requireGuestOtp}
+              className="mt-1 h-4 w-4 accent-[#173b57]"
+            />
+            <span>
+              <span className="block text-sm font-semibold">
+                Код за достъп по имейл
+              </span>
+              <span className="mt-1 block text-xs text-[#173b57]/55">
+                Изисквай 6-цифрен код преди достъп до галерията.
+              </span>
+            </span>
+          </label>
+        )}
+        {error && (
+          <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>
+        )}
+        <button
+          disabled={saving}
+          className="primary-action w-full py-4 disabled:opacity-50"
         >
-          <option value="ocean">Океан</option>
-          <option value="rose">Роза</option>
-          <option value="sage">Градински чай</option>
-          <option value="lavender">Лавандула</option>
-          <option value="terracotta">Теракота</option>
-          <option value="midnight">Полунощ</option>
-        </select>
-      </Field>
-      {canConfigureGuestOtp && (
-        <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
-          <input
-            name="requireGuestOtp"
-            type="checkbox"
-            defaultChecked={event.requireGuestOtp}
-            className="mt-1 h-4 w-4 accent-[#173b57]"
-          />
-          <span>
-            <span className="block text-sm font-semibold">
-              Код за достъп по имейл
-            </span>
-            <span className="mt-1 block text-xs text-[#173b57]/55">
-              Изисквай 6-цифрен код преди достъп до галерията.
-            </span>
-          </span>
-        </label>
-      )}
-      {error && (
-        <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>
-      )}
-      <button
-        disabled={saving}
-        className="primary-action w-full py-4 disabled:opacity-50"
-      >
-        {saving ? "Запазване…" : "Запази промените"}
-      </button>
-    </form>
+          {saving ? "Запазване…" : "Запази промените"}
+        </button>
+      </form>
+      <EventQuizBuilder publicId={publicId} />
+    </div>
   );
 }
 

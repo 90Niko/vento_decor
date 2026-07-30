@@ -46,12 +46,16 @@ model events {
   cover_image_public_id String?                @db.VarChar(255)
   theme_color           String                 @default("ocean") @db.VarChar(30)
   require_guest_otp     Boolean                @default(false)
+  quiz_enabled          Boolean                @default(false)
+  quiz_title            String?                @db.VarChar(150)
+  quiz_questions        Json?
   is_active             Boolean                @default(true)
   created_at            DateTime               @default(now()) @db.Timestamp(0)
   updated_at            DateTime               @default(now()) @db.Timestamp(0)
   event_guests          event_guests[]
   event_images          event_images[]
   guest_otp_challenges  guest_otp_challenges[]
+  event_quiz_attempts   event_quiz_attempts[]
   creators              creators?              @relation(fields: [creator_id], references: [id], onDelete: SetNull, map: "fk_events_creator")
 
   @@index([is_active, start_at], map: "idx_events_active_start")
@@ -71,21 +75,37 @@ model creators {
 }
 
 model event_guests {
-  id                 Int                 @id @default(autoincrement()) @db.UnsignedInt
-  event_id           Int                 @db.UnsignedInt
-  name               String              @db.VarChar(100)
-  email              String?             @db.VarChar(255)
-  session_token_hash String              @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
-  session_expires_at DateTime?           @db.DateTime(0)
-  created_at         DateTime            @default(now()) @db.Timestamp(0)
-  updated_at         DateTime            @default(now()) @db.Timestamp(0)
-  events             events              @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_event_guests_event")
-  event_images       event_images[]
-  event_image_likes  event_image_likes[]
+  id                  Int                   @id @default(autoincrement()) @db.UnsignedInt
+  event_id            Int                   @db.UnsignedInt
+  name                String                @db.VarChar(100)
+  email               String?               @db.VarChar(255)
+  session_token_hash  String                @unique(map: "uq_event_guests_session_token_hash") @db.Char(64)
+  session_expires_at  DateTime?             @db.DateTime(0)
+  created_at          DateTime              @default(now()) @db.Timestamp(0)
+  updated_at          DateTime              @default(now()) @db.Timestamp(0)
+  events              events                @relation(fields: [event_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "fk_event_guests_event")
+  event_images        event_images[]
+  event_image_likes   event_image_likes[]
+  event_quiz_attempts event_quiz_attempts[]
 
   @@unique([event_id, email], map: "uq_event_guests_event_email")
   @@index([event_id, created_at], map: "idx_event_guests_event_created")
   @@index([event_id], map: "idx_event_guests_event_id")
+}
+
+model event_quiz_attempts {
+  id           Int          @id @default(autoincrement()) @db.UnsignedInt
+  event_id     Int          @db.UnsignedInt
+  guest_id     Int          @db.UnsignedInt
+  score        Int          @db.UnsignedInt
+  total        Int          @db.UnsignedInt
+  answers      Json
+  created_at   DateTime     @default(now()) @db.Timestamp(0)
+  events       events       @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_quiz_attempt_event")
+  event_guests event_guests @relation(fields: [guest_id], references: [id], onDelete: Cascade, map: "fk_quiz_attempt_guest")
+
+  @@index([event_id, created_at], map: "idx_quiz_attempt_event")
+  @@index([guest_id], map: "idx_quiz_attempt_guest")
 }
 
 model event_image_likes {

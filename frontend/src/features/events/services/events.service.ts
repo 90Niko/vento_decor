@@ -18,7 +18,10 @@ export class ApiError extends Error {
 }
 
 export const eventsService = {
-  getPublicEventResponse(publicId: string, signal?: AbortSignal): Promise<Response> {
+  getPublicEventResponse(
+    publicId: string,
+    signal?: AbortSignal,
+  ): Promise<Response> {
     return fetch(`${getApiUrl()}/events/public/${publicId}`, { signal });
   },
 
@@ -58,11 +61,69 @@ export const eventsService = {
     });
   },
 
-  getAdminEventsResponse(): Promise<Response> {
-    return fetch(`${getApiUrl()}/events/admin`, { cache: "no-store", credentials: "include" });
+  getManagerQuizResponse(publicId: string): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/admin/${publicId}/quiz`, {
+      credentials: "include",
+      cache: "no-store",
+    });
   },
 
-  getAdminEventResponse(publicId: string, signal?: AbortSignal): Promise<Response> {
+  updateManagerQuizResponse(
+    publicId: string,
+    quiz: {
+      enabled: boolean;
+      title: string;
+      questions: Array<{
+        prompt: string;
+        options: string[];
+        correctOption: number;
+      }>;
+    },
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/admin/${publicId}/quiz`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quiz),
+    });
+  },
+
+  getPublicQuizResponse(
+    publicId: string,
+    guestToken: string,
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/public/${publicId}/quiz`, {
+      headers: { Authorization: `Bearer ${guestToken}` },
+      cache: "no-store",
+    });
+  },
+
+  submitQuizAttemptResponse(
+    publicId: string,
+    guestToken: string,
+    answers: number[],
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/public/${publicId}/quiz/attempts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${guestToken}`,
+      },
+      body: JSON.stringify({ answers }),
+    });
+  },
+
+  getAdminEventsResponse(): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/admin`, {
+      cache: "no-store",
+      credentials: "include",
+    });
+  },
+
+  getAdminEventResponse(
+    publicId: string,
+    signal?: AbortSignal,
+  ): Promise<Response> {
     return fetch(`${getApiUrl()}/events/admin/${publicId}`, {
       cache: "no-store",
       credentials: "include",
@@ -79,7 +140,10 @@ export const eventsService = {
     });
   },
 
-  updateEventResponse(publicId: string, payload: CreateEventInput): Promise<Response> {
+  updateEventResponse(
+    publicId: string,
+    payload: CreateEventInput,
+  ): Promise<Response> {
     return fetch(`${getApiUrl()}/events/admin/${publicId}`, {
       method: "PUT",
       credentials: "include",
@@ -139,42 +203,71 @@ export const eventsService = {
     });
   },
 
-  async getPublicEvent(publicId: string, signal?: AbortSignal): Promise<PublicEvent> {
-    const response = await fetch(`${getApiUrl()}/events/public/${publicId}`, { signal });
+  async getPublicEvent(
+    publicId: string,
+    signal?: AbortSignal,
+  ): Promise<PublicEvent> {
+    const response = await fetch(`${getApiUrl()}/events/public/${publicId}`, {
+      signal,
+    });
     if (!response.ok) {
-      throw new ApiError("Събитието не може да бъде заредено.", response.status);
+      throw new ApiError(
+        "Събитието не може да бъде заредено.",
+        response.status,
+      );
     }
     return response.json() as Promise<PublicEvent>;
   },
 
-  async registerGuest(publicId: string, name: string): Promise<GuestRegistration> {
-    const response = await fetch(`${getApiUrl()}/events/public/${publicId}/guests`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
+  async registerGuest(
+    publicId: string,
+    name: string,
+  ): Promise<GuestRegistration> {
+    const response = await fetch(
+      `${getApiUrl()}/events/public/${publicId}/guests`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      },
+    );
     if (!response.ok) {
-      throw new ApiError("Гостът не може да бъде регистриран.", response.status);
+      throw new ApiError(
+        "Гостът не може да бъде регистриран.",
+        response.status,
+      );
     }
     return response.json() as Promise<GuestRegistration>;
   },
 
   async getAdminEvents(): Promise<AdminEventSummary[]> {
-    const response = await fetch(`${getApiUrl()}/events/admin`, { cache: "no-store", credentials: "include" });
+    const response = await fetch(`${getApiUrl()}/events/admin`, {
+      cache: "no-store",
+      credentials: "include",
+    });
     if (!response.ok) {
-      throw new ApiError("Събитията не могат да бъдат заредени.", response.status);
+      throw new ApiError(
+        "Събитията не могат да бъдат заредени.",
+        response.status,
+      );
     }
     return response.json() as Promise<AdminEventSummary[]>;
   },
 
-  async getAdminEvent(publicId: string, signal?: AbortSignal): Promise<AdminEventDetails> {
+  async getAdminEvent(
+    publicId: string,
+    signal?: AbortSignal,
+  ): Promise<AdminEventDetails> {
     const response = await fetch(`${getApiUrl()}/events/admin/${publicId}`, {
       cache: "no-store",
       credentials: "include",
       signal,
     });
     if (!response.ok) {
-      throw new ApiError("Галерията на събитието не може да бъде заредена.", response.status);
+      throw new ApiError(
+        "Галерията на събитието не може да бъде заредена.",
+        response.status,
+      );
     }
     return response.json() as Promise<AdminEventDetails>;
   },
@@ -193,12 +286,18 @@ export const eventsService = {
   },
 
   async deleteImage(imageId: number): Promise<void> {
-    const response = await fetch(`${getApiUrl()}/admin/event-images/${imageId}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${getApiUrl()}/admin/event-images/${imageId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
     if (!response.ok) {
-      throw new ApiError(`Ð¡Ð½Ð¸Ð¼ÐºÐ°Ñ‚Ð° Ð½Ðµ Ð¼Ð¾Ð¶Ðµ Ð´Ð° Ð±ÑŠÐ´Ðµ Ð¸Ð·Ñ‚Ñ€Ð¸Ñ‚Ð° (ÐºÐ¾Ð´ ${response.status}).`, response.status);
+      throw new ApiError(
+        `Ð¡Ð½Ð¸Ð¼ÐºÐ°Ñ‚Ð° Ð½Ðµ Ð¼Ð¾Ð¶Ðµ Ð´Ð° Ð±ÑŠÐ´Ðµ Ð¸Ð·Ñ‚Ñ€Ð¸Ñ‚Ð° (ÐºÐ¾Ð´ ${response.status}).`,
+        response.status,
+      );
     }
   },
 };
@@ -209,7 +308,10 @@ async function readError(response: Response): Promise<string> {
     if (typeof payload.message === "string") {
       return payload.message;
     }
-    if (Array.isArray(payload.message) && payload.message.every((item) => typeof item === "string")) {
+    if (
+      Array.isArray(payload.message) &&
+      payload.message.every((item) => typeof item === "string")
+    ) {
       return payload.message.join(" ");
     }
   } catch {

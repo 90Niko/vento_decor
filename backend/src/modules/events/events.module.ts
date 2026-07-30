@@ -7,14 +7,17 @@ import { PrismaEventsRepository } from './infrastructure/prisma-events.repositor
 import { ResendGuestOtpEmailService } from './infrastructure/resend-guest-otp-email.service';
 import { EventsController } from './presentation/events.controller';
 import { AuthModule } from '../auth/auth.module';
+import { EventQuizService } from './application/event-quiz.service';
+import { EventQuizController } from './presentation/event-quiz.controller';
 
 @Module({
   imports: [DatabaseModule, AuthModule],
-  controllers: [EventsController],
+  controllers: [EventsController, EventQuizController],
   providers: [
     EventsService,
     GuestAccessService,
     ResendGuestOtpEmailService,
+    EventQuizService,
     {
       provide: EventsRepository,
       useClass: PrismaEventsRepository,

@@ -12,6 +12,7 @@ function requestLimit(path: string, method: string): number {
   if (method === 'POST' && path.endsWith('/guest-otp')) return 5;
   if (method === 'POST' && path.endsWith('/guest-otp/verify')) return 10;
   if (method === 'POST' && path.endsWith('/guests')) return 10;
+  if (method === 'POST' && path.endsWith('/quiz/attempts')) return 10;
   if (method === 'POST' && path === '/auth/login') return 10;
   if (method === 'POST' && path === '/auth/register') return 5;
   if (method === 'POST' && path.endsWith('/images')) return 20;
