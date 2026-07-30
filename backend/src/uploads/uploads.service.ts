@@ -84,7 +84,10 @@ export class UploadsService {
     creator: CreatorSession,
   ): Promise<void> {
     const image = await this.requireOwnedEventImage(imageId, creator);
-    await this.cloudinaryService.deleteImage(image.publicId);
+    await this.cloudinaryService.deleteImage(
+      image.publicId,
+      this.getResourceType(image.url),
+    );
     await this.eventImagesRepository.deleteById(image.id);
   }
 
@@ -144,7 +147,9 @@ export class UploadsService {
 
   private async cleanupImages(images: UploadedImage[]): Promise<void> {
     await Promise.allSettled(
-      images.map((image) => this.cloudinaryService.deleteImage(image.publicId)),
+      images.map((image) =>
+        this.cloudinaryService.deleteImage(image.publicId, image.resourceType),
+      ),
     );
   }
 
@@ -155,6 +160,10 @@ export class UploadsService {
     }
 
     return image;
+  }
+
+  private getResourceType(url: string): 'image' | 'video' {
+    return url.includes('/video/upload/') ? 'video' : 'image';
   }
 
   private async requireOwnedEventImage(

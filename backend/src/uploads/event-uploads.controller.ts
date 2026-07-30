@@ -18,7 +18,7 @@ import { UploadedEventImage, UploadsService } from './uploads.service';
 import { GuestGalleryImage } from './domain/event-images.repository';
 
 const MAX_FILES = 10;
-const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 @Controller('events/public/:publicId/images')
 export class EventUploadsController {
@@ -85,10 +85,11 @@ export class EventUploadsController {
         validators: [
           new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE }),
           new FileTypeValidator({
-            fileType: /^image\/(jpeg|png|webp|gif|avif|heic|heif|svg\+xml)$/,
+            fileType:
+              /^(image\/(jpeg|png|webp|gif|avif|heic|heif|svg\+xml)|video\/(mp4|quicktime|webm|x-m4v|mpeg))$/,
             fallbackToMimetype: true,
             errorMessage:
-              'Файлът трябва да бъде JPG, PNG, WebP, GIF, AVIF, HEIC, HEIF или SVG изображение.',
+              'Файлът трябва да бъде изображение или MP4, MOV, WebM, M4V или MPEG видео.',
           }),
         ],
       }),

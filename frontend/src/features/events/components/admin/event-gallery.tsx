@@ -8,6 +8,9 @@ import { eventsService } from "@/features/events/services/events.service";
 import { getApiUrl } from "@/shared/api/client";
 import { copyToClipboard } from "@/shared/lib/copy-to-clipboard";
 
+function isVideoUrl(url: string): boolean {
+  return url.includes("/video/upload/");
+}
 
 interface EventImage {
   id: number;
@@ -258,18 +261,32 @@ export function EventGallery({ publicId }: { publicId: string }) {
                       aria-current={offset === 0 ? "true" : undefined}
                       className="absolute inset-0 h-full w-full focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60"
                     >
-                      <Image
-                        src={image.url}
-                        alt={image.originalName ?? "Снимка от събитието"}
-                        fill
-                        unoptimized
-                        sizes="(max-width: 640px) 56vw, 48vw"
-                        className={`object-cover transition-[filter] duration-500 [backface-visibility:hidden] ${
-                          offset === 0
-                            ? "blur-none grayscale-0 saturate-100"
-                            : "grayscale saturate-0"
-                        }`}
-                      />
+                      {isVideoUrl(image.url) ? (
+                        <video
+                          src={image.url}
+                          className={`absolute inset-0 h-full w-full object-cover transition-[filter] duration-500 ${
+                            offset === 0
+                              ? "grayscale-0 saturate-100"
+                              : "grayscale saturate-0"
+                          }`}
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                      ) : (
+                        <Image
+                          src={image.url}
+                          alt={image.originalName ?? "Снимка от събитието"}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 640px) 56vw, 48vw"
+                          className={`object-cover transition-[filter] duration-500 [backface-visibility:hidden] ${
+                            offset === 0
+                              ? "blur-none grayscale-0 saturate-100"
+                              : "grayscale saturate-0"
+                          }`}
+                        />
+                      )}
                     </button>
 
                     {offset === 0 && (

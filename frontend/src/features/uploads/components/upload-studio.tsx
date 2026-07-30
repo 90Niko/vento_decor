@@ -12,7 +12,7 @@ import { uploadImages } from "@/features/uploads/services/uploads.service";
 import type { UploadedImage } from "@/features/uploads/types/uploads";
 
 const MAX_FILES = 10;
-const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = [
   ".jpg",
   ".jpeg",
@@ -24,6 +24,12 @@ const ACCEPTED_EXTENSIONS = [
   ".heic",
   ".heif",
   ".svg",
+  ".mp4",
+  ".mov",
+  ".webm",
+  ".m4v",
+  ".mpeg",
+  ".mpg",
 ];
 
 interface SelectedImage {
@@ -40,14 +46,19 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function isAcceptedImage(file: File): boolean {
+function isAcceptedMedia(file: File): boolean {
   const extension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
-  return file.type.startsWith("image/") || ACCEPTED_EXTENSIONS.includes(extension);
+  return (
+    file.type.startsWith("image/") ||
+    file.type.startsWith("video/") ||
+    ACCEPTED_EXTENSIONS.includes(extension)
+  );
 }
 
 interface UploadStudioProps {
   uploadPath?: string;
   authorizationToken?: string;
+  inputId?: string;
   theme?: {
     primary: string;
     accent: string;
@@ -59,6 +70,7 @@ interface UploadStudioProps {
 export function UploadStudio({
   uploadPath = "/uploads/images",
   authorizationToken,
+  inputId,
   theme = {
     primary: "#173b57",
     accent: "#5aa9d6",
@@ -74,6 +86,7 @@ export function UploadStudio({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const previewUrls = useRef<string[]>([]);
 
   useEffect(() => {
@@ -92,7 +105,7 @@ export function UploadStudio({
     );
     const incoming = Array.from(files).filter((file) => {
       const key = `${file.name}-${file.size}-${file.lastModified}`;
-      return isAcceptedImage(file) &&
+      return isAcceptedMedia(file) &&
         file.size <= MAX_FILE_SIZE &&
         !existing.has(key);
     });
@@ -109,7 +122,7 @@ export function UploadStudio({
 
     if (accepted.length < Array.from(files).length) {
       setError(
-        "Някои файлове са пропуснати. Избери изображения до 20 MB.",
+        "Някои файлове са пропуснати. Избери снимки или видеа до 100 MB.",
       );
     } else if (accepted.length > 0) {
       setMessage(
@@ -123,6 +136,14 @@ export function UploadStudio({
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       addFiles(event.target.files);
+      if (event.target.files.length > 0) {
+        window.setTimeout(() => {
+          formRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 0);
+      }
     }
     event.target.value = "";
   };
@@ -172,8 +193,8 @@ export function UploadStudio({
       setProgress(100);
       const uploadMessage =
         response.images.length === 1
-          ? "Снимката е качена успешно."
-          : `${response.images.length} снимки са качени успешно.`;
+          ? "Файлът е качен успешно."
+          : `${response.images.length} файла са качени успешно.`;
       setMessage(uploadMessage);
       onUploaded?.();
     } catch (uploadError) {
@@ -190,6 +211,7 @@ export function UploadStudio({
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
       <form
+        ref={formRef}
         onSubmit={handleSubmit}
         className="surface-card rounded-[2rem] p-3 sm:p-4"
       >
@@ -209,8 +231,9 @@ export function UploadStudio({
         >
           <input
             ref={inputRef}
+            id={inputId}
             type="file"
-            accept="image/*,.heic,.heif,.jfif,.avif,.svg"
+            accept="image/*,video/mp4,video/quicktime,video/webm,video/x-m4v,video/mpeg,.heic,.heif,.jfif,.avif,.svg"
             multiple
             onChange={handleInput}
             className="sr-only"
@@ -224,13 +247,13 @@ export function UploadStudio({
             <UploadIcon />
           </span>
           <span className="text-xl font-semibold tracking-[-0.02em]">
-            Пусни снимките тук
+            Пусни снимките и видеата тук
           </span>
           <span className="mt-2 text-sm leading-6 text-[#173b57]/68">
             или натисни, за да избереш от устройството
           </span>
           <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#173b57]/68 shadow-sm">
-            JPG, PNG, SVG, HEIC, WebP и други · до 20 MB · максимум 10
+            Снимки, MP4, MOV и WebM · до 100 MB · максимум 10
           </span>
         </label>
 
@@ -248,12 +271,21 @@ export function UploadStudio({
                   key={image.id}
                   className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#eaf6ff] shadow-sm"
                 >
-                  <div
-                    role="img"
-                    aria-label={`Преглед на ${image.file.name}`}
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                    style={{ backgroundImage: `url(${image.previewUrl})` }}
-                  />
+                  {image.file.type.startsWith("video/") ? (
+                    <video
+                      src={image.previewUrl}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <div
+                      role="img"
+                      aria-label={`Преглед на ${image.file.name}`}
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                      style={{ backgroundImage: `url(${image.previewUrl})` }}
+                    />
+                  )}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-8 pb-3 text-left text-white">
                     <p className="truncate text-xs font-medium">
                       {image.file.name}
@@ -346,12 +378,21 @@ export function UploadStudio({
                 className="group relative aspect-square overflow-hidden rounded-2xl bg-white/10"
                 aria-label={`Отвори ${image.originalName}`}
               >
-                <span
-                  role="img"
-                  aria-label={image.originalName}
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url(${image.url})` }}
-                />
+                {image.resourceType === "video" ? (
+                  <video
+                    src={image.url}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <span
+                    role="img"
+                    aria-label={image.originalName}
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${image.url})` }}
+                  />
+                )}
                 <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-8 pb-3 text-[11px] text-white/80">
                   {image.width} × {image.height}
                 </span>

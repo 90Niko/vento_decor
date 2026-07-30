@@ -6,6 +6,7 @@ export interface UploadedImage {
   format: string;
   bytes: number;
   originalName: string;
+  resourceType: "image" | "video";
 }
 
 export interface UploadResponse {

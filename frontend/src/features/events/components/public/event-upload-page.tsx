@@ -25,6 +25,10 @@ interface GalleryImage {
   likedByGuest: boolean;
 }
 
+function isVideoUrl(url: string): boolean {
+  return url.includes("/video/upload/");
+}
+
 export function EventUploadPage({ publicId }: { publicId: string }) {
   const router = useRouter();
   const [session, setSession] = useState<GuestSession | null>(null);
@@ -193,7 +197,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
 
   return (
     <main
-      className="min-h-screen pb-20"
+      className="min-h-screen pb-32 sm:pb-20"
       style={{
         color: theme.primary,
         background: `radial-gradient(circle at 85% 8%, ${theme.accent}38, transparent 28rem), linear-gradient(145deg, ${theme.background}, #ffffff)`,
@@ -266,6 +270,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         </section>
 
         <UploadStudio
+          inputId="guest-mobile-photo-upload"
           uploadPath={`/events/public/${publicId}/images`}
           authorizationToken={session.token}
           theme={theme}
@@ -332,14 +337,24 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                     className="relative block aspect-square w-full overflow-hidden bg-black/5 md:cursor-default"
                     aria-label={`Отвори снимка от ${image.guestName ?? "гост"}`}
                   >
-                    <Image
-                      src={image.url}
-                      alt={image.originalName ?? `Снимка от ${image.guestName ?? "гост"}`}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 640px) 33vw, 25vw"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
+                    {isVideoUrl(image.url) ? (
+                      <video
+                        src={image.url}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : (
+                      <Image
+                        src={image.url}
+                        alt={image.originalName ?? `Снимка от ${image.guestName ?? "гост"}`}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 640px) 33vw, 25vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    )}
                   </button>
                   <div className="flex items-center justify-between gap-2 px-2.5 py-2 text-[#173b57]">
                     <span className="min-w-0 truncate text-[11px] font-semibold sm:text-xs">
@@ -407,14 +422,24 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                   lastViewerTap.current = now;
                 }}
               >
-                <Image
-                  src={activeImage.url}
-                  alt={activeImage.originalName ?? "Снимка от събитието"}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 640px) 100vw, 75vw"
-                  className="object-contain"
-                />
+                {isVideoUrl(activeImage.url) ? (
+                  <video
+                    src={activeImage.url}
+                    className="absolute inset-0 h-full w-full object-contain"
+                    controls
+                    autoPlay
+                    playsInline
+                  />
+                ) : (
+                  <Image
+                    src={activeImage.url}
+                    alt={activeImage.originalName ?? "Снимка от събитието"}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 640px) 100vw, 75vw"
+                    className="object-contain"
+                  />
+                )}
                 {gallery.length > 1 && (
                   <>
                     <ViewerArrow
@@ -487,6 +512,22 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           </div>
         )}
       </div>
+
+      {!activeImage && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/90 px-4 pt-3 backdrop-blur-xl sm:hidden"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <label
+            htmlFor="guest-mobile-photo-upload"
+            className="mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,.22)] active:scale-[0.98]"
+            style={{ backgroundColor: theme.primary }}
+          >
+            <UploadIcon />
+            Качи снимки или видео
+          </label>
+        </div>
+      )}
     </main>
   );
 }
@@ -564,6 +605,20 @@ function DownloadIcon() {
     >
       <path
         d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"

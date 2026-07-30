@@ -14,6 +14,7 @@ export interface UploadedImage {
   format: string;
   bytes: number;
   originalName: string;
+  resourceType: 'image' | 'video';
 }
 
 @Injectable()
@@ -32,7 +33,7 @@ export class CloudinaryService {
       const upload = cloudinary.uploader.upload_stream(
         {
           folder: 'vento-decor',
-          resource_type: 'image',
+          resource_type: 'auto',
           unique_filename: true,
           overwrite: false,
         },
@@ -66,6 +67,7 @@ export class CloudinaryService {
             format: result.format,
             bytes: result.bytes,
             originalName: file.originalname,
+            resourceType: result.resource_type === 'video' ? 'video' : 'image',
           });
         },
       );
@@ -74,8 +76,11 @@ export class CloudinaryService {
     });
   }
 
-  async deleteImage(publicId: string): Promise<void> {
-    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+  async deleteImage(
+    publicId: string,
+    resourceType: 'image' | 'video' = 'image',
+  ): Promise<void> {
+    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
   }
 
   getDownloadUrl(imageUrl: string): string {
