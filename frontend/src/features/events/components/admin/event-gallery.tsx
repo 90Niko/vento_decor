@@ -262,17 +262,24 @@ export function EventGallery({ publicId }: { publicId: string }) {
                       className="absolute inset-0 h-full w-full focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60"
                     >
                       {isVideoUrl(image.url) ? (
-                        <video
-                          src={image.url}
-                          className={`absolute inset-0 h-full w-full object-cover transition-[filter] duration-500 ${
-                            offset === 0
-                              ? "grayscale-0 saturate-100"
-                              : "grayscale saturate-0"
-                          }`}
-                          muted
-                          playsInline
-                          preload="metadata"
-                        />
+                        <>
+                          <video
+                            src={image.url}
+                            className={`absolute inset-0 h-full w-full object-cover transition-[filter] duration-500 ${
+                              offset === 0
+                                ? "grayscale-0 saturate-100"
+                                : "grayscale saturate-0"
+                            }`}
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                          <span className="pointer-events-none absolute inset-0 grid place-items-center bg-black/10">
+                            <span className="grid h-14 w-14 place-items-center rounded-full border border-white/50 bg-black/55 text-white shadow-xl backdrop-blur-sm">
+                              <PlayIcon />
+                            </span>
+                          </span>
+                        </>
                       ) : (
                         <Image
                           src={image.url}
@@ -496,6 +503,19 @@ function ViewIcon() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="12" cy="12" r="2.75" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M8.5 5.75v12.5L18 12 8.5 5.75Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
