@@ -59,13 +59,23 @@ export default function AdminEventsPage() {
           </div>
         </div>
       </div>
-      <Link
-        href="/admin/events/new"
-        className="fixed right-4 bottom-4 left-4 z-50 flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98] lg:hidden"
-      >
-        <PlusIcon />
-        Създай събитие
-      </Link>
+      <div className="fixed right-4 bottom-4 left-4 z-50 flex gap-2.5 lg:hidden">
+        <Link
+          href="/ai-chat"
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/70 bg-white text-[#3788b8] shadow-[0_12px_35px_rgb(23_59_87/20%)] transition active:scale-[0.96]"
+          aria-label="AI асистент"
+          title="AI асистент"
+        >
+          <SparkIcon />
+        </Link>
+        <Link
+          href="/admin/events/new"
+          className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98]"
+        >
+          <PlusIcon />
+          Създай събитие
+        </Link>
+      </div>
     </main>
   );
 }
