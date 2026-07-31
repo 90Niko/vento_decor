@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 
-export function LogoutButton({ iconOnly = false }: { iconOnly?: boolean }) {
+export function LogoutButton({ iconOnly = true }: { iconOnly?: boolean }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
