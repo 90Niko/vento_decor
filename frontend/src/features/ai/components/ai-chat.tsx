@@ -95,13 +95,16 @@ export function AiChat() {
                 setInput("");
                 textareaRef.current?.focus();
               }}
-              className="fixed right-5 bottom-6 z-[9999] flex items-center gap-2 rounded-2xl border-2 border-white bg-[#173b57] px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_45px_rgb(23_59_87/38%)] transition hover:-translate-y-1 hover:bg-[#397ca9] hover:shadow-[0_20px_50px_rgb(23_59_87/42%)] sm:right-8 sm:bottom-8"
+              className="ai-new-chat-fab group fixed right-4 z-[9999] flex items-center gap-2 overflow-hidden rounded-full border border-white/80 bg-gradient-to-r from-[#173b57] via-[#24577d] to-[#397ca9] py-2.5 pr-4 pl-2.5 text-sm font-bold text-white shadow-[0_14px_40px_rgb(23_59_87/36%)] transition active:scale-95 sm:right-8 sm:py-3 sm:pr-5 sm:pl-3"
               title="Започни нов разговор"
             >
-              <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/15 text-xl leading-none">
-                +
+              <span className="ai-new-chat-plus grid h-8 w-8 place-items-center rounded-full bg-white/15 text-xl leading-none ring-1 ring-white/20 backdrop-blur-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
               </span>
               Нов чат
+              <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </button>,
             document.body,
           )
