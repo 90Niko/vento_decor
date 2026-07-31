@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { eventsService } from "@/features/events/services/events.service";
 import type { CreatedEvent } from "@/features/events/types/events";
@@ -39,6 +39,9 @@ export function CreateEventForm({
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedEvent | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     return () => {
@@ -101,6 +104,37 @@ export function CreateEventForm({
     }
   }
 
+  async function generateDescription() {
+    if (!formRef.current) return;
+    const data = new FormData(formRef.current);
+    const title = String(data.get("title") ?? "").trim();
+    if (title.length < 2) {
+      setError("Въведи име на събитието, преди да генерираш послание.");
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const response = await eventsService.generateEventCopyResponse({
+        title,
+        eventType: String(data.get("eventType") ?? "other"),
+        location: String(data.get("location") ?? "").trim() || undefined,
+      });
+      if (!response.ok) throw new Error(await readError(response));
+      const result = (await response.json()) as { description: string };
+      setDescription(result.description);
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "AI посланието не може да бъде генерирано.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   if (created) {
     const publicUrl =
       typeof window === "undefined"
@@ -156,6 +190,7 @@ export function CreateEventForm({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
     >
@@ -225,9 +260,19 @@ export function CreateEventForm({
               name="description"
               rows={4}
               maxLength={10000}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
               className="field-input resize-none"
               placeholder="Споделете любимите си моменти от нашия специален ден…"
             />
+            <button
+              type="button"
+              onClick={() => void generateDescription()}
+              disabled={isGenerating}
+              className="secondary-action mt-3 disabled:cursor-wait disabled:opacity-60"
+            >
+              {isGenerating ? "Генериране…" : "✨ Генерирай с AI"}
+            </button>
           </Field>
           <div>
             <div className="mb-3 flex items-center justify-between">

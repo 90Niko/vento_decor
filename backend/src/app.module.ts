@@ -7,6 +7,7 @@ import { EventsModule } from './modules/events/events.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AdminModule } from './modules/admin/admin.module';
     UploadsModule,
     AuthModule,
     AdminModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

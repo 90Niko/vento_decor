@@ -18,6 +18,19 @@ export class ApiError extends Error {
 }
 
 export const eventsService = {
+  generateEventCopyResponse(payload: {
+    title: string;
+    eventType: string;
+    location?: string;
+  }): Promise<Response> {
+    return fetch(`${getApiUrl()}/ai/event-copy`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  },
+
   getPublicEventResponse(
     publicId: string,
     signal?: AbortSignal,

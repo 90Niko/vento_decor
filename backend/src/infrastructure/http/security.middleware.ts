@@ -16,6 +16,7 @@ function requestLimit(path: string, method: string): number {
   if (method === 'POST' && path === '/auth/login') return 10;
   if (method === 'POST' && path === '/auth/register') return 5;
   if (method === 'POST' && path.endsWith('/images')) return 20;
+  if (method === 'POST' && path === '/ai/event-copy') return 20;
   return 300;
 }
 
