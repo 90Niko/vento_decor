@@ -85,7 +85,7 @@ export function AiChat() {
 
   return (
     <>
-      {isMounted
+      {isMounted && messages.length > 0
         ? createPortal(
             <button
               type="button"
