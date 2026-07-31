@@ -1,6 +1,19 @@
-import { IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
-const EVENT_TYPES = ['wedding', 'birthday', 'baptism', 'prom', 'corporate', 'other'];
+const EVENT_TYPES = [
+  'wedding',
+  'birthday',
+  'baptism',
+  'prom',
+  'corporate',
+  'other',
+];
 
 export class GenerateEventCopyDto {
   @IsString()

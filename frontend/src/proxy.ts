@@ -7,7 +7,7 @@ export function proxy(request: NextRequest) {
   const hasSession = Boolean(session);
   const role = readRole(session);
 
-  if (!hasSession && (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/dashboard"))) {
+  if (!hasSession && (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/ai-chat"))) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -29,7 +29,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/login", "/register"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/ai-chat", "/login", "/register"],
 };
 
 function readRole(token: string | undefined): "ADMIN" | "CREATOR" | null {

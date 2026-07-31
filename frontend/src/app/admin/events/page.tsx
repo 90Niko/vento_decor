@@ -14,6 +14,7 @@ export default function AdminEventsPage() {
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />
             <NavItem href="#events" label="Събития" icon={<CalendarIcon />} />
             <NavItem href="#creators" label="Creators" icon={<DashboardIcon />} />
+            <NavItem href="/ai-chat" label="AI асистент" icon={<SparkIcon />} />
             <NavItem href="/admin/events/new" label="Създай събитие" icon={<PlusIcon />} />
           </nav>
           <div className="mt-auto rounded-2xl bg-[#173b57] p-4 text-white">
@@ -75,3 +76,4 @@ function NavItem({ href, label, icon, active = false }: { href: string; label: s
 function DashboardIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /></svg>; }
 function CalendarIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>; }
 function PlusIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
+function SparkIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 1.4 4.1a5.5 5.5 0 0 0 3.5 3.5L21 12l-4.1 1.4a5.5 5.5 0 0 0-3.5 3.5L12 21l-1.4-4.1a5.5 5.5 0 0 0-3.5-3.5L3 12l4.1-1.4a5.5 5.5 0 0 0 3.5-3.5L12 3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>; }

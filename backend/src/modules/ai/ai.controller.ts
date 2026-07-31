@@ -1,6 +1,7 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { CreatorAuthGuard } from '../auth/creator-auth.guard';
 import { AiService } from './ai.service';
+import { ChatDto } from './dto/chat.dto';
 import { GenerateEventCopyDto } from './dto/generate-event-copy.dto';
 
 @Controller('ai')
@@ -13,5 +14,10 @@ export class AiController {
     @Body() dto: GenerateEventCopyDto,
   ): Promise<{ description: string }> {
     return this.aiService.generateEventCopy(dto);
+  }
+
+  @Post('chat')
+  chat(@Body() dto: ChatDto): Promise<{ message: string }> {
+    return this.aiService.chat(dto);
   }
 }
