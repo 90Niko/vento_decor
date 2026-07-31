@@ -18,21 +18,33 @@ export class AiService {
   async generateEventCopy(
     input: GenerateEventCopyDto,
   ): Promise<{ description: string }> {
+    const xaiApiKey = cleanSecret(
+      this.config.get<string>('XAI_API_KEY'),
+    );
     const groqApiKey = cleanSecret(
       this.config.get<string>('GROQ_API_KEY'),
     );
     const apiKey =
-      groqApiKey ?? cleanSecret(this.config.get<string>('AI_API_KEY'));
+      xaiApiKey ??
+      groqApiKey ??
+      cleanSecret(this.config.get<string>('AI_API_KEY'));
+    const usesXai = Boolean(xaiApiKey || apiKey?.startsWith('xai-'));
     const usesGroq = Boolean(groqApiKey || apiKey?.startsWith('gsk_'));
     const baseUrl = (
       this.config.get<string>('AI_BASE_URL') ??
-      (usesGroq
+      (usesXai
+        ? 'https://api.x.ai/v1'
+        : usesGroq
         ? 'https://api.groq.com/openai/v1'
         : 'http://127.0.0.1:11434/v1')
     ).replace(/\/+$/, '');
     const model =
       this.config.get<string>('AI_MODEL')?.trim() ??
-      (usesGroq ? 'openai/gpt-oss-20b' : 'gpt-oss:20b');
+      (usesXai
+        ? 'grok-4.5'
+        : usesGroq
+          ? 'openai/gpt-oss-20b'
+          : 'gpt-oss:20b');
 
     if (!apiKey && this.config.get('NODE_ENV') === 'production') {
       throw new ServiceUnavailableException(
