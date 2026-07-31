@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { getApiUrl } from "@/shared/api/client";
 
 type ChatMessage = {
@@ -21,6 +22,11 @@ export function AiChat() {
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const isMounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   const endRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -79,22 +85,27 @@ export function AiChat() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setMessages([]);
-          setError(null);
-          setInput("");
-          textareaRef.current?.focus();
-        }}
-        className="fixed top-24 right-4 z-[100] flex items-center gap-2 rounded-2xl bg-[#173b57] px-4 py-3 text-sm font-bold text-white shadow-[0_12px_35px_rgb(23_59_87/30%)] transition hover:-translate-y-1 hover:bg-[#397ca9] hover:shadow-[0_16px_40px_rgb(23_59_87/35%)] sm:right-8"
-        title="Започни нов разговор"
-      >
-        <span className="grid h-6 w-6 place-items-center rounded-lg bg-white/15 text-lg leading-none">
-          +
-        </span>
-        Нов чат
-      </button>
+      {isMounted
+        ? createPortal(
+            <button
+              type="button"
+              onClick={() => {
+                setMessages([]);
+                setError(null);
+                setInput("");
+                textareaRef.current?.focus();
+              }}
+              className="fixed right-5 bottom-6 z-[9999] flex items-center gap-2 rounded-2xl border-2 border-white bg-[#173b57] px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_45px_rgb(23_59_87/38%)] transition hover:-translate-y-1 hover:bg-[#397ca9] hover:shadow-[0_20px_50px_rgb(23_59_87/42%)] sm:right-8 sm:bottom-8"
+              title="Започни нов разговор"
+            >
+              <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/15 text-xl leading-none">
+                +
+              </span>
+              Нов чат
+            </button>,
+            document.body,
+          )
+        : null}
 
       <section className="ai-chat-shell relative flex min-h-[76vh] flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-[0_32px_100px_rgb(23_59_87/15%)] backdrop-blur-2xl">
       <div className="pointer-events-none absolute -top-24 -right-20 h-64 w-64 rounded-full bg-[#8ed3f4]/25 blur-3xl" />
