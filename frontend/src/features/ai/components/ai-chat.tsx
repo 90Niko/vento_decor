@@ -78,7 +78,25 @@ export function AiChat() {
   }
 
   return (
-    <section className="ai-chat-shell relative flex min-h-[76vh] flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-[0_32px_100px_rgb(23_59_87/15%)] backdrop-blur-2xl">
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          setMessages([]);
+          setError(null);
+          setInput("");
+          textareaRef.current?.focus();
+        }}
+        className="fixed top-24 right-4 z-[100] flex items-center gap-2 rounded-2xl bg-[#173b57] px-4 py-3 text-sm font-bold text-white shadow-[0_12px_35px_rgb(23_59_87/30%)] transition hover:-translate-y-1 hover:bg-[#397ca9] hover:shadow-[0_16px_40px_rgb(23_59_87/35%)] sm:right-8"
+        title="Започни нов разговор"
+      >
+        <span className="grid h-6 w-6 place-items-center rounded-lg bg-white/15 text-lg leading-none">
+          +
+        </span>
+        Нов чат
+      </button>
+
+      <section className="ai-chat-shell relative flex min-h-[76vh] flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 shadow-[0_32px_100px_rgb(23_59_87/15%)] backdrop-blur-2xl">
       <div className="pointer-events-none absolute -top-24 -right-20 h-64 w-64 rounded-full bg-[#8ed3f4]/25 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-[#f6d6e5]/30 blur-3xl" />
 
@@ -100,19 +118,7 @@ export function AiChat() {
             <p className="text-xs text-[#173b57]/48">Онлайн · твоят event асистент</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setMessages([]);
-            setError(null);
-            setInput("");
-          }}
-          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#173b57] px-3.5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#173b57]/15 transition hover:-translate-y-0.5 hover:bg-[#397ca9] hover:shadow-xl"
-          title="Започни нов разговор"
-        >
-          <span className="text-base leading-none">+</span>
-          Нов чат
-        </button>
+        <div className="h-10 w-24 shrink-0" aria-hidden="true" />
       </div>
 
       <div className="relative flex-1 space-y-5 overflow-y-auto px-4 py-6 sm:px-7 sm:py-8">
@@ -246,7 +252,8 @@ export function AiChat() {
           Vento AI може да допуска грешки · Enter за изпращане · Shift + Enter за нов ред
         </p>
       </form>
-    </section>
+      </section>
+    </>
   );
 }
 
