@@ -102,14 +102,13 @@ export function AiChat() {
         </div>
         <button
           type="button"
-          disabled={messages.length === 0}
           onClick={() => {
             setMessages([]);
             setError(null);
             setInput("");
           }}
-          className="flex items-center gap-1.5 rounded-xl border border-[#173b57]/10 bg-white/60 px-3 py-2 text-xs font-semibold text-[#173b57]/60 transition hover:-translate-y-0.5 hover:border-[#5aa9d6]/40 hover:text-[#173b57] disabled:cursor-default disabled:opacity-45 disabled:hover:translate-y-0"
-          title={messages.length === 0 ? "Чатът вече е празен" : "Започни нов разговор"}
+          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#173b57] px-3.5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#173b57]/15 transition hover:-translate-y-0.5 hover:bg-[#397ca9] hover:shadow-xl"
+          title="Започни нов разговор"
         >
           <span className="text-base leading-none">+</span>
           Нов чат
