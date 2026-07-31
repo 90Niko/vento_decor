@@ -13,7 +13,7 @@ export default function AiChatPage() {
             <Link href="/dashboard/events" className="secondary-action px-4 py-2.5 text-sm">
               Събития
             </Link>
-            <LogoutButton />
+            <LogoutButton iconOnly />
           </div>
         </div>
       </header>
