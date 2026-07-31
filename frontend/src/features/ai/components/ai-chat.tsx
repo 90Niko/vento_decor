@@ -100,18 +100,20 @@ export function AiChat() {
             <p className="text-xs text-[#173b57]/48">Онлайн · твоят event асистент</p>
           </div>
         </div>
-        {messages.length > 0 ? (
-          <button
-            type="button"
-            onClick={() => {
-              setMessages([]);
-              setError(null);
-            }}
-            className="rounded-xl border border-[#173b57]/10 bg-white/60 px-3 py-2 text-xs font-semibold text-[#173b57]/60 transition hover:-translate-y-0.5 hover:border-[#5aa9d6]/40 hover:text-[#173b57]"
-          >
-            + Нов чат
-          </button>
-        ) : null}
+        <button
+          type="button"
+          disabled={messages.length === 0}
+          onClick={() => {
+            setMessages([]);
+            setError(null);
+            setInput("");
+          }}
+          className="flex items-center gap-1.5 rounded-xl border border-[#173b57]/10 bg-white/60 px-3 py-2 text-xs font-semibold text-[#173b57]/60 transition hover:-translate-y-0.5 hover:border-[#5aa9d6]/40 hover:text-[#173b57] disabled:cursor-default disabled:opacity-45 disabled:hover:translate-y-0"
+          title={messages.length === 0 ? "Чатът вече е празен" : "Започни нов разговор"}
+        >
+          <span className="text-base leading-none">+</span>
+          Нов чат
+        </button>
       </div>
 
       <div className="relative flex-1 space-y-5 overflow-y-auto px-4 py-6 sm:px-7 sm:py-8">

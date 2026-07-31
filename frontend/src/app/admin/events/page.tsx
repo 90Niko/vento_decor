@@ -76,4 +76,14 @@ function NavItem({ href, label, icon, active = false }: { href: string; label: s
 function DashboardIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.7" /></svg>; }
 function CalendarIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>; }
 function PlusIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
-function SparkIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 1.4 4.1a5.5 5.5 0 0 0 3.5 3.5L21 12l-4.1 1.4a5.5 5.5 0 0 0-3.5 3.5L12 21l-1.4-4.1a5.5 5.5 0 0 0-3.5-3.5L3 12l4.1-1.4a5.5 5.5 0 0 0 3.5-3.5L12 3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>; }
+function SparkIcon() {
+  return (
+    <span className="sidebar-ai-icon relative grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-[#eaf6ff] to-[#d8f2ff] text-[#3788b8] shadow-sm">
+      <span className="sidebar-ai-halo absolute inset-0 rounded-lg border border-[#5aa9d6]/30" />
+      <svg className="sidebar-ai-spark relative" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="m12 3 1.4 4.1a5.5 5.5 0 0 0 3.5 3.5L21 12l-4.1 1.4a5.5 5.5 0 0 0-3.5 3.5L12 21l-1.4-4.1a5.5 5.5 0 0 0-3.5-3.5L3 12l4.1-1.4a5.5 5.5 0 0 0 3.5-3.5L12 3Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      </svg>
+      <span className="sidebar-ai-dot absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-400" />
+    </span>
+  );
+}

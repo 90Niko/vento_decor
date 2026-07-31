@@ -271,6 +271,42 @@ a {
   animation-delay: 280ms;
 }
 
+@keyframes sidebar-ai-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(90 169 214 / 0%); }
+  50% { box-shadow: 0 0 18px 3px rgb(90 169 214 / 24%); }
+}
+
+@keyframes sidebar-ai-spark {
+  0%, 100% { transform: scale(0.92) rotate(-3deg); }
+  50% { transform: scale(1.08) rotate(3deg); }
+}
+
+@keyframes sidebar-ai-halo {
+  0% { opacity: 0.65; transform: scale(0.9); }
+  75%, 100% { opacity: 0; transform: scale(1.35); }
+}
+
+@keyframes sidebar-ai-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.72); }
+}
+
+.sidebar-ai-icon {
+  animation: sidebar-ai-breathe 2.8s ease-in-out infinite;
+}
+
+.sidebar-ai-spark {
+  animation: sidebar-ai-spark 2.8s ease-in-out infinite;
+}
+
+.sidebar-ai-halo {
+  animation: sidebar-ai-halo 2.2s ease-out infinite;
+}
+
+.sidebar-ai-dot {
+  animation: sidebar-ai-dot 1.5s ease-in-out infinite;
+}
+
 @keyframes auth-slide-from-right {
   from {
     opacity: 0;
