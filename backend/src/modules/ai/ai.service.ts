@@ -18,9 +18,11 @@ export class AiService {
   async generateEventCopy(
     input: GenerateEventCopyDto,
   ): Promise<{ description: string }> {
-    const groqApiKey = this.config.get<string>('GROQ_API_KEY')?.trim();
+    const groqApiKey = cleanSecret(
+      this.config.get<string>('GROQ_API_KEY'),
+    );
     const apiKey =
-      this.config.get<string>('AI_API_KEY')?.trim() ?? groqApiKey;
+      groqApiKey ?? cleanSecret(this.config.get<string>('AI_API_KEY'));
     const usesGroq = Boolean(groqApiKey || apiKey?.startsWith('gsk_'));
     const baseUrl = (
       this.config.get<string>('AI_BASE_URL') ??
@@ -94,4 +96,17 @@ export class AiService {
     }
     return { description };
   }
+}
+
+function cleanSecret(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  if (
+    trimmed.length >= 2 &&
+    ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'")))
+  ) {
+    return trimmed.slice(1, -1).trim() || undefined;
+  }
+  return trimmed;
 }
