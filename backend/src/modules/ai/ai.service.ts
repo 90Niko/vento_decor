@@ -44,7 +44,7 @@ export class AiService {
         {
           role: 'system',
           content:
-            'Write warm, natural event copy in Bulgarian for an upcoming event. Address the guests directly and write only in present or future tense, as an invitation before the event takes place. Never use past tense or imply that the event has already happened. Return only the final guest-facing message, without a title, markdown, quotes, or commentary. Use 2-3 short sentences and never invent names, dates, or details.',
+            'Write warm, natural event copy in Bulgarian for an upcoming event. Address the guests directly and write only in present or future tense, as an invitation before the event takes place. Never use past tense or imply that the event has already happened. When a draft is provided, improve its clarity, flow and tone while preserving its meaning and every factual detail. Return only the final guest-facing message, without a title, markdown, quotes, or commentary. Use 2-3 short sentences and never invent names, dates, or details.',
         },
         {
           role: 'user',
@@ -54,6 +54,8 @@ export class AiService {
             input.location ? `Location: ${input.location}` : null,
             input.startAt ? `Date and time: ${input.startAt}` : null,
             toneInstructions[input.tone],
+            input.keywords ? `Important words and ideas to include: ${input.keywords}` : null,
+            input.sourceText ? `User draft to improve: ${input.sourceText}` : null,
             'Write an inviting message asking guests to capture and share their favorite photos during the upcoming event. Make it clear that the event is yet to take place.',
           ]
             .filter(Boolean)

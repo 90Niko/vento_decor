@@ -61,6 +61,8 @@ export function CreateEventForm({
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [aiCopyEnabled, setAiCopyEnabled] = useState(false);
+  const [descriptionKeywords, setDescriptionKeywords] = useState("");
   const [descriptionTone, setDescriptionTone] = useState<
     "warm" | "playful" | "formal"
   >("warm");
@@ -213,6 +215,14 @@ export function CreateEventForm({
       setError("Въведи име на събитието, преди да генерираш послание.");
       return;
     }
+    const sourceText = description.trim();
+    const keywords = descriptionKeywords.trim();
+    if (!sourceText && !keywords) {
+      setError(
+        "Добави най-важните думи или напиши свой текст, който AI да подобри.",
+      );
+      return;
+    }
 
     setIsGenerating(true);
     setError(null);
@@ -226,6 +236,8 @@ export function CreateEventForm({
         location: String(data.get("location") ?? "").trim() || undefined,
         startAt: optionalDate(data, "startAt"),
         tone: descriptionTone,
+        keywords: keywords || undefined,
+        sourceText: sourceText || undefined,
       });
       if (!response.ok) throw new Error(await readError(response));
       const result = (await response.json()) as { description: string };
@@ -467,21 +479,6 @@ export function CreateEventForm({
           title="Детайли за събитието"
           description="Добави послание, място и начален час."
         >
-          <Field label="Тон на посланието">
-            <select
-              value={descriptionTone}
-              onChange={(event) =>
-                setDescriptionTone(
-                  event.target.value as "warm" | "playful" | "formal",
-                )
-              }
-              className="field-input"
-            >
-              <option value="warm">Топъл и емоционален</option>
-              <option value="playful">Забавен и непринуден</option>
-              <option value="formal">Елегантен и официален</option>
-            </select>
-          </Field>
           <Field label="Послание към гостите" hint="Незадължително">
             <textarea
               name="description"
@@ -492,15 +489,60 @@ export function CreateEventForm({
               className="field-input resize-none"
               placeholder="Споделете любимите си моменти от нашия специален ден…"
             />
-            <button
-              type="button"
-              onClick={() => void generateDescription()}
-              disabled={isGenerating}
-              className="secondary-action mt-3 disabled:cursor-wait disabled:opacity-60"
-            >
-              {isGenerating ? "Генериране…" : "✨ Генерирай с AI"}
-            </button>
           </Field>
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+            <ToggleSwitch
+              checked={aiCopyEnabled}
+              onChange={(event) => setAiCopyEnabled(event.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              <span className="block text-sm font-semibold">AI помощ за текста</span>
+              <span className="mt-1 block text-xs opacity-55">
+                Създай послание от ключови думи или подобри написаното от теб.
+              </span>
+            </span>
+          </label>
+          {aiCopyEnabled && (
+            <div className="quiz-settings-reveal space-y-4 rounded-2xl border border-[#5aa9d6]/20 bg-[#5aa9d6]/7 p-4">
+              <Field label="Най-важни думи" hint="Раздели ги със запетая">
+                <input
+                  value={descriptionKeywords}
+                  onChange={(event) => setDescriptionKeywords(event.target.value)}
+                  maxLength={500}
+                  className="field-input"
+                  placeholder="семейство, усмивки, незабравими моменти"
+                />
+              </Field>
+              <Field label="Тон на посланието">
+                <select
+                  value={descriptionTone}
+                  onChange={(event) =>
+                    setDescriptionTone(
+                      event.target.value as "warm" | "playful" | "formal",
+                    )
+                  }
+                  className="field-input"
+                >
+                  <option value="warm">Топъл и емоционален</option>
+                  <option value="playful">Забавен и непринуден</option>
+                  <option value="formal">Елегантен и официален</option>
+                </select>
+              </Field>
+              <button
+                type="button"
+                onClick={() => void generateDescription()}
+                disabled={isGenerating}
+                className="secondary-action w-full justify-center disabled:cursor-wait disabled:opacity-60"
+              >
+                {isGenerating
+                  ? "Обработване…"
+                  : description.trim()
+                    ? "✨ Подобри текста с AI"
+                    : "✨ Създай текст с AI"}
+              </button>
+            </div>
+          )}
         </FormSection>
         </div>
 

@@ -30,4 +30,14 @@ export class GenerateEventCopyDto {
   @IsString()
   @IsIn(['warm', 'playful', 'formal'])
   tone!: 'warm' | 'playful' | 'formal';
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
+  keywords?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(10000)
+  sourceText?: string;
 }

@@ -24,6 +24,8 @@ export const eventsService = {
     location?: string;
     startAt?: string;
     tone: "warm" | "playful" | "formal";
+    keywords?: string;
+    sourceText?: string;
   }): Promise<Response> {
     return fetch(`${getApiUrl()}/ai/event-copy`, {
       method: "POST",
