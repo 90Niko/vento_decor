@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import { eventsService } from "@/features/events/services/events.service";
 import { getApiUrl } from "@/shared/api/client";
 import { copyToClipboard } from "@/shared/lib/copy-to-clipboard";
+import { getEventTheme } from "@/features/events/lib/event-theme";
 
 function isVideoUrl(url: string): boolean {
   return url.includes("/video/upload/");
@@ -33,6 +34,7 @@ interface AdminEventDetails {
   isActive: boolean;
   guestCount: number;
   imageCount: number;
+  themeColor: string;
   images: EventImage[];
 }
 
@@ -77,6 +79,23 @@ export function EventGallery({ publicId }: { publicId: string }) {
     void loadEvent();
     return () => controller.abort();
   }, [publicId]);
+
+  useEffect(() => {
+    if (!event) return;
+    const theme = getEventTheme(event.themeColor);
+    const root = document.documentElement;
+    root.classList.add("live-event-page-theme");
+    root.style.setProperty("--active-event-theme-primary", theme.primary);
+    root.style.setProperty("--active-event-theme-accent", theme.accent);
+    root.style.setProperty("--active-event-theme-background", theme.background);
+
+    return () => {
+      root.classList.remove("live-event-page-theme");
+      root.style.removeProperty("--active-event-theme-primary");
+      root.style.removeProperty("--active-event-theme-accent");
+      root.style.removeProperty("--active-event-theme-background");
+    };
+  }, [event]);
 
   async function deleteImage(image: EventImage) {
     const confirmed = window.confirm(

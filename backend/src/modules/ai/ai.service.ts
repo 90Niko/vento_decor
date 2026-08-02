@@ -34,12 +34,17 @@ export class AiService {
   async generateEventCopy(
     input: GenerateEventCopyDto,
   ): Promise<{ description: string }> {
+    const toneInstructions = {
+      warm: 'Use a warm, heartfelt and welcoming tone.',
+      playful: 'Use a playful, cheerful and relaxed tone.',
+      formal: 'Use an elegant, polished and formal tone.',
+    } as const;
     const description = await this.complete(
       [
         {
           role: 'system',
           content:
-            'Write warm, natural event copy in Bulgarian. Return only the final guest-facing message, without a title, markdown, quotes, or commentary. Use 2-3 short sentences and never invent names, dates, or details.',
+            'Write warm, natural event copy in Bulgarian for an upcoming event. Address the guests directly and write only in present or future tense, as an invitation before the event takes place. Never use past tense or imply that the event has already happened. Return only the final guest-facing message, without a title, markdown, quotes, or commentary. Use 2-3 short sentences and never invent names, dates, or details.',
         },
         {
           role: 'user',
@@ -47,7 +52,9 @@ export class AiService {
             `Event title: ${input.title}`,
             `Event type: ${input.eventType}`,
             input.location ? `Location: ${input.location}` : null,
-            'Write an inviting message asking guests to share their favorite photos from the event.',
+            input.startAt ? `Date and time: ${input.startAt}` : null,
+            toneInstructions[input.tone],
+            'Write an inviting message asking guests to capture and share their favorite photos during the upcoming event. Make it clear that the event is yet to take place.',
           ]
             .filter(Boolean)
             .join('\n'),

@@ -36,12 +36,12 @@ interface QuizDraftQuestion {
 
 const WIZARD_STEPS = [
   "Основно",
-  "Послание",
   "Място и време",
   "Снимка",
   "Цветове",
   "Достъп",
   "Quiz",
+  "Послание",
   "Преглед",
 ] as const;
 
@@ -60,6 +60,9 @@ export function CreateEventForm({
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [descriptionTone, setDescriptionTone] = useState<
+    "warm" | "playful" | "formal"
+  >("warm");
   const [selectedTheme, setSelectedTheme] = useState("ocean");
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
@@ -215,8 +218,13 @@ export function CreateEventForm({
     try {
       const response = await eventsService.generateEventCopyResponse({
         title,
-        eventType: String(data.get("eventType") ?? "other"),
+        eventType:
+          selectedEventType === "other"
+            ? customEventType.trim()
+            : selectedEventType,
         location: String(data.get("location") ?? "").trim() || undefined,
+        startAt: optionalDate(data, "startAt"),
+        tone: descriptionTone,
       });
       if (!response.ok) throw new Error(await readError(response));
       const result = (await response.json()) as { description: string };
@@ -452,12 +460,27 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="1" data-active={wizardStep === 1} className="wizard-step-panel">
+        <div data-wizard-step="6" data-active={wizardStep === 6} className="wizard-step-panel">
         <FormSection
           number="02"
           title="Детайли за събитието"
           description="Добави послание, място и начален час."
         >
+          <Field label="Тон на посланието">
+            <select
+              value={descriptionTone}
+              onChange={(event) =>
+                setDescriptionTone(
+                  event.target.value as "warm" | "playful" | "formal",
+                )
+              }
+              className="field-input"
+            >
+              <option value="warm">Топъл и емоционален</option>
+              <option value="playful">Забавен и непринуден</option>
+              <option value="formal">Елегантен и официален</option>
+            </select>
+          </Field>
           <Field label="Послание към гостите" hint="Незадължително">
             <textarea
               name="description"
@@ -480,7 +503,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="2" data-active={wizardStep === 2} className="wizard-step-panel">
+        <div data-wizard-step="1" data-active={wizardStep === 1} className="wizard-step-panel">
         <FormSection
           number="03"
           title="Място и време"
@@ -508,7 +531,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="3" data-active={wizardStep === 3} className="wizard-step-panel">
+        <div data-wizard-step="2" data-active={wizardStep === 2} className="wizard-step-panel">
         <FormSection
           number="04"
           title="Заглавна снимка"
@@ -565,7 +588,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="4" data-active={wizardStep === 4} className="wizard-step-panel">
+        <div data-wizard-step="3" data-active={wizardStep === 3} className="wizard-step-panel">
         <FormSection
           number="05"
           title="Цветова тема"
@@ -631,7 +654,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="5" data-active={wizardStep === 5} className="wizard-step-panel">
+        <div data-wizard-step="4" data-active={wizardStep === 4} className="wizard-step-panel">
         <FormSection
           number="06"
           title="Период за качване"
@@ -666,7 +689,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="6" data-active={wizardStep === 6} className="wizard-step-panel">
+        <div data-wizard-step="5" data-active={wizardStep === 5} className="wizard-step-panel">
         <FormSection
           number="07"
           title="Quiz за гостите"
@@ -855,7 +878,7 @@ export function CreateEventForm({
         {error && (
           <p
             role="alert"
-            className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 md:col-span-2"
+            className="wizard-form-error rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 md:col-span-2"
           >
             {error}
           </p>
@@ -901,7 +924,7 @@ export function CreateEventForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="primary-action hidden w-full justify-center py-4 disabled:cursor-wait disabled:opacity-60 md:col-span-2 md:flex"
+          className="primary-action desktop-submit-action hidden w-full justify-center py-4 disabled:cursor-wait disabled:opacity-60 md:col-span-2 md:flex"
           style={{
             background: `linear-gradient(135deg, ${previewTheme.primary}, ${previewTheme.accent})`,
           }}

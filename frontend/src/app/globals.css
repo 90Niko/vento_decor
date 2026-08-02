@@ -679,6 +679,35 @@ a {
     align-items: center;
   }
 
+  .wizard-step-panel:is(
+      [data-wizard-step="3"],
+      [data-wizard-step="5"]
+    )[data-active="true"] {
+    align-items: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: 0.75rem;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--event-theme-accent) 55%, transparent) transparent;
+  }
+
+  .wizard-step-panel:is(
+      [data-wizard-step="3"],
+      [data-wizard-step="5"]
+    )::-webkit-scrollbar {
+    width: 0.3rem;
+  }
+
+  .wizard-step-panel:is(
+      [data-wizard-step="3"],
+      [data-wizard-step="5"]
+    )::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--event-theme-accent) 55%, transparent);
+  }
+
   .wizard-step-panel > .wizard-form-section {
     width: 100%;
     border: 0;
@@ -785,6 +814,13 @@ a {
 .success-confetti span:nth-child(12) { left: 94%; animation-delay: 600ms; }
 
 @media (min-width: 768px) {
+  .wizard-form-surface {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0;
+  }
+
   .wizard-step-panel:not(.wizard-review-step) {
     display: block;
   }
@@ -792,6 +828,28 @@ a {
   .wizard-step-panel > section {
     height: 100%;
   }
+
+  .wizard-step-panel:not(.wizard-review-step) > .wizard-form-section {
+    border: 1px solid color-mix(in srgb, var(--event-theme-primary) 10%, transparent);
+    border-radius: 1.5rem;
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--event-theme-background) 48%, #fff),
+      #fff
+    );
+    padding: 1.5rem;
+    box-shadow: 0 16px 45px color-mix(in srgb, var(--event-theme-primary) 7%, transparent);
+  }
+
+  .wizard-step-panel[data-wizard-step="0"] { order: 0; }
+  .wizard-step-panel[data-wizard-step="1"] { order: 1; }
+  .wizard-step-panel[data-wizard-step="2"] { order: 2; }
+  .wizard-step-panel[data-wizard-step="3"] { order: 3; }
+  .wizard-step-panel[data-wizard-step="4"] { order: 4; }
+  .wizard-step-panel[data-wizard-step="5"] { order: 5; }
+  .wizard-step-panel[data-wizard-step="6"] { order: 6; }
+  .wizard-form-error { order: 7; }
+  .desktop-submit-action { order: 8; }
 
   .wizard-review-step {
     display: none !important;
