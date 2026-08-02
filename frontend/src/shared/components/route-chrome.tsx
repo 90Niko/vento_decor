@@ -116,7 +116,7 @@ function BottomNavigation({
       />
       <nav
         aria-label="Основна навигация"
-        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-auto md:bottom-auto md:left-1/2 md:h-[3.75rem] md:w-[28rem] md:-translate-x-1/2"
+        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] lg:right-10"
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         <div className="fixed top-2 left-6 hidden h-[3.75rem] items-center md:flex lg:left-10">

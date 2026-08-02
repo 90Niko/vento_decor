@@ -205,10 +205,17 @@ export function CreateEventForm({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
+      className="live-event-theme grid items-start gap-6 transition-colors duration-300 lg:grid-cols-[minmax(0,1fr)_340px]"
+      style={
+        {
+          "--event-theme-primary": previewTheme.primary,
+          "--event-theme-accent": previewTheme.accent,
+          "--event-theme-background": previewTheme.background,
+        } as React.CSSProperties
+      }
     >
       <div
-        className="surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9"
+        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
@@ -459,9 +466,9 @@ export function CreateEventForm({
         </button>
       </div>
 
-      <aside className="surface-card rounded-[2rem] p-5 lg:sticky lg:top-24">
+      <aside className="theme-edit-surface surface-card rounded-[2rem] p-5 transition-colors duration-300 lg:sticky lg:top-24">
         <div
-          className="mb-6 overflow-hidden rounded-2xl p-5 text-white transition-colors duration-300"
+          className="theme-guest-preview mb-6 overflow-hidden rounded-2xl p-5 text-white transition-colors duration-300"
           style={{
             background: `linear-gradient(145deg, ${previewTheme.primary}, ${previewTheme.accent})`,
           }}

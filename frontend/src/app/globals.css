@@ -388,6 +388,41 @@ a {
   }
 }
 
+.live-event-theme .theme-edit-surface {
+  border-color: color-mix(in srgb, var(--event-theme-primary) 14%, transparent);
+  background: linear-gradient(
+    155deg,
+    #fff 42%,
+    color-mix(in srgb, var(--event-theme-accent) 14%, #fff)
+  );
+  color: var(--event-theme-primary);
+}
+
+.live-event-theme .theme-edit-surface :where(h1, h2, h3, legend, label, p, li) {
+  color: var(--event-theme-primary);
+}
+
+.live-event-theme .theme-edit-surface .field-input {
+  border-color: color-mix(in srgb, var(--event-theme-accent) 42%, transparent);
+  background-color: color-mix(in srgb, var(--event-theme-accent) 7%, #fff);
+  color: var(--event-theme-primary);
+}
+
+.live-event-theme .theme-edit-surface .field-input:focus {
+  border-color: var(--event-theme-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--event-theme-accent) 20%, transparent);
+}
+
+.live-event-theme .theme-edit-surface input[type="radio"],
+.live-event-theme .theme-edit-surface input[type="checkbox"] {
+  accent-color: var(--event-theme-primary);
+}
+
+.live-event-theme .theme-guest-preview,
+.live-event-theme .theme-guest-preview :where(p, span) {
+  color: #fff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
