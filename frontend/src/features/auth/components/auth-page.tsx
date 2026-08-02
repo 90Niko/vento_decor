@@ -66,37 +66,9 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 
         <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/82 shadow-[0_28px_90px_rgb(23_59_87/14%)] backdrop-blur-2xl">
           <div className="border-b border-[#173b57]/8 px-6 pt-7 sm:px-9 sm:pt-9">
-            <div className="relative grid grid-cols-2 rounded-2xl bg-[#173b57]/6 p-1">
-              <span
-                aria-hidden="true"
-                className={`absolute top-1 bottom-1 left-1 w-[calc(50%_-_0.25rem)] rounded-xl bg-white shadow-[0_5px_16px_rgb(23_59_87/8%)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                  isRegister ? "translate-x-full" : "translate-x-0"
-                }`}
-              />
-              <Link
-                href="/login"
-                className={`relative z-10 rounded-xl px-4 py-3 text-center text-sm font-bold transition-colors ${
-                  isRegister ? "text-[#173b57]/52" : "text-[#173b57]"
-                }`}
-              >
-                Вход
-              </Link>
-              <Link
-                href="/register"
-                className={`relative z-10 rounded-xl px-4 py-3 text-center text-sm font-bold transition-colors ${
-                  isRegister ? "text-[#173b57]" : "text-[#173b57]/52"
-                }`}
-              >
-                Регистрация
-              </Link>
-            </div>
-
-            <div className="pt-8 pb-7 text-center">
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#173b57] text-lg text-white shadow-[0_10px_24px_rgb(23_59_87/20%)]">
-                {isRegister ? "+" : "V"}
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
-                {isRegister ? "Създай своя профил" : "Добре дошъл отново"}
+            <div className="pb-7 text-center">
+              <h1 className="text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
+                {isRegister ? "Регистрация" : "Вход"}
               </h1>
               <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#173b57]/60">
                 {isRegister

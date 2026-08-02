@@ -11,7 +11,7 @@ import { BrandLockup } from "./brand-lockup";
 export function RouteChrome() {
   const pathname = usePathname();
   const hasNavigation =
-    ["/", "/login", "/register", "/ai-chat"].includes(pathname) ||
+    ["/", "/ai-chat"].includes(pathname) ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/admin");
 
@@ -24,7 +24,7 @@ export function RouteChrome() {
       document.documentElement.classList.remove("has-fixed-route-navbar");
   }, [hasNavigation]);
 
-  const isPublicNavigationRoute = ["/", "/login", "/register"].includes(pathname);
+  const isPublicNavigationRoute = pathname === "/";
   if (isPublicNavigationRoute) {
     return (
       <>
