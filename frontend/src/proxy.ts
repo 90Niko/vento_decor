@@ -18,7 +18,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (hasSession && request.nextUrl.pathname.startsWith("/admin") && role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/access-denied", request.url));
+    return NextResponse.redirect(new URL("/dashboard/events", request.url));
   }
 
   if (hasSession && request.nextUrl.pathname.startsWith("/dashboard") && role === "ADMIN") {

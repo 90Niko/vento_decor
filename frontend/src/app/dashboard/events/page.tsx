@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
+import { SiteFooter } from "@/shared/components/site-footer";
 
 export default function CreatorDashboardPage() {
   return (
+    <>
     <main className="admin-canvas min-h-screen text-[#173b57]">
       <header className="sticky top-0 z-40 border-b border-[#173b57]/10 bg-[#f4fbff]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-[76px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
@@ -26,5 +28,7 @@ export default function CreatorDashboardPage() {
         <AdminEventsDashboard basePath="/dashboard/events" />
       </div>
     </main>
+    <SiteFooter />
+    </>
   );
 }

@@ -510,9 +510,14 @@ a {
 }
 
 @media (max-width: 767px) {
-  .surface-card {
+  body *,
+  body *::before,
+  body *::after {
     border-right-width: 0 !important;
     border-left-width: 0 !important;
+  }
+
+  .surface-card {
     border-radius: 0 !important;
     box-shadow: none !important;
   }
