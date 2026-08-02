@@ -645,6 +645,87 @@ a {
   animation: wizard-step-enter 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@keyframes success-check-pop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-18deg); }
+  70% { transform: scale(1.12) rotate(3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes success-card-enter {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes success-confetti-fall {
+  0% { opacity: 0; transform: translateY(-30px) rotate(0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(260px) rotate(300deg); }
+}
+
+@keyframes success-redirect-countdown {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.success-event-card {
+  animation: success-card-enter 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.success-check {
+  animation: success-check-pop 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.success-redirect-progress {
+  animation: success-redirect-countdown 5s linear forwards;
+}
+
+.success-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.success-confetti span {
+  position: absolute;
+  top: 0;
+  left: calc((var(--confetti-index, 0) + 1) * 7.5%);
+  width: 0.45rem;
+  height: 0.8rem;
+  border-radius: 0.15rem;
+  background: #5aa9d6;
+  animation: success-confetti-fall 2.4s ease-in infinite;
+}
+
+.success-confetti span:nth-child(3n + 2) { background: #34d399; }
+.success-confetti span:nth-child(3n) { background: #f59e0b; }
+.success-confetti span:nth-child(1) { left: 8%; animation-delay: 0ms; }
+.success-confetti span:nth-child(2) { left: 16%; animation-delay: 260ms; }
+.success-confetti span:nth-child(3) { left: 24%; animation-delay: 80ms; }
+.success-confetti span:nth-child(4) { left: 32%; animation-delay: 420ms; }
+.success-confetti span:nth-child(5) { left: 40%; animation-delay: 180ms; }
+.success-confetti span:nth-child(6) { left: 48%; animation-delay: 520ms; }
+.success-confetti span:nth-child(7) { left: 56%; animation-delay: 120ms; }
+.success-confetti span:nth-child(8) { left: 64%; animation-delay: 360ms; }
+.success-confetti span:nth-child(9) { left: 72%; animation-delay: 40ms; }
+.success-confetti span:nth-child(10) { left: 80%; animation-delay: 460ms; }
+.success-confetti span:nth-child(11) { left: 88%; animation-delay: 220ms; }
+.success-confetti span:nth-child(12) { left: 94%; animation-delay: 600ms; }
+
+@media (min-width: 768px) {
+  .wizard-step-panel[hidden]:not(.wizard-review-step) {
+    display: block;
+  }
+
+  .wizard-step-panel > section {
+    height: 100%;
+  }
+
+  .wizard-review-step {
+    display: none !important;
+  }
+}
+
 .event-actions-menu {
   transform-origin: right center;
   animation: event-actions-reveal 220ms cubic-bezier(0.22, 1, 0.36, 1);

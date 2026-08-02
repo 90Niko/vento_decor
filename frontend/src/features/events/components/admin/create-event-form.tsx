@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { eventsService } from "@/features/events/services/events.service";
 import type { CreatedEvent } from "@/features/events/types/events";
 import { uploadImages } from "@/features/uploads/services/uploads.service";
-import { EventQuizBuilder } from "./event-quiz-builder";
 import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
 
 const EVENT_TYPES = [
@@ -35,7 +35,8 @@ interface QuizDraftQuestion {
 }
 
 const WIZARD_STEPS = [
-  "Информация",
+  "Основно",
+  "Детайли",
   "Визия",
   "Достъп",
   "Quiz",
@@ -47,6 +48,7 @@ export function CreateEventForm({
 }: {
   basePath?: string;
 }) {
+  const router = useRouter();
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,6 +67,7 @@ export function CreateEventForm({
   const [selectedEventType, setSelectedEventType] = useState("wedding");
   const [customEventType, setCustomEventType] = useState("");
   const [wizardStep, setWizardStep] = useState(0);
+  const [redirectSeconds, setRedirectSeconds] = useState(5);
   const [review, setReview] = useState({
     title: "",
     location: "",
@@ -110,6 +113,23 @@ export function CreateEventForm({
       color: { dark: "#173b57", light: "#ffffff" },
     }).then(setQrCode);
   }, [created]);
+
+  useEffect(() => {
+    if (!created) return;
+    setRedirectSeconds(5);
+    const interval = window.setInterval(
+      () => setRedirectSeconds((seconds) => Math.max(0, seconds - 1)),
+      1000,
+    );
+    const timeout = window.setTimeout(
+      () => router.replace(`${basePath}/${created.publicId}`),
+      5000,
+    );
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [basePath, created, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -246,10 +266,12 @@ export function CreateEventForm({
         ? created.publicUrl
         : `${window.location.origin}/event/${created.publicId}`;
     return (
-      <div className="space-y-6">
-      <section className="surface-card grid gap-8 rounded-[2rem] p-6 sm:p-9 lg:grid-cols-[1fr_260px]">
+      <section className="success-event-card surface-card relative grid gap-8 overflow-hidden rounded-[2rem] p-6 sm:p-9 lg:grid-cols-[1fr_260px]">
+        <div className="success-confetti" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, index) => <span key={index} />)}
+        </div>
         <div className="flex flex-col justify-center">
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700">
+          <span className="success-check grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-3xl text-emerald-700">
             ✓
           </span>
           <p className="mt-6 text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
@@ -259,7 +281,7 @@ export function CreateEventForm({
             {created.title}
           </h2>
           <p className="mt-3 max-w-xl text-[#173b57]/60">
-            Събитието е създадено. Сподели линка или QR кода с гостите.
+            Събитието е създадено успешно. Сподели линка или QR кода с гостите.
           </p>
           <p className="mt-5 break-all rounded-xl bg-[#173b57]/5 px-4 py-3 text-sm">
             {publicUrl}
@@ -274,8 +296,17 @@ export function CreateEventForm({
               href={`${basePath}/${created.publicId}`}
               className="primary-action"
             >
-              Отвори събитието
+              Отвори сега
             </Link>
+          </div>
+          <div className="mt-6 max-w-md">
+            <div className="flex justify-between text-xs font-semibold opacity-55">
+              <span>Автоматично пренасочване</span>
+              <span>{redirectSeconds} сек.</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#173b57]/10">
+              <span className="success-redirect-progress block h-full rounded-full bg-emerald-500" />
+            </div>
           </div>
         </div>
         <div className="rounded-2xl bg-white p-4 shadow-xl">
@@ -293,8 +324,6 @@ export function CreateEventForm({
           )}
         </div>
       </section>
-      <EventQuizBuilder publicId={created.publicId} />
-      </div>
     );
   }
 
@@ -312,13 +341,13 @@ export function CreateEventForm({
       }
     >
       <div
-        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9"
+        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
         }}
       >
-        <div className="border-b border-[#173b57]/10 pb-6">
+        <div className="border-b border-[#173b57]/10 pb-6 md:hidden">
           <div className="flex items-center justify-between gap-3 text-xs font-bold">
             <span>{WIZARD_STEPS[wizardStep]}</span>
             <span className="opacity-45">
@@ -334,7 +363,7 @@ export function CreateEventForm({
               }}
             />
           </div>
-          <div className="mt-4 hidden grid-cols-5 gap-2 sm:grid">
+          <div className="mt-4 hidden grid-cols-6 gap-2 sm:grid">
             {WIZARD_STEPS.map((step, index) => (
               <button
                 key={step}
@@ -410,6 +439,15 @@ export function CreateEventForm({
               </div>
             )}
           </fieldset>
+        </FormSection>
+        </div>
+
+        <div data-wizard-step="1" hidden={wizardStep !== 1} className="wizard-step-panel">
+        <FormSection
+          number="02"
+          title="Детайли за събитието"
+          description="Добави послание, място и начален час."
+        >
           <Field label="Послание към гостите" hint="Незадължително">
             <textarea
               name="description"
@@ -451,9 +489,9 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="1" hidden={wizardStep !== 1} className="wizard-step-panel">
+        <div data-wizard-step="2" hidden={wizardStep !== 2} className="wizard-step-panel">
         <FormSection
-          number="02"
+          number="03"
           title="Изглед за гостите"
           description="Направи публичната страница лична и разпознаваема."
         >
@@ -565,9 +603,9 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="2" hidden={wizardStep !== 2} className="wizard-step-panel">
+        <div data-wizard-step="3" hidden={wizardStep !== 3} className="wizard-step-panel">
         <FormSection
-          number="03"
+          number="04"
           title="Период за качване"
           description="Определи докога гостите могат да изпращат снимки."
         >
@@ -600,9 +638,9 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="3" hidden={wizardStep !== 3} className="wizard-step-panel">
+        <div data-wizard-step="4" hidden={wizardStep !== 4} className="wizard-step-panel">
         <FormSection
-          number="04"
+          number="05"
           title="Quiz за гостите"
           description="Добави кратък quiz, който гостите попълват преди снимките."
         >
@@ -764,7 +802,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="4" hidden={wizardStep !== 4} className="wizard-step-panel">
+        <div data-wizard-step="5" hidden={wizardStep !== 5} className="wizard-review-step wizard-step-panel">
           <section>
             <p className="text-xs font-bold tracking-[0.16em] uppercase opacity-50">
               Финална проверка
@@ -789,12 +827,12 @@ export function CreateEventForm({
         {error && (
           <p
             role="alert"
-            className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+            className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 md:col-span-2"
           >
             {error}
           </p>
         )}
-        <div className="flex gap-3">
+        <div className="flex gap-3 md:hidden">
           {wizardStep > 0 && (
             <button
               type="button"
@@ -832,6 +870,20 @@ export function CreateEventForm({
             </button>
           )}
         </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="primary-action hidden w-full justify-center py-4 disabled:cursor-wait disabled:opacity-60 md:col-span-2 md:flex"
+          style={{
+            background: `linear-gradient(135deg, ${previewTheme.primary}, ${previewTheme.accent})`,
+          }}
+        >
+          {isSubmitting
+            ? cover && progress < 100
+              ? `Качване на снимката · ${progress}%`
+              : "Създаване…"
+            : "Създай събитието →"}
+        </button>
       </div>
 
       <aside className="theme-edit-surface surface-card rounded-[2rem] p-5 transition-colors duration-300 lg:sticky lg:top-24">
