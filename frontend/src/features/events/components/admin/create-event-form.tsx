@@ -412,7 +412,7 @@ export function CreateEventForm({
                     onChange={() => setSelectedTheme(value)}
                     className="peer sr-only"
                   />
-                  <span className="flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
+                  <span className="theme-preset-card flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
                     <span className="flex -space-x-1">
                       <span
                         className="h-5 w-5 rounded-full ring-2 ring-white"
@@ -591,9 +591,47 @@ export function CreateEventForm({
                           placeholder={`Отговор ${optionIndex + 1}`}
                           className="field-input"
                         />
+                        {question.options.length > 2 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const options = question.options.filter(
+                                (_, index) => index !== optionIndex,
+                              );
+                              const correctOption =
+                                question.correctOption === optionIndex
+                                  ? 0
+                                  : question.correctOption > optionIndex
+                                    ? question.correctOption - 1
+                                    : question.correctOption;
+                              updateQuizQuestion(
+                                setQuizQuestions,
+                                questionIndex,
+                                { options, correctOption },
+                              );
+                            }}
+                            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-current/15 text-lg opacity-45 transition hover:opacity-100"
+                            aria-label={`Премахни отговор ${optionIndex + 1}`}
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
+                  {question.options.length < 4 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateQuizQuestion(setQuizQuestions, questionIndex, {
+                          options: [...question.options, ""],
+                        })
+                      }
+                      className="secondary-action mt-3 w-full justify-center"
+                    >
+                      + Добави отговор
+                    </button>
+                  )}
                 </article>
               ))}
               {quizQuestions.length < 10 && (
@@ -687,7 +725,7 @@ function FormSection({
   return (
     <section className="border-b border-[#173b57]/10 pb-9 last:border-0 last:pb-0">
       <div className="mb-6 flex gap-4">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#173b57] text-xs font-bold text-white">
+        <span className="theme-section-number grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#173b57] text-xs font-bold text-white">
           {number}
         </span>
         <div>

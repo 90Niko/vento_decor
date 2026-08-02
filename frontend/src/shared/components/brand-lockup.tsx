@@ -14,9 +14,9 @@ export function BrandLockup({
   iconOnly = false,
 }: BrandLockupProps) {
   return (
-    <Link href={href} className="group inline-flex items-center gap-3.5">
+    <Link href={href} className="brand-lockup group inline-flex items-center gap-3.5">
       <span
-        className={`relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[0.95rem] shadow-sm transition duration-300 group-hover:-rotate-3 group-hover:scale-105 ${
+        className={`brand-lockup-icon relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[0.95rem] shadow-sm transition duration-300 group-hover:-rotate-3 group-hover:scale-105 ${
           inverse
             ? "bg-[#eaf6ff] text-[#173b57]"
             : "bg-[#173b57] text-[#ffffff]"
@@ -26,11 +26,11 @@ export function BrandLockup({
         <span className="relative text-sm font-bold">V</span>
       </span>
       {!iconOnly && <span>
-        <span className="block text-sm font-bold tracking-[0.16em] uppercase">
+        <span className="brand-lockup-title block text-sm font-bold tracking-[0.16em] uppercase">
           Vento Decor
         </span>
         <span
-          className={`mt-0.5 block text-xs ${inverse ? "text-[#eaf6ff]/75" : "text-[#173b57]/68"}`}
+          className={`brand-lockup-subtitle mt-0.5 block text-xs ${inverse ? "text-[#eaf6ff]/75" : "text-[#173b57]/68"}`}
         >
           {subtitle}
         </span>

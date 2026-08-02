@@ -6,7 +6,7 @@ export default function AdminEventsPage() {
   return (
     <main className="admin-canvas min-h-screen text-[#173b57]">
       <div className="mx-auto flex min-h-screen w-full max-w-[1500px]">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[#173b57]/10 bg-white/60 px-5 py-7 backdrop-blur-xl lg:flex">
+        <aside className="sticky top-[76px] hidden h-[calc(100vh-76px)] w-64 shrink-0 self-start flex-col border-r border-[#173b57]/10 bg-white/60 px-5 py-7 backdrop-blur-xl lg:flex">
           <nav className="mt-12 space-y-2" aria-label="Админ навигация">
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />
             <NavItem href="#events" label="Събития" icon={<CalendarIcon />} />
@@ -19,16 +19,6 @@ export default function AdminEventsPage() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-40 border-b border-[#173b57]/10 bg-[#f4fbff]/80 backdrop-blur-xl">
-            <div className="flex h-[76px] items-center justify-between px-5 sm:px-8 lg:px-10">
-              <div />
-              <div className="hidden lg:block">
-                <p className="text-sm font-semibold">Админ дашборд</p>
-                <p className="mt-0.5 text-xs text-[#173b57]/50">Управление на събития и галерии</p>
-              </div>
-            </div>
-          </header>
-
           <div className="px-5 pt-8 pb-28 sm:px-8 lg:px-10 lg:py-10">
             <section id="overview" className="mb-8 scroll-mt-28">
               <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">Общ преглед</p>

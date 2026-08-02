@@ -432,6 +432,54 @@ a {
   );
 }
 
+.live-event-page-theme .admin-canvas {
+  color: var(--active-event-theme-primary);
+}
+
+.live-event-page-theme .admin-canvas :where(h1, h2, h3, legend, p) {
+  color: var(--active-event-theme-primary);
+}
+
+.live-event-page-theme .brand-lockup-icon,
+.live-event-theme .theme-section-number {
+  background: var(--active-event-theme-primary);
+}
+
+.live-event-page-theme .brand-lockup-icon > span:first-child {
+  background: var(--active-event-theme-accent);
+}
+
+.live-event-page-theme .brand-lockup-title {
+  color: var(--active-event-theme-primary);
+}
+
+.live-event-page-theme .brand-lockup-subtitle {
+  color: color-mix(in srgb, var(--active-event-theme-primary) 68%, transparent);
+}
+
+.live-event-theme .theme-preset-card {
+  border-color: color-mix(in srgb, var(--event-theme-primary) 14%, transparent);
+  color: var(--event-theme-primary);
+}
+
+.live-event-theme input:checked + .theme-preset-card {
+  border-color: var(--event-theme-accent);
+  background: color-mix(in srgb, var(--event-theme-accent) 13%, #fff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--event-theme-accent) 20%, transparent);
+}
+
+.live-event-theme .secondary-action {
+  border-color: color-mix(in srgb, var(--event-theme-primary) 18%, transparent);
+  color: var(--event-theme-primary);
+}
+
+.live-event-page-theme .primary-action,
+.live-event-page-theme .theme-section-number,
+.live-event-page-theme .theme-guest-preview,
+.live-event-page-theme .theme-guest-preview :where(p, span) {
+  color: #fff;
+}
+
 .route-navbar-background {
   border-color: color-mix(in srgb, var(--active-event-theme-primary, #173b57) 12%, transparent);
   background: color-mix(in srgb, var(--active-event-theme-background, #fff) 35%, #fff 65%);
