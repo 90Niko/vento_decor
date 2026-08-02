@@ -702,15 +702,21 @@ export function CreateEventForm({
                 const quizPanel = event.currentTarget.closest<HTMLElement>(
                   '[data-wizard-step="5"]',
                 );
+                const pageScrollX = window.scrollX;
+                const pageScrollY = window.scrollY;
+                const panelScrollTop = quizPanel?.scrollTop ?? 0;
                 setQuizEnabled(enabled);
                 if (enabled && quizQuestions.length === 0) {
                   setQuizQuestions([
                     { prompt: "", options: ["", ""], correctOption: 0 },
                   ]);
                 }
-                window.requestAnimationFrame(() =>
-                  quizPanel?.scrollTo({ top: 0, behavior: "auto" }),
-                );
+                window.requestAnimationFrame(() => {
+                  window.requestAnimationFrame(() => {
+                    quizPanel?.scrollTo({ top: panelScrollTop });
+                    window.scrollTo(pageScrollX, pageScrollY);
+                  });
+                });
               }}
               className="mt-0.5"
             />

@@ -627,6 +627,7 @@ a {
 
 .quiz-settings-reveal {
   transform-origin: top center;
+  overflow-anchor: none;
   animation: event-actions-reveal 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
