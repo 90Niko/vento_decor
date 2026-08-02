@@ -6,6 +6,7 @@ import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
 import { EventQuizBuilder, type ManagerQuiz } from "./event-quiz-builder";
 import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
+import { ToggleSwitch } from "@/shared/components/toggle-switch";
 
 export function EditEventForm({
   publicId,
@@ -178,11 +179,10 @@ export function EditEventForm({
           )}
         </Field>
         <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
-            <input
+            <ToggleSwitch
               name="requireGuestOtp"
-              type="checkbox"
               defaultChecked={event.requireGuestOtp}
-              className="mt-1 h-4 w-4 accent-[#173b57]"
+              className="mt-0.5"
             />
             <span>
               <span className="block text-sm font-semibold">

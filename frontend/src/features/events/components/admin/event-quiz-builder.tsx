@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { eventsService } from "@/features/events/services/events.service";
+import { ToggleSwitch } from "@/shared/components/toggle-switch";
 
 export interface QuizQuestion {
   prompt: string;
@@ -93,13 +94,11 @@ export function EventQuizBuilder({
           </p>
         </div>
         <label className="flex cursor-pointer items-center gap-3 rounded-full bg-[#173b57]/5 px-4 py-3 text-sm font-bold">
-          <input
-            type="checkbox"
+          <ToggleSwitch
             checked={quiz.enabled}
             onChange={(event) =>
               setQuiz({ ...quiz, enabled: event.target.checked })
             }
-            className="h-4 w-4 accent-[#173b57]"
           />
           Включен
         </label>

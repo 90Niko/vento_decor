@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { BrandLockup } from "@/shared/components/brand-lockup";
+import { ToggleSwitch } from "@/shared/components/toggle-switch";
 import { authService, readAuthError } from "@/features/auth/services/auth.service";
 
 type AuthMode = "login" | "register";
@@ -136,10 +137,8 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 
               <div className="flex items-center justify-between gap-4 text-sm">
                 <label className="flex cursor-pointer items-center gap-2.5 text-[#173b57]/65">
-                  <input
-                    type="checkbox"
+                  <ToggleSwitch
                     required={isRegister}
-                    className="h-4 w-4 accent-[#173b57]"
                   />
                   {isRegister ? "Приемам условията" : "Запомни ме"}
                 </label>

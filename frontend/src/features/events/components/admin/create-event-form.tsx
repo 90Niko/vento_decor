@@ -9,6 +9,7 @@ import { eventsService } from "@/features/events/services/events.service";
 import type { CreatedEvent } from "@/features/events/types/events";
 import { uploadImages } from "@/features/uploads/services/uploads.service";
 import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
+import { ToggleSwitch } from "@/shared/components/toggle-switch";
 
 const EVENT_TYPES = [
   ["wedding", "💍", "Сватба"],
@@ -462,7 +463,7 @@ export function CreateEventForm({
 
         <div data-wizard-step="6" data-active={wizardStep === 6} className="wizard-step-panel">
         <FormSection
-          number="02"
+          number="07"
           title="Детайли за събитието"
           description="Добави послание, място и начален час."
         >
@@ -505,7 +506,7 @@ export function CreateEventForm({
 
         <div data-wizard-step="1" data-active={wizardStep === 1} className="wizard-step-panel">
         <FormSection
-          number="03"
+          number="02"
           title="Място и време"
           description="Къде и кога ще се проведе събитието."
         >
@@ -533,7 +534,7 @@ export function CreateEventForm({
 
         <div data-wizard-step="2" data-active={wizardStep === 2} className="wizard-step-panel">
         <FormSection
-          number="04"
+          number="03"
           title="Заглавна снимка"
           description="Избери снимката, която гостите ще виждат първо."
         >
@@ -590,7 +591,7 @@ export function CreateEventForm({
 
         <div data-wizard-step="3" data-active={wizardStep === 3} className="wizard-step-panel">
         <FormSection
-          number="05"
+          number="04"
           title="Цветова тема"
           description="Избери цветовете на страницата за гостите."
         >
@@ -627,13 +628,12 @@ export function CreateEventForm({
               ))}
             </div>
             <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
-              <input
-                type="checkbox"
+              <ToggleSwitch
                 checked={selectedTheme === "custom"}
                 onChange={(event) =>
                   setSelectedTheme(event.target.checked ? "custom" : "ocean")
                 }
-                className="mt-0.5 h-4 w-4 accent-[#173b57]"
+                className="mt-0.5"
               />
               <span>
                 <span className="block text-sm font-semibold">
@@ -656,15 +656,14 @@ export function CreateEventForm({
 
         <div data-wizard-step="4" data-active={wizardStep === 4} className="wizard-step-panel">
         <FormSection
-          number="06"
+          number="05"
           title="Период за качване"
           description="Определи докога гостите могат да изпращат снимки."
         >
           <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
-              <input
+              <ToggleSwitch
                 name="requireGuestOtp"
-                type="checkbox"
-                className="mt-1 h-4 w-4 accent-[#173b57]"
+                className="mt-0.5"
               />
               <span>
                 <span className="block text-sm font-semibold">
@@ -691,24 +690,29 @@ export function CreateEventForm({
 
         <div data-wizard-step="5" data-active={wizardStep === 5} className="wizard-step-panel">
         <FormSection
-          number="07"
+          number="06"
           title="Quiz за гостите"
           description="Добави кратък quiz, който гостите попълват преди снимките."
         >
           <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
-            <input
-              type="checkbox"
+            <ToggleSwitch
               checked={quizEnabled}
               onChange={(event) => {
                 const enabled = event.target.checked;
+                const quizPanel = event.currentTarget.closest<HTMLElement>(
+                  '[data-wizard-step="5"]',
+                );
                 setQuizEnabled(enabled);
                 if (enabled && quizQuestions.length === 0) {
                   setQuizQuestions([
                     { prompt: "", options: ["", ""], correctOption: 0 },
                   ]);
                 }
+                window.requestAnimationFrame(() =>
+                  quizPanel?.scrollTo({ top: 0, behavior: "auto" }),
+                );
               }}
-              className="mt-0.5 h-4 w-4"
+              className="mt-0.5"
             />
             <span>
               <span className="block text-sm font-semibold">Включи quiz</span>
