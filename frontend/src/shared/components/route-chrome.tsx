@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SiteFooter } from "./site-footer";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "./brand-lockup";
+import { getApiUrl } from "@/shared/api/client";
 
 export function RouteChrome() {
   const pathname = usePathname();
+  const [userName, setUserName] = useState<string | null>(null);
   const hasNavigation =
     ["/", "/ai-chat"].includes(pathname) ||
     pathname.startsWith("/dashboard") ||
@@ -23,6 +25,29 @@ export function RouteChrome() {
     return () =>
       document.documentElement.classList.remove("has-fixed-route-navbar");
   }, [hasNavigation]);
+
+  useEffect(() => {
+    const isPrivateRoute =
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/admin") ||
+      pathname === "/ai-chat";
+    if (!isPrivateRoute) return;
+    const controller = new AbortController();
+    void fetch(`${getApiUrl()}/auth/me`, {
+      credentials: "include",
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const result = (await response.json()) as {
+          creator?: { name?: string };
+        };
+        if (result.creator?.name) setUserName(result.creator.name);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [pathname]);
 
   const isPublicNavigationRoute = pathname === "/";
   if (isPublicNavigationRoute) {
@@ -40,7 +65,8 @@ export function RouteChrome() {
         pathname={pathname}
         showLogout
         brandHref="/dashboard/events"
-        brandSubtitle="Creator dashboard"
+        brandSubtitle={userName ? `Здравей, ${userName}` : "Creator dashboard"}
+        userName={userName}
         items={[
           {
             href: "/dashboard/events",
@@ -67,7 +93,8 @@ export function RouteChrome() {
         pathname={pathname}
         showLogout
         brandHref="/admin/events"
-        brandSubtitle="Администрация"
+        brandSubtitle={userName ? `Здравей, ${userName}` : "Администрация"}
+        userName={userName}
         items={[
           {
             href: "/admin/events",
@@ -114,12 +141,14 @@ function BottomNavigation({
   showLogout = false,
   brandHref,
   brandSubtitle,
+  userName,
 }: {
   pathname: string;
   items: NavigationItem[];
   showLogout?: boolean;
   brandHref: string;
   brandSubtitle: string;
+  userName?: string | null;
 }) {
   return (
     <>
@@ -133,6 +162,11 @@ function BottomNavigation({
         className="route-navbar fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] lg:right-10"
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
+        {userName && (
+          <span className="absolute right-1 bottom-full mb-1 text-xs font-semibold text-[#173b57]/55 md:hidden">
+            Здравей, {userName}
+          </span>
+        )}
         <div className="fixed top-2 left-6 hidden h-[3.75rem] items-center md:flex lg:left-10">
           <BrandLockup href={brandHref} subtitle={brandSubtitle} />
         </div>

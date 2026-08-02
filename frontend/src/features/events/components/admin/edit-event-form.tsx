@@ -14,7 +14,6 @@ export function EditEventForm({
   publicId: string;
   basePath?: string;
 }) {
-  const canConfigureGuestOtp = basePath.startsWith("/admin");
   const router = useRouter();
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -159,8 +158,7 @@ export function EditEventForm({
             </span>
           )}
         </Field>
-        {canConfigureGuestOtp && (
-          <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
+        <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
             <input
               name="requireGuestOtp"
               type="checkbox"
@@ -175,8 +173,7 @@ export function EditEventForm({
                 Изисквай 6-цифрен код преди достъп до галерията.
               </span>
             </span>
-          </label>
-        )}
+        </label>
         {error && (
           <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>
         )}

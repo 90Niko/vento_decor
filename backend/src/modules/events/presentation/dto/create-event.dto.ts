@@ -1,7 +1,6 @@
 import {
   IsBoolean,
   IsISO8601,
-  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -44,7 +43,9 @@ export class CreateEventDto {
   location!: string;
 
   @IsOptional()
-  @IsIn(['wedding', 'birthday', 'baptism', 'prom', 'corporate', 'other'])
+  @IsString()
+  @Matches(/\S/)
+  @MaxLength(40)
   eventType?: string;
 
   @IsOptional()

@@ -39,7 +39,6 @@ export function CreateEventForm({
 }: {
   basePath?: string;
 }) {
-  const canConfigureGuestOtp = basePath.startsWith("/admin");
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +54,8 @@ export function CreateEventForm({
   const [quizEnabled, setQuizEnabled] = useState(false);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizQuestions, setQuizQuestions] = useState<QuizDraftQuestion[]>([]);
+  const [selectedEventType, setSelectedEventType] = useState("wedding");
+  const [customEventType, setCustomEventType] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const previewTheme = getEventTheme(
     selectedTheme === "custom"
@@ -115,7 +116,10 @@ export function CreateEventForm({
 
       const response = await eventsService.createEventResponse({
         title: String(data.get("title") ?? ""),
-        eventType: String(data.get("eventType") ?? "other"),
+        eventType:
+          selectedEventType === "other"
+            ? customEventType.trim()
+            : selectedEventType,
         description: optionalValue(data, "description"),
         location: String(data.get("location") ?? ""),
         startAt: optionalDate(data, "startAt"),
@@ -286,13 +290,14 @@ export function CreateEventForm({
           <fieldset>
             <legend className="mb-3 text-sm font-semibold">Тип събитие</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {EVENT_TYPES.map(([value, icon, label], index) => (
+              {EVENT_TYPES.map(([value, icon, label]) => (
                 <label key={value} className="cursor-pointer">
                   <input
                     type="radio"
                     name="eventType"
                     value={value}
-                    defaultChecked={index === 0}
+                    checked={selectedEventType === value}
+                    onChange={() => setSelectedEventType(value)}
                     className="peer sr-only"
                   />
                   <span className="flex items-center gap-2 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:bg-[#5aa9d6]/12 peer-checked:text-[#173b57]">
@@ -302,6 +307,21 @@ export function CreateEventForm({
                 </label>
               ))}
             </div>
+            {selectedEventType === "other" && (
+              <div className="mt-4">
+                <Field label="Вид на събитието" required hint="До 40 символа">
+                  <input
+                    value={customEventType}
+                    onChange={(event) => setCustomEventType(event.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={40}
+                    className="field-input"
+                    placeholder="Напр. Годеж, юбилей, фирмено парти"
+                  />
+                </Field>
+              </div>
+            )}
           </fieldset>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Дата и начален час" required>
@@ -460,8 +480,7 @@ export function CreateEventForm({
           title="Период за качване"
           description="Определи докога гостите могат да изпращат снимки."
         >
-          {canConfigureGuestOtp && (
-            <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
+          <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
               <input
                 name="requireGuestOtp"
                 type="checkbox"
@@ -476,8 +495,7 @@ export function CreateEventForm({
                   код.
                 </span>
               </span>
-            </label>
-          )}
+          </label>
           <Field
             label="Краен срок за качване"
             hint="Може да се промени по-късно"

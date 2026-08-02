@@ -556,7 +556,7 @@ function getEventTypeLabel(value: string) {
     corporate: "Корпоративно събитие",
     other: "Специално събитие",
   };
-  return labels[value] ?? labels.other;
+  return labels[value] ?? value;
 }
 
 function formatImageDate(value: string) {

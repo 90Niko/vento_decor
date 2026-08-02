@@ -499,6 +499,40 @@ a {
   background: var(--active-event-theme-accent, #5aa9d6);
 }
 
+@keyframes route-nav-active-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes route-nav-active-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.route-navbar .route-nav-active::before {
+  position: absolute;
+  inset: 0.3rem;
+  z-index: -1;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--active-event-theme-accent, #5aa9d6) 22%, transparent);
+  content: "";
+  animation: route-nav-active-pulse 2.4s ease-in-out infinite;
+}
+
+.route-navbar .route-nav-active > span:first-of-type {
+  animation: route-nav-active-float 2.4s ease-in-out infinite;
+}
+
+.route-navbar .route-nav-active .route-nav-indicator {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--active-event-theme-accent, #5aa9d6) 70%, transparent);
+}
+
 @media (min-width: 768px) {
   .has-fixed-route-navbar body {
     padding-top: 76px;
