@@ -36,8 +36,10 @@ interface QuizDraftQuestion {
 
 const WIZARD_STEPS = [
   "Основно",
-  "Детайли",
-  "Визия",
+  "Послание",
+  "Място и време",
+  "Снимка",
+  "Цветове",
   "Достъп",
   "Quiz",
   "Преглед",
@@ -349,7 +351,7 @@ export function CreateEventForm({
         ×
       </Link>
       <div
-        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0 md:pb-9"
+        className="theme-edit-surface surface-card wizard-form-surface space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0 md:pb-9"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
@@ -371,7 +373,7 @@ export function CreateEventForm({
               }}
             />
           </div>
-          <div className="mt-4 hidden grid-cols-6 gap-2 sm:grid">
+          <div className="mt-4 hidden grid-cols-8 gap-2 sm:grid">
             {WIZARD_STEPS.map((step, index) => (
               <button
                 key={step}
@@ -396,7 +398,7 @@ export function CreateEventForm({
             ))}
           </div>
         </div>
-        <div data-wizard-step="0" hidden={wizardStep !== 0} className="wizard-step-panel">
+        <div data-wizard-step="0" data-active={wizardStep === 0} className="wizard-step-panel">
         <FormSection
           number="01"
           title="Основна информация"
@@ -450,7 +452,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="1" hidden={wizardStep !== 1} className="wizard-step-panel">
+        <div data-wizard-step="1" data-active={wizardStep === 1} className="wizard-step-panel">
         <FormSection
           number="02"
           title="Детайли за събитието"
@@ -475,6 +477,15 @@ export function CreateEventForm({
               {isGenerating ? "Генериране…" : "✨ Генерирай с AI"}
             </button>
           </Field>
+        </FormSection>
+        </div>
+
+        <div data-wizard-step="2" data-active={wizardStep === 2} className="wizard-step-panel">
+        <FormSection
+          number="03"
+          title="Място и време"
+          description="Къде и кога ще се проведе събитието."
+        >
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Локация" required>
               <input
@@ -497,11 +508,11 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="2" hidden={wizardStep !== 2} className="wizard-step-panel">
+        <div data-wizard-step="3" data-active={wizardStep === 3} className="wizard-step-panel">
         <FormSection
-          number="03"
-          title="Изглед за гостите"
-          description="Направи публичната страница лична и разпознаваема."
+          number="04"
+          title="Заглавна снимка"
+          description="Избери снимката, която гостите ще виждат първо."
         >
           <div>
             <div className="mb-3 flex items-center justify-between">
@@ -551,6 +562,15 @@ export function CreateEventForm({
               )}
             </label>
           </div>
+        </FormSection>
+        </div>
+
+        <div data-wizard-step="4" data-active={wizardStep === 4} className="wizard-step-panel">
+        <FormSection
+          number="05"
+          title="Цветова тема"
+          description="Избери цветовете на страницата за гостите."
+        >
           <fieldset>
             <legend className="text-sm font-semibold">Цветова тема</legend>
             <p className="mt-1 text-xs text-[#173b57]/45">
@@ -611,9 +631,9 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="3" hidden={wizardStep !== 3} className="wizard-step-panel">
+        <div data-wizard-step="5" data-active={wizardStep === 5} className="wizard-step-panel">
         <FormSection
-          number="04"
+          number="06"
           title="Период за качване"
           description="Определи докога гостите могат да изпращат снимки."
         >
@@ -646,9 +666,9 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="4" hidden={wizardStep !== 4} className="wizard-step-panel">
+        <div data-wizard-step="6" data-active={wizardStep === 6} className="wizard-step-panel">
         <FormSection
-          number="05"
+          number="07"
           title="Quiz за гостите"
           description="Добави кратък quiz, който гостите попълват преди снимките."
         >
@@ -810,7 +830,7 @@ export function CreateEventForm({
         </FormSection>
         </div>
 
-        <div data-wizard-step="5" hidden={wizardStep !== 5} className="wizard-review-step wizard-step-panel">
+        <div data-wizard-step="7" data-active={wizardStep === 7} className="wizard-review-step wizard-step-panel">
           <section>
             <p className="text-xs font-bold tracking-[0.16em] uppercase opacity-50">
               Финална проверка
@@ -941,8 +961,8 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-[#173b57]/10 pb-9 last:border-0 last:pb-0">
-      <div className="mb-6 flex gap-4">
+    <section className="wizard-form-section border-b border-[#173b57]/10 pb-9 last:border-0 last:pb-0">
+      <div className="wizard-section-heading mb-6 flex gap-4">
         <span className="theme-section-number grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#173b57] text-xs font-bold text-white">
           {number}
         </span>
@@ -951,7 +971,7 @@ function FormSection({
           <p className="mt-0.5 text-sm text-[#173b57]/50">{description}</p>
         </div>
       </div>
-      <div className="space-y-5">{children}</div>
+      <div className="wizard-section-fields space-y-5">{children}</div>
     </section>
   );
 }
