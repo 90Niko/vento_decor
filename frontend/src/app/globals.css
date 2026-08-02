@@ -714,7 +714,7 @@ a {
 
 @media (min-width: 768px) {
   .wizard-step-panel[hidden]:not(.wizard-review-step) {
-    display: block;
+    display: block !important;
   }
 
   .wizard-step-panel > section {

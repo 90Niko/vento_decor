@@ -340,8 +340,16 @@ export function CreateEventForm({
         } as React.CSSProperties
       }
     >
+      <Link
+        href={basePath}
+        aria-label="Прекрати създаването"
+        title="Прекрати създаването"
+        className="fixed top-4 right-4 z-[70] grid h-11 w-11 place-items-center rounded-full bg-white/90 text-2xl text-[#173b57] shadow-lg backdrop-blur-xl transition hover:rotate-90 hover:bg-white"
+      >
+        ×
+      </Link>
       <div
-        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0"
+        className="theme-edit-surface surface-card space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0 md:pb-9"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
@@ -832,7 +840,7 @@ export function CreateEventForm({
             {error}
           </p>
         )}
-        <div className="flex gap-3 md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-60 flex gap-3 bg-white/92 px-4 py-3 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:static md:hidden">
           {wizardStep > 0 && (
             <button
               type="button"
@@ -886,7 +894,7 @@ export function CreateEventForm({
         </button>
       </div>
 
-      <aside className="theme-edit-surface surface-card rounded-[2rem] p-5 transition-colors duration-300 lg:sticky lg:top-24">
+      <aside className="theme-edit-surface surface-card hidden rounded-[2rem] p-5 transition-colors duration-300 lg:sticky lg:top-24 lg:block">
         <div
           className="theme-guest-preview mb-6 overflow-hidden rounded-2xl p-5 text-white transition-colors duration-300"
           style={{

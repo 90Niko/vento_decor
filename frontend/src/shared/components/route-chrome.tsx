@@ -11,12 +11,16 @@ import { getApiUrl } from "@/shared/api/client";
 
 export function RouteChrome() {
   const pathname = usePathname();
+  const isEventCreationRoute =
+    pathname === "/admin/events/new" ||
+    pathname === "/dashboard/events/new";
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<"ADMIN" | "CREATOR" | null>(null);
   const hasNavigation =
-    ["/", "/ai-chat", "/profile"].includes(pathname) ||
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/admin");
+    !isEventCreationRoute &&
+    (["/", "/ai-chat", "/profile"].includes(pathname) ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/admin"));
 
   useEffect(() => {
     document.documentElement.classList.toggle(
@@ -51,6 +55,8 @@ export function RouteChrome() {
       .catch(() => undefined);
     return () => controller.abort();
   }, [pathname]);
+
+  if (isEventCreationRoute) return null;
 
   const isPublicNavigationRoute = pathname === "/";
   if (isPublicNavigationRoute) {
