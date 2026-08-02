@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 import { eventsService } from "@/features/events/services/events.service";
+import { getEventTheme } from "@/features/events/lib/event-theme";
 
 interface PublicEvent {
   publicId: string;
@@ -38,7 +39,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const theme = getTheme(event?.themeColor);
+  const theme = getEventTheme(event?.themeColor);
 
   useEffect(() => {
     const savedSession = sessionStorage.getItem(guestSessionKey(publicId));
@@ -317,19 +318,6 @@ function formatEventDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-const THEMES: Record<string, { primary: string; accent: string }> = {
-  ocean: { primary: "#173b57", accent: "#5aa9d6" },
-  rose: { primary: "#6d3044", accent: "#d8899e" },
-  sage: { primary: "#354f42", accent: "#8eaa96" },
-  lavender: { primary: "#493d6b", accent: "#a99bd4" },
-  terracotta: { primary: "#6d382b", accent: "#c8795d" },
-  midnight: { primary: "#171b2e", accent: "#59658f" },
-};
-
-function getTheme(theme: string | undefined) {
-  return THEMES[theme ?? "ocean"] ?? THEMES.ocean;
 }
 
 async function readResponseError(response: Response): Promise<string> {

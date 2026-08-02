@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { PublicEvent } from "@/features/events/types/events";
 import { guestSessionKey } from "./event-entry";
+import { getEventTheme } from "@/features/events/lib/event-theme";
 
 interface GuestSession {
   token: string;
@@ -92,7 +93,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
     setResult((await response.json()) as { score: number; total: number });
   }
 
-  const theme = getTheme(event?.themeColor);
+  const theme = getEventTheme(event?.themeColor);
   if (!session || !event || !quiz || !quiz.enabled) {
     return (
       <main className="page-canvas grid min-h-screen place-items-center">
@@ -236,17 +237,4 @@ function resultMessage(score: number, total: number) {
   if (percent >= 0.6)
     return "Почти част от семейството — страхотно представяне!";
   return "Днес ще научиш още много за тях. Най-хубавите моменти тепърва започват!";
-}
-
-const THEMES: Record<string, { primary: string; accent: string }> = {
-  ocean: { primary: "#173b57", accent: "#5aa9d6" },
-  rose: { primary: "#6d3044", accent: "#d8899e" },
-  sage: { primary: "#354f42", accent: "#8eaa96" },
-  lavender: { primary: "#493d6b", accent: "#a99bd4" },
-  terracotta: { primary: "#6d382b", accent: "#c8795d" },
-  midnight: { primary: "#171b2e", accent: "#59658f" },
-};
-
-function getTheme(theme: string | undefined) {
-  return THEMES[theme ?? "ocean"] ?? THEMES.ocean;
 }

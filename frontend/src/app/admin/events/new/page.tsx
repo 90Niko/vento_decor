@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { CreateEventForm } from "@/features/events/components/admin/create-event-form";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 
@@ -6,15 +5,8 @@ export default function CreateEventPage() {
   return (
     <main className="admin-canvas min-h-screen px-5 py-6 text-[#173b57] sm:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl">
-        <header className="surface-card flex items-center justify-between rounded-2xl px-4 py-3 sm:px-5">
+        <header className="surface-card flex items-center rounded-2xl px-4 py-3 sm:px-5">
           <BrandLockup subtitle="Администрация" />
-          <Link
-            href="/admin/events"
-            className="secondary-action px-4 py-2.5"
-          >
-            <span aria-hidden="true">←</span>
-            Към дашборда
-          </Link>
         </header>
 
         <section className="py-10 sm:py-14">

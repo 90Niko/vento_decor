@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getEventTheme } from "@/features/events/lib/event-theme";
 import { UploadStudio } from "@/features/uploads/components/upload-studio";
 import { eventsService } from "@/features/events/services/events.service";
 import type { PublicEvent } from "@/features/events/types/events";
@@ -191,7 +192,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
     );
   }
 
-  const theme = getTheme(event.themeColor);
+  const theme = getEventTheme(event.themeColor);
   const activeImage =
     activeImageIndex === null ? null : gallery[activeImageIndex] ?? null;
 
@@ -537,22 +538,6 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       )}
     </main>
   );
-}
-
-const THEMES: Record<
-  string,
-  { primary: string; accent: string; background: string }
-> = {
-  ocean: { primary: "#173b57", accent: "#5aa9d6", background: "#eaf6ff" },
-  rose: { primary: "#6d3044", accent: "#d8899e", background: "#fff2f5" },
-  sage: { primary: "#354f42", accent: "#8eaa96", background: "#f1f7f2" },
-  lavender: { primary: "#493d6b", accent: "#a99bd4", background: "#f5f2ff" },
-  terracotta: { primary: "#6d382b", accent: "#c8795d", background: "#fff4ef" },
-  midnight: { primary: "#171b2e", accent: "#59658f", background: "#f0f2fa" },
-};
-
-function getTheme(value: string) {
-  return THEMES[value] ?? THEMES.ocean;
 }
 
 function formatEventDate(value: string) {

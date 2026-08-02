@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
 import { EventQuizBuilder } from "./event-quiz-builder";
+import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
 
 export function EditEventForm({
   publicId,
@@ -18,6 +19,9 @@ export function EditEventForm({
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("ocean");
+  const [customPrimary, setCustomPrimary] = useState("#173b57");
+  const [customAccent, setCustomAccent] = useState("#5aa9d6");
 
   useEffect(() => {
     void eventsService
@@ -25,7 +29,16 @@ export function EditEventForm({
       .then(async (response) => {
         if (!response.ok)
           return setError("Събитието не може да бъде заредено.");
-        setEvent((await response.json()) as AdminEventDetails);
+        const loadedEvent = (await response.json()) as AdminEventDetails;
+        const loadedTheme = getEventTheme(loadedEvent.themeColor);
+        setEvent(loadedEvent);
+        setSelectedTheme(
+          loadedEvent.themeColor.startsWith("custom-")
+            ? "custom"
+            : loadedEvent.themeColor,
+        );
+        setCustomPrimary(loadedTheme.primary);
+        setCustomAccent(loadedTheme.accent);
       });
   }, [publicId]);
 
@@ -45,7 +58,10 @@ export function EditEventForm({
       eventType: String(data.get("eventType") ?? "other"),
       startAt: date("startAt"),
       uploadDeadline: date("uploadDeadline"),
-      themeColor: String(data.get("themeColor") ?? "ocean"),
+      themeColor:
+        selectedTheme === "custom"
+          ? customThemeValue(customPrimary, customAccent)
+          : selectedTheme,
       requireGuestOtp: data.has("requireGuestOtp"),
     });
     setSaving(false);
@@ -124,7 +140,8 @@ export function EditEventForm({
         <Field label="Цветова тема">
           <select
             name="themeColor"
-            defaultValue={event.themeColor}
+            value={selectedTheme}
+            onChange={(event) => setSelectedTheme(event.target.value)}
             className="field-input"
           >
             <option value="ocean">Океан</option>
@@ -133,7 +150,14 @@ export function EditEventForm({
             <option value="lavender">Лавандула</option>
             <option value="terracotta">Теракота</option>
             <option value="midnight">Полунощ</option>
+            <option value="custom">Персонална палитра</option>
           </select>
+          {selectedTheme === "custom" && (
+            <span className="mt-3 grid gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
+              <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
+              <ColorPicker label="Акцентен цвят" value={customAccent} onChange={setCustomAccent} />
+            </span>
+          )}
         </Field>
         {canConfigureGuestOtp && (
           <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#173b57]/12 bg-white/55 p-4">
@@ -165,6 +189,15 @@ export function EditEventForm({
       </form>
       <EventQuizBuilder publicId={publicId} />
     </div>
+  );
+}
+
+function ColorPicker({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <span className="flex items-center gap-3 text-sm font-semibold">
+      <input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border-0 bg-transparent p-0" />
+      <span>{label}<span className="mt-0.5 block font-mono text-xs font-normal uppercase opacity-45">{value}</span></span>
+    </span>
   );
 }
 

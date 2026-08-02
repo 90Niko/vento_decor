@@ -62,7 +62,9 @@ export class CreateEventDto {
   coverImagePublicId?: string;
 
   @IsOptional()
-  @IsIn(['ocean', 'rose', 'sage', 'lavender', 'terracotta', 'midnight'])
+  @Matches(
+    /^(ocean|rose|sage|lavender|terracotta|midnight|custom-[0-9a-fA-F]{6}-[0-9a-fA-F]{6})$/,
+  )
   themeColor?: string;
 
   @IsOptional()

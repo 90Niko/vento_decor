@@ -7,6 +7,8 @@ import QRCode from "qrcode";
 import { eventsService } from "@/features/events/services/events.service";
 import type { CreatedEvent } from "@/features/events/types/events";
 import { uploadImages } from "@/features/uploads/services/uploads.service";
+import { EventQuizBuilder } from "./event-quiz-builder";
+import { customThemeValue } from "@/features/events/lib/event-theme";
 
 const EVENT_TYPES = [
   ["wedding", "💍", "Сватба"],
@@ -41,6 +43,9 @@ export function CreateEventForm({
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("ocean");
+  const [customPrimary, setCustomPrimary] = useState("#173b57");
+  const [customAccent, setCustomAccent] = useState("#5aa9d6");
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -86,7 +91,10 @@ export function CreateEventForm({
         uploadDeadline: optionalDate(data, "uploadDeadline"),
         coverImageUrl: uploadedCover?.url,
         coverImagePublicId: uploadedCover?.publicId,
-        themeColor: String(data.get("themeColor") ?? "ocean"),
+        themeColor:
+          String(data.get("themeColor") ?? "ocean") === "custom"
+            ? customThemeValue(customPrimary, customAccent)
+            : String(data.get("themeColor") ?? "ocean"),
         requireGuestOtp: data.has("requireGuestOtp"),
       });
       if (!response.ok) {
@@ -141,6 +149,7 @@ export function CreateEventForm({
         ? created.publicUrl
         : `${window.location.origin}/event/${created.publicId}`;
     return (
+      <div className="space-y-6">
       <section className="surface-card grid gap-8 rounded-[2rem] p-6 sm:p-9 lg:grid-cols-[1fr_260px]">
         <div className="flex flex-col justify-center">
           <span className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700">
@@ -159,12 +168,9 @@ export function CreateEventForm({
             {publicUrl}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href={basePath} className="primary-action">
-              Към дашборда
-            </Link>
             <Link
               href={`${basePath}/${created.publicId}`}
-              className="secondary-action"
+              className="primary-action"
             >
               Отвори събитието
             </Link>
@@ -185,6 +191,8 @@ export function CreateEventForm({
           )}
         </div>
       </section>
+      <EventQuizBuilder publicId={created.publicId} />
+      </div>
     );
   }
 
@@ -219,6 +227,7 @@ export function CreateEventForm({
                     name="eventType"
                     value={value}
                     defaultChecked={index === 0}
+                    onChange={() => setSelectedTheme(value)}
                     className="peer sr-only"
                   />
                   <span className="flex items-center gap-2 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:bg-[#5aa9d6]/12 peer-checked:text-[#173b57]">
@@ -227,7 +236,29 @@ export function CreateEventForm({
                   </span>
                 </label>
               ))}
+              <label className="cursor-pointer">
+                <input
+                  type="radio"
+                  name="themeColor"
+                  value="custom"
+                  onChange={() => setSelectedTheme("custom")}
+                  className="peer sr-only"
+                />
+                <span className="flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
+                  <span className="flex -space-x-1">
+                    <span className="h-5 w-5 rounded-full ring-2 ring-white" style={{ backgroundColor: customPrimary }} />
+                    <span className="h-5 w-5 rounded-full ring-2 ring-white" style={{ backgroundColor: customAccent }} />
+                  </span>
+                  Персонална
+                </span>
+              </label>
             </div>
+            {selectedTheme === "custom" && (
+              <div className="mt-4 grid gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
+                <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
+                <ColorPicker label="Акцентен цвят" value={customAccent} onChange={setCustomAccent} />
+              </div>
+            )}
           </fieldset>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Дата и начален час" required>
@@ -485,6 +516,14 @@ function Tip({ children }: { children: React.ReactNode }) {
       <span className="mt-0.5 text-emerald-500">✓</span>
       <span>{children}</span>
     </li>
+  );
+}
+function ColorPicker({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label className="flex items-center gap-3 text-sm font-semibold">
+      <input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border-0 bg-transparent p-0" />
+      <span>{label}<span className="mt-0.5 block font-mono text-xs font-normal uppercase opacity-45">{value}</span></span>
+    </label>
   );
 }
 function optionalValue(data: FormData, key: string) {
