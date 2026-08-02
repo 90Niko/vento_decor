@@ -48,7 +48,9 @@ export class UploadsService {
       guestToken,
     );
     if (event.uploadDeadline && event.uploadDeadline < new Date()) {
-      throw new ForbiddenException('The upload deadline has passed.');
+      throw new ForbiddenException(
+        'Крайният срок за качване на снимки е изтекъл.',
+      );
     }
     for (const file of files) {
       if (!hasAllowedFileSignature(file)) {

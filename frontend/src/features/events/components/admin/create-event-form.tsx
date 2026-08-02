@@ -354,12 +354,12 @@ export function CreateEventForm({
         href={basePath}
         aria-label="Прекрати създаването"
         title="Прекрати създаването"
-        className="fixed top-4 right-4 z-[70] grid h-11 w-11 place-items-center rounded-full bg-white/90 text-2xl text-[#173b57] shadow-lg backdrop-blur-xl transition hover:rotate-90 hover:bg-white"
+        className="fixed top-4 right-4 z-[70] grid h-11 w-11 place-items-center rounded-full bg-white/90 text-2xl text-[#173b57] shadow-lg backdrop-blur-xl transition hover:rotate-90 hover:bg-white md:top-24"
       >
         ×
       </Link>
       <div
-        className="theme-edit-surface surface-card wizard-form-surface space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-2 md:items-start md:gap-7 md:space-y-0 md:pb-9"
+        className="theme-edit-surface surface-card wizard-form-surface space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-1 md:items-start md:gap-7 md:space-y-0 md:pb-9"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
@@ -878,7 +878,7 @@ export function CreateEventForm({
         {error && (
           <p
             role="alert"
-            className="wizard-form-error rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 md:col-span-2"
+            className="wizard-form-error rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
           >
             {error}
           </p>
@@ -924,7 +924,7 @@ export function CreateEventForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="primary-action desktop-submit-action hidden w-full justify-center py-4 disabled:cursor-wait disabled:opacity-60 md:col-span-2 md:flex"
+          className="primary-action desktop-submit-action hidden w-full justify-center py-4 disabled:cursor-wait disabled:opacity-60 md:flex"
           style={{
             background: `linear-gradient(135deg, ${previewTheme.primary}, ${previewTheme.accent})`,
           }}

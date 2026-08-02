@@ -814,31 +814,12 @@ a {
 .success-confetti span:nth-child(12) { left: 94%; animation-delay: 600ms; }
 
 @media (min-width: 768px) {
-  .wizard-form-surface {
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 0;
-  }
-
   .wizard-step-panel:not(.wizard-review-step) {
     display: block;
   }
 
   .wizard-step-panel > section {
     height: 100%;
-  }
-
-  .wizard-step-panel:not(.wizard-review-step) > .wizard-form-section {
-    border: 1px solid color-mix(in srgb, var(--event-theme-primary) 10%, transparent);
-    border-radius: 1.5rem;
-    background: linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--event-theme-background) 48%, #fff),
-      #fff
-    );
-    padding: 1.5rem;
-    box-shadow: 0 16px 45px color-mix(in srgb, var(--event-theme-primary) 7%, transparent);
   }
 
   .wizard-step-panel[data-wizard-step="0"] { order: 0; }

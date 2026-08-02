@@ -17,7 +17,6 @@ export function RouteChrome() {
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<"ADMIN" | "CREATOR" | null>(null);
   const hasNavigation =
-    !isEventCreationRoute &&
     (["/", "/ai-chat", "/profile"].includes(pathname) ||
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/admin"));
@@ -56,8 +55,6 @@ export function RouteChrome() {
     return () => controller.abort();
   }, [pathname]);
 
-  if (isEventCreationRoute) return null;
-
   const isPublicNavigationRoute = pathname === "/";
   if (isPublicNavigationRoute) {
     return (
@@ -76,6 +73,7 @@ export function RouteChrome() {
     return (
       <BottomNavigation
         pathname={pathname}
+        desktopOnly={isEventCreationRoute}
         showLogout
         brandHref="/dashboard/events"
         brandSubtitle={userName ? `Здравей, ${userName}` : "Creator dashboard"}
@@ -108,6 +106,7 @@ export function RouteChrome() {
     return (
       <BottomNavigation
         pathname={pathname}
+        desktopOnly={isEventCreationRoute}
         showLogout
         brandHref="/admin/events"
         brandSubtitle={userName ? `Здравей, ${userName}` : "Администрация"}
@@ -157,6 +156,7 @@ function BottomNavigation({
   pathname,
   items,
   showLogout = false,
+  desktopOnly = false,
   brandHref,
   brandSubtitle,
   userName,
@@ -164,20 +164,21 @@ function BottomNavigation({
   pathname: string;
   items: NavigationItem[];
   showLogout?: boolean;
+  desktopOnly?: boolean;
   brandHref: string;
   brandSubtitle: string;
   userName?: string | null;
 }) {
   return (
     <>
-      <div className="h-24 md:hidden" aria-hidden="true" />
+      <div className={desktopOnly ? "hidden" : "h-24 md:hidden"} aria-hidden="true" />
       <div
         className="route-navbar-background fixed inset-x-0 top-0 z-40 hidden h-[76px] border-b shadow-[0_8px_30px_rgb(23_59_87/8%)] backdrop-blur-xl md:block"
         aria-hidden="true"
       />
       <nav
         aria-label="Основна навигация"
-        className="route-navbar fixed right-0 bottom-0 left-0 z-50 grid h-[4.75rem] items-center bg-white/90 px-4 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] md:bg-transparent md:shadow-none md:backdrop-blur-none lg:right-10"
+        className={`route-navbar fixed right-0 bottom-0 left-0 z-50 h-[4.75rem] items-center bg-white/90 px-4 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:top-2 md:right-6 md:bottom-auto md:left-auto md:grid md:h-[3.75rem] md:w-[22rem] md:bg-transparent md:shadow-none md:backdrop-blur-none lg:right-10 ${desktopOnly ? "hidden" : "grid"}`}
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         {userName && (
