@@ -587,6 +587,12 @@ a {
     border-left-width: 1px !important;
   }
 
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
   input[type="date"],
   input[type="datetime-local"],
   input[type="time"] {
