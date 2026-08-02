@@ -315,7 +315,7 @@ a {
 }
 
 .navbar-ai-spark {
-  animation: navbar-ai-spin 6s ease-in-out infinite;
+  animation: navbar-ai-spin 10s ease-in-out infinite;
 }
 
 @keyframes ai-new-chat-enter {
@@ -529,7 +529,7 @@ a {
 .route-navbar .route-nav-active::before {
   position: absolute;
   inset: 0.3rem;
-  z-index: -1;
+  z-index: 0;
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--active-event-theme-accent, #5aa9d6) 45%, transparent);
   background: color-mix(in srgb, var(--active-event-theme-accent, #5aa9d6) 14%, transparent);
@@ -537,25 +537,19 @@ a {
   animation: sidebar-ai-halo 2.2s ease-out infinite;
 }
 
-.route-navbar .route-nav-active::after {
-  position: absolute;
-  top: 0.2rem;
-  right: 0.2rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  border: 1px solid #fff;
-  border-radius: 999px;
-  background: #34d399;
-  content: "";
-  animation: sidebar-ai-dot 1.5s ease-in-out infinite;
-}
-
 .route-navbar .route-nav-active > span:first-of-type {
+  position: relative;
+  z-index: 1;
   animation: sidebar-ai-spark 2.8s ease-in-out infinite;
 }
 
 .route-navbar .route-nav-active {
+  isolation: isolate;
   animation: sidebar-ai-breathe 2.8s ease-in-out infinite;
+}
+
+.route-navbar .route-nav-active .route-nav-indicator {
+  z-index: 1;
 }
 
 .route-navbar .route-nav-active .route-nav-indicator {
@@ -583,6 +577,23 @@ a {
   .surface-card {
     border-radius: 0 !important;
     box-shadow: none !important;
+  }
+
+  .field-input {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    border-right-width: 1px !important;
+    border-left-width: 1px !important;
+  }
+
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

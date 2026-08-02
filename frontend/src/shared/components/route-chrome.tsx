@@ -159,7 +159,7 @@ function BottomNavigation({
       />
       <nav
         aria-label="Основна навигация"
-        className="route-navbar fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] lg:right-10"
+        className="route-navbar fixed right-0 bottom-0 left-0 z-50 grid h-[4.75rem] items-center bg-white/90 px-4 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] md:bg-transparent md:shadow-none md:backdrop-blur-none lg:right-10"
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         {userName && (
