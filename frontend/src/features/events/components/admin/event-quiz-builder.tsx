@@ -3,20 +3,28 @@
 import { useEffect, useState } from "react";
 import { eventsService } from "@/features/events/services/events.service";
 
-interface QuizQuestion {
+export interface QuizQuestion {
   prompt: string;
   options: string[];
   correctOption: number;
 }
 
-interface ManagerQuiz {
+export interface ManagerQuiz {
   enabled: boolean;
   title: string;
   questions: QuizQuestion[];
   stats: { attempts: number; averagePercent: number };
 }
 
-export function EventQuizBuilder({ publicId }: { publicId: string }) {
+export function EventQuizBuilder({
+  publicId,
+  hideSaveButton = false,
+  onChange,
+}: {
+  publicId: string;
+  hideSaveButton?: boolean;
+  onChange?: (quiz: ManagerQuiz) => void;
+}) {
   const [quiz, setQuiz] = useState<ManagerQuiz | null>(null);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -30,6 +38,10 @@ export function EventQuizBuilder({ publicId }: { publicId: string }) {
       })
       .catch(() => setNotice("Quiz настройките не могат да бъдат заредени."));
   }, [publicId]);
+
+  useEffect(() => {
+    if (quiz) onChange?.(quiz);
+  }, [quiz, onChange]);
 
   if (!quiz) {
     return (
@@ -93,6 +105,8 @@ export function EventQuizBuilder({ publicId }: { publicId: string }) {
         </label>
       </div>
 
+      {quiz.enabled && (
+      <div className="quiz-settings-reveal">
       <label className="mt-7 block">
         <span className="mb-2 block text-sm font-semibold">Заглавие</span>
         <input
@@ -248,15 +262,19 @@ export function EventQuizBuilder({ publicId }: { publicId: string }) {
           + Добави въпрос
         </button>
       )}
+      </div>
+      )}
       {notice && <p className="mt-4 text-sm font-semibold">{notice}</p>}
-      <button
-        type="button"
-        onClick={() => void save()}
-        disabled={saving}
-        className="primary-action mt-5 w-full justify-center py-4 disabled:opacity-50"
-      >
-        {saving ? "Запазване…" : "Запази quiz-а"}
-      </button>
+      {!hideSaveButton && (
+        <button
+          type="button"
+          onClick={() => void save()}
+          disabled={saving}
+          className="primary-action mt-5 w-full justify-center py-4 disabled:opacity-50"
+        >
+          {saving ? "Запазване…" : "Запази quiz-а"}
+        </button>
+      )}
     </section>
   );
 }

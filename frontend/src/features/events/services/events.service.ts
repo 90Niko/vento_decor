@@ -133,6 +133,13 @@ export const eventsService = {
     });
   },
 
+  getCreatorEventsResponse(): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/mine`, {
+      cache: "no-store",
+      credentials: "include",
+    });
+  },
+
   getAdminEventResponse(
     publicId: string,
     signal?: AbortSignal,

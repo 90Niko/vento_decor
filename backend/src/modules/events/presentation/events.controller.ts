@@ -55,6 +55,14 @@ export class EventsController {
     return this.eventsService.findAllForAdmin(req.creator);
   }
 
+  @Get('mine')
+  @UseGuards(CreatorAuthGuard)
+  findMine(
+    @Req() req: Request & { creator: CreatorSession },
+  ): Promise<AdminEventRecord[]> {
+    return this.eventsService.findAllForCreator(req.creator);
+  }
+
   @Delete('admin/:publicId')
   @UseGuards(CreatorAuthGuard)
   async delete(

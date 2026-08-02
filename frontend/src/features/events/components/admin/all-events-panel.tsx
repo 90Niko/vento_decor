@@ -32,7 +32,9 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await eventsService.getAdminEventsResponse();
+      const response = basePath.startsWith("/dashboard")
+        ? await eventsService.getCreatorEventsResponse()
+        : await eventsService.getAdminEventsResponse();
       if (!response.ok) {
         throw new Error(`Събитията не могат да бъдат заредени (код ${response.status}).`);
       }
@@ -48,7 +50,7 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [basePath]);
 
   async function deleteEvent(event: AdminEvent) {
     setOpenMenuId(null);

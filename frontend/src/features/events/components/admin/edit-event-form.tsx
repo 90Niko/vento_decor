@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
-import { EventQuizBuilder } from "./event-quiz-builder";
+import { EventQuizBuilder, type ManagerQuiz } from "./event-quiz-builder";
 import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
 
 export function EditEventForm({
@@ -21,6 +21,7 @@ export function EditEventForm({
   const [selectedTheme, setSelectedTheme] = useState("ocean");
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
+  const [quiz, setQuiz] = useState<ManagerQuiz | null>(null);
 
   useEffect(() => {
     void eventsService
@@ -63,8 +64,25 @@ export function EditEventForm({
           : selectedTheme,
       requireGuestOtp: data.has("requireGuestOtp"),
     });
+    if (!response.ok) {
+      setSaving(false);
+      return setError("Промените не могат да бъдат запазени.");
+    }
+    if (quiz) {
+      const quizResponse = await eventsService.updateManagerQuizResponse(
+        publicId,
+        {
+          enabled: quiz.enabled,
+          title: quiz.title,
+          questions: quiz.questions,
+        },
+      );
+      if (!quizResponse.ok) {
+        setSaving(false);
+        return setError("Събитието е запазено, но quiz-ът не можа да бъде запазен.");
+      }
+    }
     setSaving(false);
-    if (!response.ok) return setError("Промените не могат да бъдат запазени.");
     router.push(`${basePath}/${publicId}`);
     router.refresh();
   }
@@ -76,6 +94,7 @@ export function EditEventForm({
   return (
     <div className="space-y-8">
       <form
+        id="edit-event-form"
         onSubmit={submit}
         className="surface-card space-y-6 rounded-[2rem] p-6 sm:p-9"
       >
@@ -177,14 +196,20 @@ export function EditEventForm({
         {error && (
           <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>
         )}
-        <button
-          disabled={saving}
-          className="primary-action w-full py-4 disabled:opacity-50"
-        >
-          {saving ? "Запазване…" : "Запази промените"}
-        </button>
       </form>
-      <EventQuizBuilder publicId={publicId} />
+      <EventQuizBuilder
+        publicId={publicId}
+        hideSaveButton
+        onChange={setQuiz}
+      />
+      <button
+        type="submit"
+        form="edit-event-form"
+        disabled={saving}
+        className="primary-action w-full justify-center py-4 disabled:opacity-50"
+      >
+        {saving ? "Запазване…" : "Запази промените"}
+      </button>
     </div>
   );
 }

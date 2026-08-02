@@ -150,6 +150,10 @@ export class EventsService {
     );
   }
 
+  findAllForCreator(creator: CreatorSession): Promise<AdminEventRecord[]> {
+    return this.eventsRepository.findAllForAdmin(creator.id);
+  }
+
   async delete(publicId: string, creator: CreatorSession): Promise<void> {
     const deleted = await this.eventsRepository.deleteByPublicId(
       publicId,
