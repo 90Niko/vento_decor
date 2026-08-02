@@ -28,6 +28,12 @@ const COLOR_THEMES = [
   ["midnight", "#171b2e", "#59658f", "Полунощ"],
 ] as const;
 
+interface QuizDraftQuestion {
+  prompt: string;
+  options: string[];
+  correctOption: number;
+}
+
 export function CreateEventForm({
   basePath = "/admin/events",
 }: {
@@ -46,6 +52,9 @@ export function CreateEventForm({
   const [selectedTheme, setSelectedTheme] = useState("ocean");
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
+  const [quizEnabled, setQuizEnabled] = useState(false);
+  const [quizTitle, setQuizTitle] = useState("");
+  const [quizQuestions, setQuizQuestions] = useState<QuizDraftQuestion[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
   const previewTheme = getEventTheme(
     selectedTheme === "custom"
@@ -58,6 +67,23 @@ export function CreateEventForm({
       if (coverPreview) URL.revokeObjectURL(coverPreview);
     };
   }, [coverPreview]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add("live-event-page-theme");
+    root.style.setProperty("--active-event-theme-primary", previewTheme.primary);
+    root.style.setProperty("--active-event-theme-accent", previewTheme.accent);
+    root.style.setProperty(
+      "--active-event-theme-background",
+      previewTheme.background,
+    );
+    return () => {
+      root.classList.remove("live-event-page-theme");
+      root.style.removeProperty("--active-event-theme-primary");
+      root.style.removeProperty("--active-event-theme-accent");
+      root.style.removeProperty("--active-event-theme-background");
+    };
+  }, [previewTheme.primary, previewTheme.accent, previewTheme.background]);
 
   useEffect(() => {
     if (!created) return;
@@ -105,7 +131,24 @@ export function CreateEventForm({
       if (!response.ok) {
         throw new Error(await readError(response));
       }
-      setCreated((await response.json()) as CreatedEvent);
+      const createdEvent = (await response.json()) as CreatedEvent;
+      if (quizEnabled) {
+        const quizResponse = await eventsService.updateManagerQuizResponse(
+          createdEvent.publicId,
+          {
+            enabled: true,
+            title: quizTitle,
+            questions: quizQuestions,
+          },
+        );
+        if (!quizResponse.ok) {
+          setCreated(createdEvent);
+          throw new Error(
+            "Събитието е създадено, но quiz-ът не можа да бъде запазен. Можеш да го настроиш от секцията по-долу.",
+          );
+        }
+      }
+      setCreated(createdEvent);
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -172,6 +215,11 @@ export function CreateEventForm({
           <p className="mt-5 break-all rounded-xl bg-[#173b57]/5 px-4 py-3 text-sm">
             {publicUrl}
           </p>
+          {error && (
+            <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+              {error}
+            </p>
+          )}
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={`${basePath}/${created.publicId}`}
@@ -442,6 +490,130 @@ export function CreateEventForm({
           </Field>
         </FormSection>
 
+        <FormSection
+          number="04"
+          title="Quiz за гостите"
+          description="Добави кратък quiz, който гостите попълват преди снимките."
+        >
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+            <input
+              type="checkbox"
+              checked={quizEnabled}
+              onChange={(event) => {
+                const enabled = event.target.checked;
+                setQuizEnabled(enabled);
+                if (enabled && quizQuestions.length === 0) {
+                  setQuizQuestions([
+                    { prompt: "", options: ["", ""], correctOption: 0 },
+                  ]);
+                }
+              }}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              <span className="block text-sm font-semibold">Включи quiz</span>
+              <span className="mt-1 block text-xs opacity-55">
+                Всеки гост може да го попълни само веднъж.
+              </span>
+            </span>
+          </label>
+          {quizEnabled && (
+            <div className="space-y-4">
+              <Field label="Заглавие на quiz-а" hint="Незадължително">
+                <input
+                  value={quizTitle}
+                  onChange={(event) => setQuizTitle(event.target.value)}
+                  maxLength={150}
+                  placeholder="Колко добре познаваш домакините?"
+                  className="field-input"
+                />
+              </Field>
+              {quizQuestions.map((question, questionIndex) => (
+                <article
+                  key={questionIndex}
+                  className="rounded-2xl border border-[#173b57]/10 bg-white/55 p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-bold opacity-55">
+                      Въпрос {questionIndex + 1}
+                    </span>
+                    {quizQuestions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setQuizQuestions((questions) =>
+                            questions.filter((_, index) => index !== questionIndex),
+                          )
+                        }
+                        className="text-sm font-bold opacity-50 hover:opacity-100"
+                      >
+                        Премахни
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    required
+                    value={question.prompt}
+                    onChange={(event) =>
+                      updateQuizQuestion(setQuizQuestions, questionIndex, {
+                        prompt: event.target.value,
+                      })
+                    }
+                    maxLength={240}
+                    placeholder="Напиши въпроса…"
+                    className="field-input mt-3"
+                  />
+                  <div className="mt-3 space-y-2">
+                    {question.options.map((option, optionIndex) => (
+                      <div key={optionIndex} className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name={`draft-correct-${questionIndex}`}
+                          checked={question.correctOption === optionIndex}
+                          onChange={() =>
+                            updateQuizQuestion(setQuizQuestions, questionIndex, {
+                              correctOption: optionIndex,
+                            })
+                          }
+                          aria-label="Правилен отговор"
+                        />
+                        <input
+                          required
+                          value={option}
+                          onChange={(event) => {
+                            const options = [...question.options];
+                            options[optionIndex] = event.target.value;
+                            updateQuizQuestion(setQuizQuestions, questionIndex, {
+                              options,
+                            });
+                          }}
+                          maxLength={120}
+                          placeholder={`Отговор ${optionIndex + 1}`}
+                          className="field-input"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+              {quizQuestions.length < 10 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuizQuestions((questions) => [
+                      ...questions,
+                      { prompt: "", options: ["", ""], correctOption: 0 },
+                    ])
+                  }
+                  className="secondary-action w-full justify-center"
+                >
+                  + Добави въпрос
+                </button>
+              )}
+            </div>
+          )}
+        </FormSection>
+
         {error && (
           <p
             role="alert"
@@ -567,6 +739,17 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
       <input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-14 cursor-pointer rounded-lg border-0 bg-transparent p-0" />
       <span>{label}<span className="mt-0.5 block font-mono text-xs font-normal uppercase opacity-45">{value}</span></span>
     </label>
+  );
+}
+function updateQuizQuestion(
+  setQuestions: React.Dispatch<React.SetStateAction<QuizDraftQuestion[]>>,
+  questionIndex: number,
+  update: Partial<QuizDraftQuestion>,
+) {
+  setQuestions((questions) =>
+    questions.map((question, index) =>
+      index === questionIndex ? { ...question, ...update } : question,
+    ),
   );
 }
 function optionalValue(data: FormData, key: string) {

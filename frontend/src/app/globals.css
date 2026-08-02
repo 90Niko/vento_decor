@@ -423,6 +423,53 @@ a {
   color: #fff;
 }
 
+.live-event-page-theme body,
+.live-event-page-theme .admin-canvas {
+  background: linear-gradient(
+    145deg,
+    #fff,
+    color-mix(in srgb, var(--active-event-theme-background) 88%, #fff)
+  );
+}
+
+.route-navbar-background {
+  border-color: color-mix(in srgb, var(--active-event-theme-primary, #173b57) 12%, transparent);
+  background: color-mix(in srgb, var(--active-event-theme-background, #fff) 35%, #fff 65%);
+}
+
+.route-navbar .route-nav-link,
+.route-navbar button {
+  color: color-mix(in srgb, var(--active-event-theme-primary, #173b57) 42%, transparent);
+}
+
+.route-navbar .route-nav-link:hover,
+.route-navbar .route-nav-active {
+  color: var(--active-event-theme-primary, #173b57);
+}
+
+.route-navbar .route-nav-indicator {
+  background: var(--active-event-theme-accent, #5aa9d6);
+}
+
+@media (min-width: 768px) {
+  .has-fixed-route-navbar body {
+    padding-top: 76px;
+  }
+
+  .has-fixed-route-navbar .sticky.top-0 {
+    top: 76px;
+  }
+}
+
+@media (max-width: 767px) {
+  .surface-card {
+    border-right-width: 0 !important;
+    border-left-width: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

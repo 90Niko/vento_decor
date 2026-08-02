@@ -3,12 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { SiteFooter } from "./site-footer";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "./brand-lockup";
 
 export function RouteChrome() {
   const pathname = usePathname();
+  const hasNavigation =
+    ["/", "/login", "/register", "/ai-chat"].includes(pathname) ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/admin");
+
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "has-fixed-route-navbar",
+      hasNavigation,
+    );
+    return () =>
+      document.documentElement.classList.remove("has-fixed-route-navbar");
+  }, [hasNavigation]);
 
   const isPublicNavigationRoute = ["/", "/login", "/register"].includes(pathname);
   if (isPublicNavigationRoute) {
@@ -111,12 +125,12 @@ function BottomNavigation({
     <>
       <div className="h-24 md:hidden" aria-hidden="true" />
       <div
-        className="fixed inset-x-0 top-0 z-40 hidden h-[76px] border-b border-[#173b57]/10 bg-white/85 shadow-[0_8px_30px_rgb(23_59_87/8%)] backdrop-blur-xl md:block"
+        className="route-navbar-background fixed inset-x-0 top-0 z-40 hidden h-[76px] border-b shadow-[0_8px_30px_rgb(23_59_87/8%)] backdrop-blur-xl md:block"
         aria-hidden="true"
       />
       <nav
         aria-label="Основна навигация"
-        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] lg:right-10"
+        className="route-navbar fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-6 md:bottom-auto md:left-auto md:h-[3.75rem] md:w-[22rem] lg:right-10"
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         <div className="fixed top-2 left-6 hidden h-[3.75rem] items-center md:flex lg:left-10">
@@ -132,14 +146,14 @@ function BottomNavigation({
               href={item.href}
               aria-label={item.label}
               aria-current={active ? "page" : undefined}
-              className={`relative mx-auto grid h-12 w-12 place-items-center transition active:scale-90 ${
-                active ? "text-[#173b57]" : "text-[#173b57]/38 hover:text-[#5aa9d6]"
+              className={`route-nav-link relative mx-auto grid h-12 w-12 place-items-center transition active:scale-90 ${
+                active ? "route-nav-active" : ""
               }`}
             >
               <span className="transition-transform duration-300">{item.icon}</span>
               <span
                 aria-hidden="true"
-                className={`absolute -bottom-1 h-0.5 rounded-full bg-[#5aa9d6] transition-all duration-300 ${
+                className={`route-nav-indicator absolute -bottom-1 h-0.5 rounded-full transition-all duration-300 ${
                   active ? "w-6 opacity-100" : "w-0 opacity-0"
                 }`}
               />
