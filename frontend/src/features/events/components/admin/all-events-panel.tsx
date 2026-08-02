@@ -26,6 +26,7 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<EventFilter>("all");
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const loadEvents = useCallback(async () => {
     setIsLoading(true);
@@ -50,6 +51,7 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
   }, []);
 
   async function deleteEvent(event: AdminEvent) {
+    setOpenMenuId(null);
     const confirmed = window.confirm(
       `Да изтрия ли „${event.title}“? Всички гости и снимки към събитието също ще бъдат изтрити. Действието е необратимо.`,
     );
@@ -217,24 +219,47 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                   </span>
                 </div>
                 </Link>
-                <div className="ml-16 flex items-center gap-2 sm:ml-0">
-                  <Link
-                    href={`${basePath}/${event.publicId}/edit`}
-                    aria-label={`Редактирай ${event.title}`}
-                    title="Редактирай събитието"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-[#5aa9d6]/40 text-[#5aa9d6] transition hover:border-[#5aa9d6] hover:bg-[#5aa9d6] hover:text-white"
-                  >
-                    <EditIcon />
-                  </Link>
+                <div className="ml-16 flex min-h-10 items-center justify-end gap-2 sm:ml-0">
+                  {openMenuId === event.id && (
+                    <div className="event-actions-menu flex items-center gap-2 rounded-full bg-[#173b57]/5 p-1.5">
+                      <Link
+                        href={`${basePath}/${event.publicId}/edit`}
+                        onClick={() => setOpenMenuId(null)}
+                        aria-label={`Редактирай ${event.title}`}
+                        title="Редактирай събитието"
+                        className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#5aa9d6] shadow-sm transition hover:bg-[#5aa9d6] hover:text-white"
+                      >
+                        <EditIcon />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => void deleteEvent(event)}
+                        disabled={deletingId === event.id}
+                        aria-label={`Изтрий ${event.title}`}
+                        title="Изтрий събитието"
+                        className="grid h-9 w-9 place-items-center rounded-full bg-white text-red-500 shadow-sm transition hover:bg-red-500 hover:text-white disabled:cursor-wait disabled:opacity-40"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  )}
                   <button
                     type="button"
-                    onClick={() => void deleteEvent(event)}
-                    disabled={deletingId === event.id}
-                    aria-label={`Изтрий ${event.title}`}
-                    title="Изтрий събитието"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-red-200 text-red-500 transition hover:border-red-500 hover:bg-red-500 hover:text-white disabled:cursor-wait disabled:opacity-40"
+                    onClick={() =>
+                      setOpenMenuId((current) =>
+                        current === event.id ? null : event.id,
+                      )
+                    }
+                    aria-expanded={openMenuId === event.id}
+                    aria-label={`Действия за ${event.title}`}
+                    title="Действия"
+                    className={`grid h-10 w-10 place-items-center rounded-full transition ${
+                      openMenuId === event.id
+                        ? "rotate-90 bg-[#173b57] text-white"
+                        : "bg-[#173b57]/5 text-[#173b57]/55 hover:bg-[#173b57]/10 hover:text-[#173b57]"
+                    }`}
                   >
-                    <TrashIcon />
+                    <MoreIcon />
                   </button>
                 </div>
               </div>
@@ -297,3 +322,4 @@ function ImageIcon() { return <svg width="19" height="19" viewBox="0 0 24 24" fi
 function SearchIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" /><path d="m16 16 4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
 function EditIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="m14.5 6.7 2.8 2.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
 function TrashIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
+function MoreIcon() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="19" cy="12" r="1.7" /></svg>; }
