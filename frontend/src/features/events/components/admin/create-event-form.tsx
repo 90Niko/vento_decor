@@ -8,7 +8,7 @@ import { eventsService } from "@/features/events/services/events.service";
 import type { CreatedEvent } from "@/features/events/types/events";
 import { uploadImages } from "@/features/uploads/services/uploads.service";
 import { EventQuizBuilder } from "./event-quiz-builder";
-import { customThemeValue } from "@/features/events/lib/event-theme";
+import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
 
 const EVENT_TYPES = [
   ["wedding", "💍", "Сватба"],
@@ -47,6 +47,11 @@ export function CreateEventForm({
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
   const formRef = useRef<HTMLFormElement>(null);
+  const previewTheme = getEventTheme(
+    selectedTheme === "custom"
+      ? customThemeValue(customPrimary, customAccent)
+      : selectedTheme,
+  );
 
   useEffect(() => {
     return () => {
@@ -92,9 +97,9 @@ export function CreateEventForm({
         coverImageUrl: uploadedCover?.url,
         coverImagePublicId: uploadedCover?.publicId,
         themeColor:
-          String(data.get("themeColor") ?? "ocean") === "custom"
+          selectedTheme === "custom"
             ? customThemeValue(customPrimary, customAccent)
-            : String(data.get("themeColor") ?? "ocean"),
+            : selectedTheme,
         requireGuestOtp: data.has("requireGuestOtp"),
       });
       if (!response.ok) {
@@ -202,7 +207,13 @@ export function CreateEventForm({
       onSubmit={handleSubmit}
       className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
     >
-      <div className="surface-card space-y-9 rounded-[2rem] p-6 sm:p-9">
+      <div
+        className="surface-card space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9"
+        style={{
+          color: previewTheme.primary,
+          background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
+        }}
+      >
         <FormSection
           number="01"
           title="Основна информация"
@@ -236,23 +247,27 @@ export function CreateEventForm({
                   </span>
                 </label>
               ))}
-              <label className="cursor-pointer">
-                <input
-                  type="radio"
-                  name="themeColor"
-                  value="custom"
-                  onChange={() => setSelectedTheme("custom")}
-                  className="peer sr-only"
-                />
-                <span className="flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
-                  <span className="flex -space-x-1">
-                    <span className="h-5 w-5 rounded-full ring-2 ring-white" style={{ backgroundColor: customPrimary }} />
-                    <span className="h-5 w-5 rounded-full ring-2 ring-white" style={{ backgroundColor: customAccent }} />
-                  </span>
-                  Персонална
-                </span>
-              </label>
             </div>
+            <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+              <input
+                type="checkbox"
+                name="themeColor"
+                value="custom"
+                checked={selectedTheme === "custom"}
+                onChange={(event) =>
+                  setSelectedTheme(event.target.checked ? "custom" : "ocean")
+                }
+                className="mt-0.5 h-4 w-4 accent-[#173b57]"
+              />
+              <span>
+                <span className="block text-sm font-semibold">
+                  Персонална палитра
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-[#173b57]/50">
+                  Избери собствен основен и акцентен цвят за събитието.
+                </span>
+              </span>
+            </label>
             {selectedTheme === "custom" && (
               <div className="mt-4 grid gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
                 <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
@@ -359,13 +374,13 @@ export function CreateEventForm({
               Темата определя цветовете на страницата, която виждат гостите.
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {COLOR_THEMES.map(([value, primary, accent, label], index) => (
+              {COLOR_THEMES.map(([value, primary, accent, label]) => (
                 <label key={value} className="cursor-pointer">
                   <input
                     type="radio"
                     name="themeColor"
                     value={value}
-                    defaultChecked={index === 0}
+                    checked={selectedTheme === value}
                     className="peer sr-only"
                   />
                   <span className="flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
@@ -434,6 +449,9 @@ export function CreateEventForm({
           type="submit"
           disabled={isSubmitting}
           className="primary-action w-full py-4 disabled:cursor-wait disabled:opacity-60"
+          style={{
+            background: `linear-gradient(135deg, ${previewTheme.primary}, ${previewTheme.accent})`,
+          }}
         >
           {isSubmitting
             ? cover && progress < 100
@@ -444,6 +462,26 @@ export function CreateEventForm({
       </div>
 
       <aside className="surface-card rounded-[2rem] p-5 lg:sticky lg:top-24">
+        <div
+          className="mb-6 overflow-hidden rounded-2xl p-5 text-white transition-colors duration-300"
+          style={{
+            background: `linear-gradient(145deg, ${previewTheme.primary}, ${previewTheme.accent})`,
+          }}
+        >
+          <p className="text-xs font-bold tracking-[0.16em] text-white/65 uppercase">
+            Преглед на темата
+          </p>
+          <p className="mt-3 text-xl font-semibold">Твоето събитие</p>
+          <p className="mt-2 text-sm text-white/75">
+            Така ще изглеждат основните цветове за гостите.
+          </p>
+          <span
+            className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-xs font-bold"
+            style={{ color: previewTheme.primary }}
+          >
+            Акцентен бутон
+          </span>
+        </div>
         <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
           Добра форма
         </p>

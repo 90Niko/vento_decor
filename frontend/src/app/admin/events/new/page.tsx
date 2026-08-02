@@ -5,7 +5,7 @@ export default function CreateEventPage() {
   return (
     <main className="admin-canvas min-h-screen px-5 py-6 text-[#173b57] sm:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl">
-        <header className="surface-card flex items-center rounded-2xl px-4 py-3 sm:px-5">
+        <header className="flex h-[76px] items-center px-1 sm:px-2">
           <BrandLockup subtitle="Администрация" />
         </header>
 

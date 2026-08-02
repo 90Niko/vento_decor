@@ -103,7 +103,7 @@ function BottomNavigation({
       <div className="h-24 md:hidden" aria-hidden="true" />
       <nav
         aria-label="Основна навигация"
-        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center rounded-[1.4rem] border border-white/80 bg-white/90 px-4 shadow-[0_18px_55px_rgb(23_59_87/24%)] backdrop-blur-xl md:top-2 md:right-auto md:bottom-auto md:left-1/2 md:h-[3.75rem] md:w-[28rem] md:-translate-x-1/2 md:rounded-2xl md:shadow-[0_10px_35px_rgb(23_59_87/16%)]"
+        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] items-center bg-transparent px-4 md:top-2 md:right-auto md:bottom-auto md:left-1/2 md:h-[3.75rem] md:w-[28rem] md:-translate-x-1/2"
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         {items.map((item) => {
