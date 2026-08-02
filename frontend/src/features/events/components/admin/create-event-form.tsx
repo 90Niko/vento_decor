@@ -238,7 +238,6 @@ export function CreateEventForm({
                     name="eventType"
                     value={value}
                     defaultChecked={index === 0}
-                    onChange={() => setSelectedTheme(value)}
                     className="peer sr-only"
                   />
                   <span className="flex items-center gap-2 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:bg-[#5aa9d6]/12 peer-checked:text-[#173b57]">
@@ -248,32 +247,6 @@ export function CreateEventForm({
                 </label>
               ))}
             </div>
-            <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
-              <input
-                type="checkbox"
-                name="themeColor"
-                value="custom"
-                checked={selectedTheme === "custom"}
-                onChange={(event) =>
-                  setSelectedTheme(event.target.checked ? "custom" : "ocean")
-                }
-                className="mt-0.5 h-4 w-4 accent-[#173b57]"
-              />
-              <span>
-                <span className="block text-sm font-semibold">
-                  Персонална палитра
-                </span>
-                <span className="mt-1 block text-xs leading-5 text-[#173b57]/50">
-                  Избери собствен основен и акцентен цвят за събитието.
-                </span>
-              </span>
-            </label>
-            {selectedTheme === "custom" && (
-              <div className="mt-4 grid gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
-                <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
-                <ColorPicker label="Акцентен цвят" value={customAccent} onChange={setCustomAccent} />
-              </div>
-            )}
           </fieldset>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Дата и начален час" required>
@@ -381,6 +354,7 @@ export function CreateEventForm({
                     name="themeColor"
                     value={value}
                     checked={selectedTheme === value}
+                    onChange={() => setSelectedTheme(value)}
                     className="peer sr-only"
                   />
                   <span className="flex items-center gap-3 rounded-xl border border-[#173b57]/12 bg-white/55 px-3 py-3 text-sm font-semibold transition peer-checked:border-[#5aa9d6] peer-checked:ring-2 peer-checked:ring-[#5aa9d6]/20">
@@ -399,6 +373,30 @@ export function CreateEventForm({
                 </label>
               ))}
             </div>
+            <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+              <input
+                type="checkbox"
+                checked={selectedTheme === "custom"}
+                onChange={(event) =>
+                  setSelectedTheme(event.target.checked ? "custom" : "ocean")
+                }
+                className="mt-0.5 h-4 w-4 accent-[#173b57]"
+              />
+              <span>
+                <span className="block text-sm font-semibold">
+                  Персонална палитра
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-[#173b57]/50">
+                  Избери собствен основен и акцентен цвят за събитието.
+                </span>
+              </span>
+            </label>
+            {selectedTheme === "custom" && (
+              <div className="mt-3 grid gap-3 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
+                <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
+                <ColorPicker label="Акцентен цвят" value={customAccent} onChange={setCustomAccent} />
+              </div>
+            )}
           </fieldset>
         </FormSection>
 

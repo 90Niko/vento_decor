@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
-import { BrandLockup } from "@/shared/components/brand-lockup";
 import { CreatorsAdminPanel } from "@/features/auth/components/creators-admin-panel";
 
 export default function AdminEventsPage() {
@@ -8,7 +7,6 @@ export default function AdminEventsPage() {
     <main className="admin-canvas min-h-screen text-[#173b57]">
       <div className="mx-auto flex min-h-screen w-full max-w-[1500px]">
         <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[#173b57]/10 bg-white/60 px-5 py-7 backdrop-blur-xl lg:flex">
-          <BrandLockup subtitle="Администрация" />
           <nav className="mt-12 space-y-2" aria-label="Админ навигация">
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />
             <NavItem href="#events" label="Събития" icon={<CalendarIcon />} />
@@ -23,7 +21,7 @@ export default function AdminEventsPage() {
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-40 border-b border-[#173b57]/10 bg-[#f4fbff]/80 backdrop-blur-xl">
             <div className="flex h-[76px] items-center justify-between px-5 sm:px-8 lg:px-10">
-              <div className="lg:hidden"><BrandLockup subtitle="Администрация" /></div>
+              <div />
               <div className="hidden lg:block">
                 <p className="text-sm font-semibold">Админ дашборд</p>
                 <p className="mt-0.5 text-xs text-[#173b57]/50">Управление на събития и галерии</p>

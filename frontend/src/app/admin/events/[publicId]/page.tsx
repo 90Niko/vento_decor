@@ -1,5 +1,4 @@
 import { EventGallery } from "@/features/events/components/admin/event-gallery";
-import { BrandLockup } from "@/shared/components/brand-lockup";
 
 interface EventDetailsPageProps {
   params: Promise<{ publicId: string }>;
@@ -11,15 +10,6 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   return (
     <main className="page-canvas min-h-screen pb-20 text-[#173b57]">
       <div className="page-container relative max-w-7xl">
-        <header className="sticky top-3 z-30 mb-10 pt-3 sm:top-5 sm:pt-5">
-          <div className="surface-card flex items-center rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
-            <BrandLockup
-              href="/admin/events"
-              subtitle="Галерия на събитието"
-            />
-          </div>
-        </header>
-
         <EventGallery publicId={publicId} />
       </div>
     </main>
