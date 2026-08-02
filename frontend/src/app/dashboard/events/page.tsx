@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
-import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 
 export default function CreatorDashboardPage() {
@@ -12,7 +11,6 @@ export default function CreatorDashboardPage() {
           <div className="flex items-center gap-3">
             <Link href="/ai-chat" className="secondary-action px-4 py-2.5 text-sm">✦ AI чат</Link>
             <Link href="/dashboard/events/new" className="primary-action px-4 py-2.5 text-sm">+ Ново събитие</Link>
-            <LogoutButton />
           </div>
         </div>
       </header>

@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 
-export function LogoutButton({ iconOnly = true }: { iconOnly?: boolean }) {
+export function LogoutButton({
+  iconOnly = true,
+  navigation = false,
+}: {
+  iconOnly?: boolean;
+  navigation?: boolean;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -24,7 +30,9 @@ export function LogoutButton({ iconOnly = true }: { iconOnly?: boolean }) {
       onClick={logout}
       disabled={pending}
       className={
-        iconOnly
+        navigation
+          ? "relative mx-auto grid h-12 w-12 place-items-center text-[#173b57]/38 transition hover:text-[#5aa9d6] active:scale-90 disabled:opacity-50"
+          : iconOnly
           ? "secondary-action grid h-10 w-10 place-items-center p-0"
           : "secondary-action px-4 py-2.5 text-xs sm:text-sm"
       }
