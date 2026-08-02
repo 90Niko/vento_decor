@@ -29,10 +29,10 @@ function PublicBottomNavigation({ pathname }: { pathname: string }) {
 
   return (
     <>
-      <div className="h-24 md:hidden" aria-hidden="true" />
+      <div className="h-24" aria-hidden="true" />
       <nav
-        aria-label="Основна мобилна навигация"
-        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] grid-cols-3 items-center rounded-[1.4rem] border border-white/80 bg-white/90 px-4 shadow-[0_18px_55px_rgb(23_59_87/24%)] backdrop-blur-xl md:hidden"
+        aria-label="Основна навигация"
+        className="fixed right-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] left-3 z-50 grid h-[4.5rem] grid-cols-3 items-center rounded-[1.4rem] border border-white/80 bg-white/90 px-4 shadow-[0_18px_55px_rgb(23_59_87/24%)] backdrop-blur-xl md:right-auto md:left-1/2 md:w-[28rem] md:-translate-x-1/2"
       >
         {items.map((item) => {
           const active = pathname === item.href;

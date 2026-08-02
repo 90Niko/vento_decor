@@ -104,6 +104,7 @@ model event_quiz_attempts {
   events       events       @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "fk_quiz_attempt_event")
   event_guests event_guests @relation(fields: [guest_id], references: [id], onDelete: Cascade, map: "fk_quiz_attempt_guest")
 
+  @@unique([event_id, guest_id], map: "uq_quiz_attempt_event_guest")
   @@index([event_id, created_at], map: "idx_quiz_attempt_event")
   @@index([guest_id], map: "idx_quiz_attempt_guest")
 }

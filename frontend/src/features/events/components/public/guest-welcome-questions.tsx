@@ -13,6 +13,7 @@ interface GuestSession {
 
 interface PublicQuiz {
   enabled: boolean;
+  completed: boolean;
   title: string;
   questions: Array<{ prompt: string; options: string[] }>;
 }
@@ -113,7 +114,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
   const question = quiz.questions[questionIndex];
   const progress = result
     ? 100
-    : ((questionIndex + 1) / quiz.questions.length) * 100;
+    : (questionIndex / quiz.questions.length) * 100;
 
   return (
     <main

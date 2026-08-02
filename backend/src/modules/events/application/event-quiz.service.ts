@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -85,21 +86,36 @@ export class EventQuizService {
   }
 
   async getPublic(publicId: string, token: string | undefined) {
-    const { event } = await this.guestAccess.authenticate(publicId, token);
-    const quiz = await this.prisma.events.findUnique({
-      where: { id: event.id },
-      select: {
-        quiz_enabled: true,
-        quiz_title: true,
-        quiz_questions: true,
-      },
-    });
+    const { event, guest } = await this.guestAccess.authenticate(
+      publicId,
+      token,
+    );
+    const [quiz, previousAttempt] = await Promise.all([
+      this.prisma.events.findUnique({
+        where: { id: event.id },
+        select: {
+          quiz_enabled: true,
+          quiz_title: true,
+          quiz_questions: true,
+        },
+      }),
+      this.prisma.event_quiz_attempts.findFirst({
+        where: { event_id: event.id, guest_id: guest.id },
+        select: { id: true },
+      }),
+    ]);
     const questions = this.readQuestions(quiz?.quiz_questions);
-    if (!quiz?.quiz_enabled || questions.length === 0) {
-      return { enabled: false, title: '', questions: [] };
+    if (!quiz?.quiz_enabled || questions.length === 0 || previousAttempt) {
+      return {
+        enabled: false,
+        completed: Boolean(previousAttempt),
+        title: '',
+        questions: [],
+      };
     }
     return {
       enabled: true,
+      completed: false,
       title: quiz.quiz_title || 'Колко добре познаваш домакините?',
       questions: questions.map(({ prompt, options }) => ({ prompt, options })),
     };
@@ -118,6 +134,13 @@ export class EventQuizService {
     if (!quiz?.quiz_enabled || questions.length === 0) {
       throw new NotFoundException('The quiz is not enabled.');
     }
+    const previousAttempt = await this.prisma.event_quiz_attempts.findFirst({
+      where: { event_id: event.id, guest_id: guest.id },
+      select: { id: true },
+    });
+    if (previousAttempt) {
+      throw new ConflictException('This guest has already completed the quiz.');
+    }
     if (
       answers.length !== questions.length ||
       answers.some(
@@ -132,15 +155,27 @@ export class EventQuizService {
         total + (question.correctOption === answers[index] ? 1 : 0),
       0,
     );
-    await this.prisma.event_quiz_attempts.create({
-      data: {
-        event_id: event.id,
-        guest_id: guest.id,
-        score,
-        total: questions.length,
-        answers,
-      },
-    });
+    try {
+      await this.prisma.event_quiz_attempts.create({
+        data: {
+          event_id: event.id,
+          guest_id: guest.id,
+          score,
+          total: questions.length,
+          answers,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          'This guest has already completed the quiz.',
+        );
+      }
+      throw error;
+    }
     return { score, total: questions.length };
   }
 
