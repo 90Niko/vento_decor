@@ -216,9 +216,6 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                 <div className="flex items-center justify-between gap-6 pl-16 sm:justify-end sm:pl-0">
                   <SmallStat value={event.guestCount} label="гости" />
                   <SmallStat value={event.imageCount} label="снимки" />
-                  <span className="grid h-9 w-9 place-items-center rounded-full border border-[#173b57]/10 text-[#173b57]/55 transition group-hover:border-[#5aa9d6] group-hover:bg-[#5aa9d6] group-hover:text-white">
-                    →
-                  </span>
                 </div>
                 </Link>
                 <div className="ml-16 flex min-h-10 items-center justify-end gap-2 sm:ml-0">

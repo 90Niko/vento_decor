@@ -12,8 +12,9 @@ import { getApiUrl } from "@/shared/api/client";
 export function RouteChrome() {
   const pathname = usePathname();
   const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<"ADMIN" | "CREATOR" | null>(null);
   const hasNavigation =
-    ["/", "/ai-chat"].includes(pathname) ||
+    ["/", "/ai-chat", "/profile"].includes(pathname) ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/admin");
 
@@ -30,7 +31,8 @@ export function RouteChrome() {
     const isPrivateRoute =
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/admin") ||
-      pathname === "/ai-chat";
+      pathname === "/ai-chat" ||
+      pathname === "/profile";
     if (!isPrivateRoute) return;
     const controller = new AbortController();
     void fetch(`${getApiUrl()}/auth/me`, {
@@ -41,9 +43,10 @@ export function RouteChrome() {
       .then(async (response) => {
         if (!response.ok) return;
         const result = (await response.json()) as {
-          creator?: { name?: string };
+          creator?: { name?: string; role?: "ADMIN" | "CREATOR" };
         };
         if (result.creator?.name) setUserName(result.creator.name);
+        if (result.creator?.role) setUserRole(result.creator.role);
       })
       .catch(() => undefined);
     return () => controller.abort();
@@ -59,7 +62,11 @@ export function RouteChrome() {
     );
   }
 
-  if (pathname.startsWith("/dashboard") || pathname === "/ai-chat") {
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname === "/ai-chat" ||
+    (pathname === "/profile" && userRole === "CREATOR")
+  ) {
     return (
       <BottomNavigation
         pathname={pathname}
@@ -82,12 +89,16 @@ export function RouteChrome() {
             icon: <PlusIcon />,
           },
           { href: "/ai-chat", label: "AI чат", icon: <AiIcon /> },
+          { href: "/profile", label: "Моят профил", icon: <ProfileIcon /> },
         ]}
       />
     );
   }
 
-  if (pathname.startsWith("/admin")) {
+  if (
+    pathname.startsWith("/admin") ||
+    (pathname === "/profile" && userRole === "ADMIN")
+  ) {
     return (
       <BottomNavigation
         pathname={pathname}
@@ -110,6 +121,7 @@ export function RouteChrome() {
             icon: <PlusIcon />,
           },
           { href: "/ai-chat", label: "AI чат", icon: <AiIcon /> },
+          { href: "/profile", label: "Моят профил", icon: <ProfileIcon /> },
         ]}
       />
     );
@@ -204,3 +216,4 @@ function PlusIcon() { return <svg width="22" height="22" viewBox="0 0 24 24" fil
 function HomeIcon() { return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 11 9-8 9 8M5.5 9.5V21h13V9.5M9.5 21v-7h5v7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
 function LoginIcon() { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" /><path d="M5 20c.65-4.25 3-6.4 7-6.4s6.35 2.15 7 6.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
 function AiIcon() { return <span className="sidebar-ai-icon relative grid h-9 w-9 place-items-center rounded-xl bg-[#5aa9d6]/12 text-[#3788b8]"><span className="sidebar-ai-halo absolute inset-0 rounded-xl border border-[#5aa9d6]/45" /><svg className="navbar-ai-spark relative" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 2.75 1.45 4.15a5.75 5.75 0 0 0 3.65 3.65L21.25 12l-4.15 1.45a5.75 5.75 0 0 0-3.65 3.65L12 21.25l-1.45-4.15a5.75 5.75 0 0 0-3.65-3.65L2.75 12l4.15-1.45a5.75 5.75 0 0 0 3.65-3.65L12 2.75Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="m19 3 .45 1.3a1.8 1.8 0 0 0 1.25 1.25L22 6l-1.3.45a1.8 1.8 0 0 0-1.25 1.25L19 9l-.45-1.3a1.8 1.8 0 0 0-1.25-1.25L16 6l1.3-.45a1.8 1.8 0 0 0 1.25-1.25L19 3Z" fill="currentColor" /></svg><span className="sidebar-ai-dot absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-400" /></span>; }
+function ProfileIcon() { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" /><path d="M5 20c.65-4.25 3-6.4 7-6.4s6.35 2.15 7 6.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
