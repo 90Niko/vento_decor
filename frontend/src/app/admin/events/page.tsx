@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AdminEventsDashboard } from "@/features/events/components/admin/admin-events-dashboard";
-import { LogoutButton } from "@/features/auth/components/logout-button";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 import { CreatorsAdminPanel } from "@/features/auth/components/creators-admin-panel";
 
@@ -14,14 +13,10 @@ export default function AdminEventsPage() {
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />
             <NavItem href="#events" label="Събития" icon={<CalendarIcon />} />
             <NavItem href="#creators" label="Creators" icon={<DashboardIcon />} />
-            <NavItem href="/ai-chat" label="AI асистент" icon={<SparkIcon />} />
             <NavItem href="/admin/events/new" label="Създай събитие" icon={<PlusIcon />} />
           </nav>
-          <div className="mt-auto rounded-2xl bg-[#173b57] p-4 text-white">
-            <p className="text-xs font-bold tracking-[0.14em] text-[#8ed3f4] uppercase">Vento tip</p>
-            <p className="mt-2 text-sm leading-5 text-white/75">
-              Сподели QR кода на видно място, за да събереш повече моменти.
-            </p>
+          <div className="mt-auto">
+            <NavItem href="/ai-chat" label="AI асистент" icon={<SparkIcon />} />
           </div>
         </aside>
 
@@ -32,9 +27,6 @@ export default function AdminEventsPage() {
               <div className="hidden lg:block">
                 <p className="text-sm font-semibold">Админ дашборд</p>
                 <p className="mt-0.5 text-xs text-[#173b57]/50">Управление на събития и галерии</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <LogoutButton />
               </div>
             </div>
           </header>
@@ -58,23 +50,6 @@ export default function AdminEventsPage() {
             <AdminEventsDashboard />
           </div>
         </div>
-      </div>
-      <div className="fixed right-4 bottom-4 left-4 z-50 flex gap-2.5 lg:hidden">
-        <Link
-          href="/ai-chat"
-          className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/70 bg-white text-[#3788b8] shadow-[0_12px_35px_rgb(23_59_87/20%)] transition active:scale-[0.96]"
-          aria-label="AI асистент"
-          title="AI асистент"
-        >
-          <SparkIcon />
-        </Link>
-        <Link
-          href="/admin/events/new"
-          className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#173b57] px-5 text-base font-semibold text-white shadow-[0_12px_35px_rgb(23_59_87/28%)] transition active:scale-[0.98]"
-        >
-          <PlusIcon />
-          Създай събитие
-        </Link>
       </div>
     </main>
   );

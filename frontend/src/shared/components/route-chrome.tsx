@@ -44,6 +44,31 @@ export function RouteChrome() {
     );
   }
 
+  if (pathname.startsWith("/admin")) {
+    return (
+      <BottomNavigation
+        pathname={pathname}
+        showLogout
+        items={[
+          {
+            href: "/admin/events",
+            label: "Всички събития",
+            icon: <HomeIcon />,
+            active: (path) =>
+              path.startsWith("/admin/events") &&
+              path !== "/admin/events/new",
+          },
+          {
+            href: "/admin/events/new",
+            label: "Ново събитие",
+            icon: <PlusIcon />,
+          },
+          { href: "/ai-chat", label: "AI чат", icon: <ChatIcon /> },
+        ]}
+      />
+    );
+  }
+
   return null;
 }
 
