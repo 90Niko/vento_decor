@@ -617,6 +617,12 @@ a {
     display: none;
   }
 
+  .route-navbar .route-nav-active,
+  .route-navbar .sidebar-ai-icon,
+  .route-navbar .sidebar-ai-halo {
+    border-radius: 9999px;
+  }
+
   body *,
   body *::before,
   body *::after {

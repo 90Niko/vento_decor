@@ -104,14 +104,14 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
     if (start.axis !== "x") return;
 
     event.preventDefault();
-    const offset = Math.min(112, Math.max(0, deltaX));
+    const offset = Math.min(112, Math.max(0, -deltaX));
     start.offset = offset;
     if (offset > 8) suppressSwipeClick.current = true;
     setSwipe({ id: eventId, offset });
   }
 
   function endEventSwipe(item: AdminEvent) {
-    if (swipeStart.current?.axis === "x" && swipeStart.current.offset >= 88) {
+    if (swipeStart.current?.axis === "x" && swipeStart.current.offset >= 108) {
       void deleteEvent(item);
     }
     swipeStart.current = null;
@@ -235,15 +235,15 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
               return (
               <div
                 key={event.id}
-                className="relative overflow-hidden bg-red-500"
+                className="relative overflow-hidden bg-white"
               >
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex w-28 items-center justify-center gap-2 text-sm font-bold text-white sm:hidden">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex w-28 items-center justify-center gap-2 bg-red-500 text-sm font-bold text-white sm:hidden">
                   <TrashIcon />
                   Ð˜Ð·Ñ‚Ñ€Ð¸Ð¹
                 </div>
                 <div
                   className={`group grid touch-pan-y gap-4 bg-white p-5 hover:bg-[#eaf6ff] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
-                  style={{ transform: `translateX(${swipeOffset}px)` }}
+                  style={{ transform: `translateX(-${swipeOffset}px)` }}
                   onTouchStart={(touchEvent) => startEventSwipe(touchEvent, event.id)}
                   onTouchMove={(touchEvent) => moveEventSwipe(touchEvent, event.id)}
                   onTouchEnd={() => endEventSwipe(event)}
