@@ -594,8 +594,13 @@ a {
   .page-container > section:not(.guest-event-hero),
   .page-container > article {
     box-sizing: border-box;
-    padding-right: 0.75rem;
-    padding-left: 0.75rem;
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
+  }
+
+  .guest-event-intro {
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
   }
 
   .guest-top-navbar {

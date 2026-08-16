@@ -60,6 +60,14 @@ export class EventQuizController {
       dto.answers,
     );
   }
+
+  @Get('public/:publicId/quiz/review')
+  getReview(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<unknown> {
+    return this.quizService.getReview(publicId, bearerToken(authorization));
+  }
 }
 
 function bearerToken(authorization: string | undefined) {

@@ -212,7 +212,7 @@ export function UploadStudio({
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="surface-card rounded-[2rem] p-3 sm:p-4"
+        className="surface-card rounded-[2rem] p-0 sm:p-4"
       >
         <label
           onDragEnter={(event) => {
@@ -222,7 +222,7 @@ export function UploadStudio({
           onDragOver={(event) => event.preventDefault()}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.6rem] border border-dashed px-6 py-12 text-center transition duration-300 sm:min-h-96 ${
+          className={`group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-none border border-dashed px-6 py-12 text-center transition duration-300 sm:min-h-96 sm:rounded-[1.6rem] ${
             isDragging
               ? "scale-[0.99] border-[#5aa9d6] bg-[#eaf6ff]"
               : "border-[#173b57]/20 bg-[linear-gradient(145deg,rgba(234,246,255,.82),rgba(255,255,255,.72))] hover:border-[#5aa9d6]/60 hover:bg-[#eaf6ff]"
@@ -339,7 +339,7 @@ export function UploadStudio({
       </form>
 
       <aside
-        className="rounded-[2rem] p-6 text-white shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28 sm:p-8"
+        className="rounded-none p-6 text-white shadow-none sm:rounded-[2rem] sm:p-8 sm:shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28"
         style={{
           background: `linear-gradient(155deg, ${theme.primary}, ${theme.accent})`,
         }}

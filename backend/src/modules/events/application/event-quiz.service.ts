@@ -179,6 +179,51 @@ export class EventQuizService {
     return { score, total: questions.length };
   }
 
+  async getReview(publicId: string, token: string | undefined) {
+    const { event, guest } = await this.guestAccess.authenticate(
+      publicId,
+      token,
+    );
+    const [quiz, attempt] = await Promise.all([
+      this.prisma.events.findUnique({
+        where: { id: event.id },
+        select: { quiz_title: true, quiz_questions: true },
+      }),
+      this.prisma.event_quiz_attempts.findFirst({
+        where: { event_id: event.id, guest_id: guest.id },
+        select: {
+          score: true,
+          total: true,
+          answers: true,
+          created_at: true,
+        },
+      }),
+    ]);
+    if (!attempt) {
+      throw new NotFoundException('The guest has not completed the quiz.');
+    }
+
+    const questions = this.readQuestions(quiz?.quiz_questions);
+    const answers = this.readAnswers(attempt.answers);
+    return {
+      title: quiz?.quiz_title || 'Колко добре познаваш домакините?',
+      score: attempt.score,
+      total: attempt.total,
+      percentage:
+        attempt.total > 0
+          ? Math.round((attempt.score / attempt.total) * 100)
+          : 0,
+      completedAt: attempt.created_at,
+      questions: questions.map((question, index) => ({
+        prompt: question.prompt,
+        options: question.options,
+        selectedOption: answers[index] ?? null,
+        correctOption: question.correctOption,
+        isCorrect: answers[index] === question.correctOption,
+      })),
+    };
+  }
+
   private async findManagedEvent(publicId: string, creator: CreatorSession) {
     const event = await this.prisma.events.findFirst({
       where: {
@@ -199,6 +244,14 @@ export class EventQuizService {
   private readQuestions(value: Prisma.JsonValue | null | undefined) {
     if (!Array.isArray(value)) return [];
     return value.filter(this.isQuestion) as unknown as StoredQuizQuestion[];
+  }
+
+  private readAnswers(value: Prisma.JsonValue): number[] {
+    if (!Array.isArray(value)) return [];
+    return value.filter(
+      (answer): answer is number =>
+        typeof answer === 'number' && Number.isInteger(answer),
+    );
   }
 
   private readonly isQuestion = (

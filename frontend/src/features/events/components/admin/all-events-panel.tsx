@@ -58,11 +58,6 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
 
   async function deleteEvent(event: AdminEvent) {
     setOpenMenuId(null);
-    const confirmed = window.confirm(
-      `Да изтрия ли „${event.title}“? Всички гости и снимки към събитието също ще бъдат изтрити. Действието е необратимо.`,
-    );
-    if (!confirmed) return;
-
     setDeletingId(event.id);
     setError(null);
     try {
@@ -232,6 +227,7 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
           <div className="divide-y divide-[#173b57]/8">
             {visibleEvents.map((event) => {
               const swipeOffset = swipe?.id === event.id ? swipe.offset : 0;
+              const isDeleting = deletingId === event.id;
               return (
               <div
                 key={event.id}
@@ -239,11 +235,16 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
               >
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex w-28 items-center justify-center gap-2 bg-red-500 text-sm font-bold text-white sm:hidden">
                   <TrashIcon />
-                  Ð˜Ð·Ñ‚Ñ€Ð¸Ð¹
+                  Изтрий
                 </div>
                 <div
-                  className={`group grid touch-pan-y gap-4 bg-white p-5 hover:bg-[#eaf6ff] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
-                  style={{ transform: `translateX(-${swipeOffset}px)` }}
+                  className={`group grid touch-pan-y gap-4 bg-white p-5 hover:bg-[#eaf6ff] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${isDeleting ? "pointer-events-none transition-all duration-300 ease-in" : swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
+                  style={{
+                    opacity: isDeleting ? 0 : 1,
+                    transform: isDeleting
+                      ? "translateX(-100%) scale(0.96)"
+                      : `translateX(-${swipeOffset}px)`,
+                  }}
                   onTouchStart={(touchEvent) => startEventSwipe(touchEvent, event.id)}
                   onTouchMove={(touchEvent) => moveEventSwipe(touchEvent, event.id)}
                   onTouchEnd={() => endEventSwipe(event)}

@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
-import { guestOtpKey, guestSessionKey } from "./event-entry";
+import { guestOtpKey, saveGuestSession } from "./event-entry";
 
 interface PendingGuestOtp {
   name: string;
@@ -53,8 +53,8 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
         throw new Error("Кодът е грешен или е изтекъл. Опитай отново.");
 
       const registration = (await response.json()) as GuestRegistration;
-      sessionStorage.setItem(
-        guestSessionKey(publicId),
+      saveGuestSession(
+        publicId,
         JSON.stringify({
           token: registration.token,
           name: registration.guest.name,

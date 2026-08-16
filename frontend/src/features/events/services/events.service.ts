@@ -130,6 +130,18 @@ export const eventsService = {
     });
   },
 
+  getQuizReviewResponse(
+    publicId: string,
+    guestToken: string,
+    signal?: AbortSignal,
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/public/${publicId}/quiz/review`, {
+      headers: { Authorization: `Bearer ${guestToken}` },
+      cache: "no-store",
+      signal,
+    });
+  },
+
   getAdminEventsResponse(): Promise<Response> {
     return fetch(`${getApiUrl()}/events/admin`, {
       cache: "no-store",

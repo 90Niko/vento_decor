@@ -31,6 +31,29 @@ export function guestOtpKey(publicId: string): string {
   return `vento:event:${publicId}:guest-otp`;
 }
 
+export function readGuestSession(publicId: string): string | null {
+  const key = guestSessionKey(publicId);
+  const persistentSession = localStorage.getItem(key);
+  if (persistentSession) return persistentSession;
+
+  const legacySession = sessionStorage.getItem(key);
+  if (legacySession) {
+    localStorage.setItem(key, legacySession);
+    sessionStorage.removeItem(key);
+  }
+  return legacySession;
+}
+
+export function saveGuestSession(publicId: string, value: string): void {
+  localStorage.setItem(guestSessionKey(publicId), value);
+}
+
+export function clearGuestSession(publicId: string): void {
+  const key = guestSessionKey(publicId);
+  localStorage.removeItem(key);
+  sessionStorage.removeItem(key);
+}
+
 export function EventEntry({ publicId }: { publicId: string }) {
   const router = useRouter();
   const [event, setEvent] = useState<PublicEvent | null>(null);
@@ -42,7 +65,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
   const theme = getEventTheme(event?.themeColor);
 
   useEffect(() => {
-    const savedSession = sessionStorage.getItem(guestSessionKey(publicId));
+    const savedSession = readGuestSession(publicId);
     if (savedSession) {
       router.replace(`/event/${publicId}/upload`);
       return;
@@ -125,8 +148,8 @@ export function EventEntry({ publicId }: { publicId: string }) {
         router.push(`/event/${publicId}/verify`);
       } else {
         const registration = (await response.json()) as GuestRegistration;
-        sessionStorage.setItem(
-          guestSessionKey(publicId),
+        saveGuestSession(
+          publicId,
           JSON.stringify({
             token: registration.token,
             name: registration.guest.name,

@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getEventTheme } from "@/features/events/lib/event-theme";
 import { UploadStudio } from "@/features/uploads/components/upload-studio";
 import { eventsService } from "@/features/events/services/events.service";
 import type { PublicEvent } from "@/features/events/types/events";
-import { guestSessionKey } from "./event-entry";
+import { clearGuestSession, readGuestSession } from "./event-entry";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 
 interface GuestSession {
@@ -41,11 +42,12 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
     null,
   );
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+  const [quizReviewPercentage, setQuizReviewPercentage] = useState<number | null>(null);
   const lastViewerTap = useRef(0);
 
   useEffect(() => {
     let isActive = true;
-    const stored = sessionStorage.getItem(guestSessionKey(publicId));
+    const stored = readGuestSession(publicId);
     if (!stored) {
       router.replace(`/event/${publicId}`);
       return () => {
@@ -62,7 +64,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         if (isActive) setSession({ token: parsed.token!, name: parsed.name! });
       });
     } catch {
-      sessionStorage.removeItem(guestSessionKey(publicId));
+      clearGuestSession(publicId);
       router.replace(`/event/${publicId}`);
     }
 
@@ -93,7 +95,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       if (response.ok) {
         setGallery((await response.json()) as GalleryImage[]);
       } else if (response.status === 401) {
-        sessionStorage.removeItem(guestSessionKey(publicId));
+        clearGuestSession(publicId);
         router.replace(`/event/${publicId}`);
       }
     } finally {
@@ -127,6 +129,22 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activeImageIndex, gallery.length]);
+
+  useEffect(() => {
+    if (!session) return;
+    const controller = new AbortController();
+    void eventsService
+      .getQuizReviewResponse(publicId, session.token, controller.signal)
+      .then(async (response) => {
+        if (!response.ok) return;
+        const review = (await response.json()) as { percentage?: unknown };
+        if (typeof review.percentage === "number") {
+          setQuizReviewPercentage(review.percentage);
+        }
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [publicId, session]);
 
   async function toggleLike(imageId: number) {
     if (!session || likingImageId !== null) return;
@@ -220,6 +238,24 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           </div>
         </header>
 
+        {quizReviewPercentage !== null && (
+          <div className="flex justify-end px-5 pt-4 sm:px-0">
+            <Link
+              href={`/event/${publicId}/quiz-review`}
+              aria-label={`Моят quiz резултат: ${quizReviewPercentage}%`}
+              className="grid h-20 w-20 place-items-center rounded-full text-center text-white shadow-[0_12px_30px_rgba(0,0,0,.18)] ring-4 ring-white/70 transition active:scale-95"
+              style={{
+                background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+              }}
+            >
+              <span>
+                <span className="block text-xl font-bold leading-none">{quizReviewPercentage}%</span>
+                <span className="mt-1 block text-[9px] font-bold tracking-[0.12em] uppercase opacity-75">quiz</span>
+              </span>
+            </Link>
+          </div>
+        )}
+
         <section className="guest-event-hero py-8 sm:py-12">
           <div
             className="relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,.15)] sm:p-10"
@@ -254,7 +290,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             </div>
           </div>
 
-          <div className="mt-10">
+          <div className="guest-event-intro mt-10">
             <p
               className="text-xs font-bold tracking-[0.18em] uppercase"
               style={{ color: theme.accent }}

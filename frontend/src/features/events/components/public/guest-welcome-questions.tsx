@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { PublicEvent } from "@/features/events/types/events";
-import { guestSessionKey } from "./event-entry";
+import { clearGuestSession, readGuestSession } from "./event-entry";
 import { getEventTheme } from "@/features/events/lib/event-theme";
 
 interface GuestSession {
@@ -34,7 +34,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const rawSession = sessionStorage.getItem(guestSessionKey(publicId));
+    const rawSession = readGuestSession(publicId);
     if (!rawSession) {
       router.replace(`/event/${publicId}`);
       return;
@@ -45,7 +45,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
       if (!parsed.token || !parsed.name) throw new Error("Invalid session");
       queueMicrotask(() => setSession(parsed));
     } catch {
-      sessionStorage.removeItem(guestSessionKey(publicId));
+      clearGuestSession(publicId);
       router.replace(`/event/${publicId}`);
       return;
     }
@@ -63,7 +63,9 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
       .then(([loadedEvent, loadedQuiz]) => {
         setEvent(loadedEvent);
         setQuiz(loadedQuiz);
-        if (!loadedQuiz.enabled) router.replace(`/event/${publicId}/upload`);
+        if (!loadedQuiz.enabled || loadedQuiz.completed) {
+          router.replace(`/event/${publicId}/upload`);
+        }
       })
       .catch(() => setError("Quiz-ът не може да бъде зареден."));
     return () => controller.abort();
@@ -94,7 +96,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
   }
 
   const theme = getEventTheme(event?.themeColor);
-  if (!session || !event || !quiz || !quiz.enabled) {
+  if (!session || !event || !quiz || !quiz.enabled || quiz.completed) {
     return (
       <main className="page-canvas grid min-h-screen place-items-center">
         {error ? (
@@ -151,15 +153,23 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
             <p className="mx-auto mt-4 max-w-md text-sm leading-6 opacity-65">
               {resultMessage(result.score, result.total)}
             </p>
-            <button
-              onClick={() => router.replace(`/event/${publicId}/upload`)}
-              className="mt-8 rounded-full px-8 py-4 text-sm font-bold text-white"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
-              }}
-            >
-              Към снимките →
-            </button>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                onClick={() => router.push(`/event/${publicId}/quiz-review`)}
+                className="rounded-full px-8 py-4 text-sm font-bold text-white"
+                style={{
+                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                }}
+              >
+                Преглед на отговорите
+              </button>
+              <button
+                onClick={() => router.replace(`/event/${publicId}/upload`)}
+                className="rounded-full border border-black/10 bg-white/70 px-8 py-4 text-sm font-bold"
+              >
+                Към снимките →
+              </button>
+            </div>
           </div>
         ) : (
           <>
