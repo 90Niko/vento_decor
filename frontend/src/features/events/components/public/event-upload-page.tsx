@@ -205,8 +205,8 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       }}
     >
       <div className="page-container relative">
-        <header className="sticky top-3 z-30 pt-3 sm:top-5 sm:pt-5">
-          <div className="surface-card flex items-center justify-between rounded-2xl px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
+        <header className="guest-top-navbar sticky top-0 z-30 sm:top-5 sm:pt-5">
+          <div className="guest-top-navbar-surface surface-card flex items-center justify-between px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
             <BrandLockup subtitle="Галерия за гости" />
             <span className="flex items-center gap-2 rounded-full border border-black/10 bg-white/65 px-3 py-2 text-xs font-bold sm:px-4">
               <span
@@ -523,12 +523,12 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
 
       {!activeImage && (
         <div
-          className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/90 px-4 pt-3 backdrop-blur-xl sm:hidden"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pt-3 sm:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <label
             htmlFor="guest-mobile-photo-upload"
-            className="mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,.22)] active:scale-[0.98]"
+            className="pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,.22)] active:scale-[0.98]"
             style={{ backgroundColor: theme.primary }}
           >
             <UploadIcon />

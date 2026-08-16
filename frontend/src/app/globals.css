@@ -567,6 +567,21 @@ a {
 }
 
 @media (max-width: 767px) {
+  .guest-top-navbar {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+
+  .guest-top-navbar-surface {
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  }
+
+  .route-navbar {
+    box-sizing: content-box;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: #fff;
+  }
+
   body *,
   body *::before,
   body *::after {

@@ -178,7 +178,7 @@ function BottomNavigation({
       />
       <nav
         aria-label="Основна навигация"
-        className={`route-navbar fixed right-0 bottom-0 left-0 z-50 h-[4.75rem] items-center bg-white/90 px-4 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:top-2 md:right-6 md:bottom-auto md:left-auto md:grid md:h-[3.75rem] md:w-[22rem] md:bg-transparent md:shadow-none md:backdrop-blur-none lg:right-10 ${desktopOnly ? "hidden" : "grid"}`}
+        className={`route-navbar fixed right-0 bottom-0 left-0 z-50 h-[4.75rem] items-center bg-white px-4 shadow-[0_-10px_35px_rgb(23_59_87/14%)] md:top-2 md:right-6 md:bottom-auto md:left-auto md:grid md:h-[3.75rem] md:w-[22rem] md:bg-transparent md:shadow-none lg:right-10 ${desktopOnly ? "hidden" : "grid"}`}
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         {userName && (
