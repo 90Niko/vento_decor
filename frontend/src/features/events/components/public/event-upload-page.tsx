@@ -205,8 +205,8 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       }}
     >
       <div className="page-container relative">
-        <header className="guest-top-navbar sticky top-0 z-30 sm:top-5 sm:pt-5">
-          <div className="guest-top-navbar-surface surface-card flex items-center justify-between px-3.5 py-3 sm:rounded-[1.4rem] sm:px-5">
+        <header className="guest-top-navbar sm:pt-5">
+          <div className="guest-top-navbar-surface flex items-center justify-between px-3.5 py-3 sm:px-5">
             <BrandLockup subtitle="Галерия за гости" />
             <span className="flex items-center gap-2 rounded-full border border-black/10 bg-white/65 px-3 py-2 text-xs font-bold sm:px-4">
               <span

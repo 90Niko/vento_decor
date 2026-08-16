@@ -567,6 +567,15 @@ a {
 }
 
 @media (max-width: 767px) {
+  html.has-fixed-route-navbar,
+  .has-fixed-route-navbar body {
+    background: #fff;
+  }
+
+  .page-container {
+    width: 100%;
+  }
+
   .guest-top-navbar {
     width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -579,7 +588,7 @@ a {
   .route-navbar {
     box-sizing: content-box;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: #fff;
+    background: #fff !important;
   }
 
   body *,
