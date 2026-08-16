@@ -613,14 +613,8 @@ a {
     background: #fff !important;
   }
 
-  .route-navbar .route-nav-active::before,
-  .route-navbar .sidebar-ai-halo {
+  .route-navbar .route-nav-active::before {
     display: none;
-  }
-
-  .route-navbar .sidebar-ai-icon {
-    border-radius: 0;
-    background: transparent;
   }
 
   body *,
