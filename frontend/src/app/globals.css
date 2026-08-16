@@ -576,6 +576,15 @@ a {
     width: 100%;
   }
 
+  main.page-canvas.grid,
+  main.auth-canvas,
+  main.admin-canvas,
+  main.guest-flow-page,
+  .admin-canvas > div[class*="mx-auto"] {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+
   .page-container :where(section, article, form, .surface-card),
   .page-container > div,
   .page-container > section > div {
@@ -604,6 +613,16 @@ a {
     background: #fff !important;
   }
 
+  .route-navbar .route-nav-active::before,
+  .route-navbar .sidebar-ai-halo {
+    display: none;
+  }
+
+  .route-navbar .sidebar-ai-icon {
+    border-radius: 0;
+    background: transparent;
+  }
+
   body *,
   body *::before,
   body *::after {
@@ -612,6 +631,14 @@ a {
   }
 
   .surface-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .auth-card-shell,
+  .ai-chat-shell {
+    border-right-width: 0 !important;
+    border-left-width: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
   }

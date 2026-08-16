@@ -372,7 +372,7 @@ export function CreateEventForm({
         ×
       </Link>
       <div
-        className="theme-edit-surface surface-card wizard-form-surface space-y-9 rounded-[2rem] p-6 pb-28 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-1 md:items-start md:gap-7 md:space-y-0 md:pb-9"
+        className="theme-edit-surface surface-card wizard-form-surface space-y-9 rounded-[2rem] p-6 transition-colors duration-300 sm:p-9 md:grid md:grid-cols-1 md:items-start md:gap-7 md:space-y-0"
         style={{
           color: previewTheme.primary,
           background: `linear-gradient(155deg, #ffffff 45%, ${previewTheme.accent}18)`,
@@ -935,7 +935,7 @@ export function CreateEventForm({
             {error}
           </p>
         )}
-        <div className="fixed inset-x-0 bottom-0 z-60 flex gap-3 bg-white/92 px-4 py-3 shadow-[0_-10px_35px_rgb(23_59_87/14%)] backdrop-blur-xl md:static md:hidden">
+        <div className="flex gap-3 pt-3 md:hidden">
           {wizardStep > 0 && (
             <button
               type="button"

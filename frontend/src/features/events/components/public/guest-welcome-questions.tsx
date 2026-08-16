@@ -119,7 +119,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
 
   return (
     <main
-      className="grid min-h-screen place-items-center overflow-hidden px-4 py-10"
+      className="guest-flow-page grid min-h-screen place-items-center overflow-hidden px-4 py-10"
       style={{
         color: theme.primary,
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,

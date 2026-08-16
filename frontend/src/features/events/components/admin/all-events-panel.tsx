@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { TouchEvent as ReactTouchEvent } from "react";
 import { eventsService } from "@/features/events/services/events.service";
 
 interface AdminEvent {
@@ -27,6 +28,9 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<EventFilter>("all");
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [swipe, setSwipe] = useState<{ id: number; offset: number } | null>(null);
+  const swipeStart = useRef<{ id: number; x: number; y: number; offset: number; axis: "x" | "y" | null } | null>(null);
+  const suppressSwipeClick = useRef(false);
 
   const loadEvents = useCallback(async () => {
     setIsLoading(true);
@@ -76,6 +80,47 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
     } finally {
       setDeletingId(null);
     }
+  }
+
+  function startEventSwipe(event: ReactTouchEvent<HTMLDivElement>, eventId: number) {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    const touch = event.touches[0];
+    swipeStart.current = { id: eventId, x: touch.clientX, y: touch.clientY, offset: 0, axis: null };
+    suppressSwipeClick.current = false;
+    setOpenMenuId(null);
+    setSwipe({ id: eventId, offset: 0 });
+  }
+
+  function moveEventSwipe(event: ReactTouchEvent<HTMLDivElement>, eventId: number) {
+    const start = swipeStart.current;
+    if (!start || start.id !== eventId) return;
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+
+    if (!start.axis && Math.max(Math.abs(deltaX), Math.abs(deltaY)) > 6) {
+      start.axis = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
+    }
+    if (start.axis !== "x") return;
+
+    event.preventDefault();
+    const offset = Math.min(112, Math.max(0, deltaX));
+    start.offset = offset;
+    if (offset > 8) suppressSwipeClick.current = true;
+    setSwipe({ id: eventId, offset });
+  }
+
+  function endEventSwipe(item: AdminEvent) {
+    if (swipeStart.current?.axis === "x" && swipeStart.current.offset >= 88) {
+      void deleteEvent(item);
+    }
+    swipeStart.current = null;
+    setSwipe(null);
+  }
+
+  function cancelEventSwipe() {
+    swipeStart.current = null;
+    setSwipe(null);
   }
 
   useEffect(() => {
@@ -185,11 +230,31 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
           </div>
         ) : (
           <div className="divide-y divide-[#173b57]/8">
-            {visibleEvents.map((event) => (
+            {visibleEvents.map((event) => {
+              const swipeOffset = swipe?.id === event.id ? swipe.offset : 0;
+              return (
               <div
                 key={event.id}
-                className="group grid gap-4 p-5 transition hover:bg-[#eaf6ff]/55 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7"
+                className="relative overflow-hidden bg-red-500"
               >
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex w-28 items-center justify-center gap-2 text-sm font-bold text-white sm:hidden">
+                  <TrashIcon />
+                  Ð˜Ð·Ñ‚Ñ€Ð¸Ð¹
+                </div>
+                <div
+                  className={`group grid touch-pan-y gap-4 bg-white p-5 hover:bg-[#eaf6ff] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
+                  style={{ transform: `translateX(${swipeOffset}px)` }}
+                  onTouchStart={(touchEvent) => startEventSwipe(touchEvent, event.id)}
+                  onTouchMove={(touchEvent) => moveEventSwipe(touchEvent, event.id)}
+                  onTouchEnd={() => endEventSwipe(event)}
+                  onTouchCancel={cancelEventSwipe}
+                  onClickCapture={(clickEvent) => {
+                    if (!suppressSwipeClick.current) return;
+                    clickEvent.preventDefault();
+                    clickEvent.stopPropagation();
+                    suppressSwipeClick.current = false;
+                  }}
+                >
                 <Link href={`${basePath}/${event.publicId}`} className="contents">
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#173b57] text-sm font-bold text-white shadow-lg shadow-[#173b57]/10">
@@ -261,8 +326,10 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                     <MoreIcon />
                   </button>
                 </div>
+                </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

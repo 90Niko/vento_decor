@@ -65,7 +65,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
           <BrandLockup subtitle="Галерии за красиви моменти" />
         </div>
 
-        <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/82 shadow-[0_28px_90px_rgb(23_59_87/14%)] backdrop-blur-2xl">
+        <div className="auth-card-shell overflow-hidden rounded-[2rem] border border-white/80 bg-white/82 shadow-[0_28px_90px_rgb(23_59_87/14%)] backdrop-blur-2xl">
           <div className="border-b border-[#173b57]/8 px-6 pt-7 sm:px-9 sm:pt-9">
             <div className="pb-7 text-center">
               <h1 className="text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
