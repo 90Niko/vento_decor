@@ -220,7 +220,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           </div>
         </header>
 
-        <section className="py-8 sm:py-12">
+        <section className="guest-event-hero py-8 sm:py-12">
           <div
             className="relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,.15)] sm:p-10"
             style={{

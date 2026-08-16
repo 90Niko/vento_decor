@@ -576,6 +576,19 @@ a {
     width: 100%;
   }
 
+  .page-container :where(section, article, form, .surface-card),
+  .page-container > div,
+  .page-container > section > div {
+    border-radius: 0 !important;
+  }
+
+  .page-container > section:not(.guest-event-hero),
+  .page-container > article {
+    box-sizing: border-box;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
   .guest-top-navbar {
     width: 100vw;
     margin-left: calc(50% - 50vw);
