@@ -41,11 +41,11 @@ export function LogoutButton({
     >
       {iconOnly ? (
         pending ? (
-          <svg className="animate-spin" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className={navigation ? "relative top-0.5 animate-spin" : "animate-spin"} width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
         ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className={navigation ? "relative top-0.5" : undefined} width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M10 5H5v14h5M14 8l4 4-4 4m4-4H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )

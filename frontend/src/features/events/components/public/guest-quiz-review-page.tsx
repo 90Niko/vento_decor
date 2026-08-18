@@ -104,12 +104,7 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
         <div className="mt-6 space-y-4">
           {review.questions.map((question, index) => (
             <article key={`${question.prompt}-${index}`} className="surface-card p-5 sm:rounded-2xl sm:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="font-semibold">{index + 1}. {question.prompt}</h2>
-                <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${question.isCorrect ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
-                  {question.isCorrect ? "Вярно" : "Грешно"}
-                </span>
-              </div>
+              <h2 className="font-semibold">{index + 1}. {question.prompt}</h2>
               <div className="mt-5 space-y-2">
                 {question.options.map((option, optionIndex) => {
                   const isCorrect = optionIndex === question.correctOption;
@@ -117,7 +112,7 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
                   return (
                     <div
                       key={`${option}-${optionIndex}`}
-                      className={`rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-red-300 bg-red-50 text-red-800" : "border-black/8 bg-white/45 opacity-60"}`}
+                      className={`rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-sky-300 bg-sky-50 text-sky-800" : "border-black/8 bg-white/45 opacity-60"}`}
                     >
                       {option}{isSelected ? " · Твоят отговор" : ""}{isCorrect ? " · Верен отговор" : ""}
                     </div>

@@ -27,8 +27,9 @@ export class EventQuizService {
     const event = await this.findManagedEvent(publicId, creator);
     const attempts = await this.prisma.event_quiz_attempts.findMany({
       where: { event_id: event.id },
-      select: { score: true, total: true },
+      select: { score: true, total: true, answers: true },
     });
+    const questions = this.readQuestions(event.quiz_questions);
     const averagePercent = attempts.length
       ? Math.round(
           attempts.reduce(
@@ -43,7 +44,17 @@ export class EventQuizService {
     return {
       enabled: event.quiz_enabled,
       title: event.quiz_title ?? '',
-      questions: this.readQuestions(event.quiz_questions),
+      questions: questions.map((question, questionIndex) => ({
+        ...question,
+        optionPercentages: question.options.map((_, optionIndex) => {
+          if (attempts.length === 0) return 0;
+          const selectedCount = attempts.reduce((count, attempt) => {
+            const answers = this.readAnswers(attempt.answers);
+            return count + (answers[questionIndex] === optionIndex ? 1 : 0);
+          }, 0);
+          return Math.round((selectedCount / attempts.length) * 100);
+        }),
+      })),
       stats: { attempts: attempts.length, averagePercent },
     };
   }

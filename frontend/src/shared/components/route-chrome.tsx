@@ -203,7 +203,7 @@ function BottomNavigation({
                 active ? "route-nav-active" : ""
               }`}
             >
-              <span className="transition-transform duration-300">{item.icon}</span>
+              <span className="relative top-0.5 transition-transform duration-300">{item.icon}</span>
               <span
                 aria-hidden="true"
                 className={`route-nav-indicator absolute -bottom-1 h-0.5 rounded-full transition-all duration-300 ${

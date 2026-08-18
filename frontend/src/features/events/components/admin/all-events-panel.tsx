@@ -79,6 +79,13 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
 
   function startEventSwipe(event: ReactTouchEvent<HTMLDivElement>, eventId: number) {
     if (!window.matchMedia("(max-width: 767px)").matches) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest("a, button, input, select, textarea")
+    ) {
+      return;
+    }
     const touch = event.touches[0];
     swipeStart.current = { id: eventId, x: touch.clientX, y: touch.clientY, offset: 0, axis: null };
     suppressSwipeClick.current = false;

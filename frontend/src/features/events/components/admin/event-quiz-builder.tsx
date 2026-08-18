@@ -8,6 +8,7 @@ export interface QuizQuestion {
   prompt: string;
   options: string[];
   correctOption: number;
+  optionPercentages?: number[];
 }
 
 export interface ManagerQuiz {
@@ -200,6 +201,12 @@ export function EventQuizBuilder({
                     placeholder={`Отговор ${optionIndex + 1}`}
                     className="field-input py-2.5"
                   />
+                  <span
+                    className="w-11 shrink-0 text-right text-sm font-bold tabular-nums text-[#173b57]/55"
+                    title="Процент от всички гости, попълнили quiz-а"
+                  >
+                    {question.optionPercentages?.[optionIndex] ?? 0}%
+                  </span>
                   {question.options.length > 2 && (
                     <button
                       type="button"
