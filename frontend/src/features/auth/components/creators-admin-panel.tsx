@@ -16,6 +16,7 @@ export function CreatorsAdminPanel() {
   const [creators, setCreators] = useState<CreatorItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<number | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const response = await fetch(`${getApiUrl()}/admin/creators`, { credentials: "include", cache: "no-store" });
@@ -32,6 +33,7 @@ export function CreatorsAdminPanel() {
   }, [load]);
 
   async function toggle(creator: CreatorItem) {
+    setOpenMenuId(null);
     setPendingId(creator.id);
     setError(null);
     try {
@@ -54,10 +56,45 @@ export function CreatorsAdminPanel() {
     <div className="mt-5 divide-y divide-[#173b57]/10">
       {creators.length === 0 && !error ? <p className="py-6 text-sm text-[#173b57]/55">Все още няма регистрирани creators.</p> : creators.map((creator) => <div key={creator.id} className="flex flex-wrap items-center justify-between gap-4 py-4">
         <div><p className="font-semibold">{creator.name}</p><p className="text-sm text-[#173b57]/55">{creator.email} · {creator.eventCount} събития</p></div>
-        <button type="button" disabled={pendingId === creator.id} onClick={() => void toggle(creator)} className={`rounded-full px-4 py-2 text-sm font-semibold ${creator.isActive ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
-          {creator.isActive ? "Блокирай" : "Активирай"}
-        </button>
+        <div className="flex min-h-10 items-center justify-end gap-2">
+          {openMenuId === creator.id && (
+            <div className="event-actions-menu flex items-center gap-2 rounded-full bg-[#173b57]/5 p-1.5">
+              <button
+                type="button"
+                disabled={pendingId === creator.id}
+                onClick={() => void toggle(creator)}
+                aria-label={creator.isActive ? `Блокирай ${creator.name}` : `Активирай ${creator.name}`}
+                title={creator.isActive ? "Блокирай профила" : "Активирай профила"}
+                className={`grid h-9 w-9 place-items-center rounded-full bg-white shadow-sm transition disabled:cursor-wait disabled:opacity-40 ${creator.isActive ? "text-[#173b57]/60 hover:bg-[#173b57] hover:text-white" : "text-emerald-600 hover:bg-emerald-600 hover:text-white"}`}
+              >
+                {creator.isActive ? <BlockIcon /> : <ActivateIcon />}
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpenMenuId((current) => current === creator.id ? null : creator.id)}
+            aria-expanded={openMenuId === creator.id}
+            aria-label={`Действия за ${creator.name}`}
+            title="Действия"
+            className={`grid h-10 w-10 place-items-center rounded-full transition ${openMenuId === creator.id ? "rotate-90 bg-[#173b57] text-white" : "bg-[#173b57]/5 text-[#173b57]/55 hover:bg-[#173b57]/10 hover:text-[#173b57]"}`}
+          >
+            <MoreIcon />
+          </button>
+        </div>
       </div>)}
     </div>
   </section>;
+}
+
+function MoreIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="19" cy="12" r="1.7" /></svg>;
+}
+
+function BlockIcon() {
+  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" /><path d="m6.4 6.4 11.2 11.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
+}
+
+function ActivateIcon() {
+  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }

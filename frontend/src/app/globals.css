@@ -585,6 +585,11 @@ a {
     padding-left: 0 !important;
   }
 
+  .admin-canvas > .creator-dashboard-content {
+    padding-right: 1.25rem !important;
+    padding-left: 1.25rem !important;
+  }
+
   .page-container :where(section, article, form, .surface-card),
   .page-container > div,
   .page-container > section > div {
@@ -637,13 +642,6 @@ a {
     border-right-width: 0;
     border-left-width: 0;
     border-radius: 0;
-  }
-
-  body *,
-  body *::before,
-  body *::after {
-    border-right-width: 0 !important;
-    border-left-width: 0 !important;
   }
 
   .surface-card {
@@ -728,14 +726,14 @@ a {
 
 @media (max-width: 767px) {
   .live-event-theme {
-    height: 100svh;
+    height: 100dvh;
     min-height: 0;
     overflow: hidden;
   }
 
   .wizard-form-surface {
     display: flex;
-    height: calc(100svh - 0.75rem);
+    height: calc(100dvh - 0.75rem);
     min-height: 0;
     flex-direction: column;
     gap: 0;
