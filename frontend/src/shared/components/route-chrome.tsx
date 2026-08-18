@@ -182,7 +182,7 @@ function BottomNavigation({
         style={{ gridTemplateColumns: `repeat(${items.length + (showLogout ? 1 : 0)}, minmax(0, 1fr))` }}
       >
         {userName && (
-          <span className="absolute right-1 bottom-full mb-1 text-xs font-semibold text-[#173b57]/55 md:hidden">
+          <span className="absolute inset-x-4 bottom-full mb-1 truncate text-right text-xs font-semibold text-[#173b57]/55 md:hidden">
             Здравей, {userName}
           </span>
         )}

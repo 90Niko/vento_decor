@@ -585,7 +585,7 @@ a {
     padding-left: 0 !important;
   }
 
-  .admin-canvas > .creator-dashboard-content {
+  .admin-canvas > div.creator-dashboard-content {
     padding-right: 1.25rem !important;
     padding-left: 1.25rem !important;
   }
