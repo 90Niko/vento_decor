@@ -330,7 +330,7 @@ export function UploadStudio({
         {selected.length > 0 && <button
           type="submit"
           disabled={isUploading}
-          className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-black/10" : ""}`}
+          className="mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           style={{ backgroundColor: theme.primary }}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}
