@@ -214,7 +214,7 @@ export function UploadStudio({
         onSubmit={handleSubmit}
         className="surface-card rounded-[2rem] p-0 sm:p-4"
       >
-        <label
+        {selected.length === 0 && <label
           onDragEnter={(event) => {
             event.preventDefault();
             setIsDragging(true);
@@ -254,7 +254,7 @@ export function UploadStudio({
           <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#173b57]/68 shadow-sm">
             Снимки, MP4, MOV и WebM · до 100 MB · максимум 10
           </span>
-        </label>
+        </label>}
 
         {selected.length > 0 && (
           <div className="mt-6">
@@ -327,15 +327,15 @@ export function UploadStudio({
           </div>
         )}
 
-        <button
+        {selected.length > 0 && <button
           type="submit"
-          disabled={selected.length === 0 || isUploading}
+          disabled={isUploading}
           className={`bottom-4 z-20 mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${selected.length > 0 ? "sticky ring-4 ring-black/10" : ""}`}
           style={{ backgroundColor: theme.primary }}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}
           {!isUploading && <ArrowIcon />}
-        </button>
+        </button>}
       </form>
 
       <aside

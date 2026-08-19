@@ -85,7 +85,7 @@ export function EditEventForm({
       }
     }
     setSaving(false);
-    router.push(`${basePath}/${publicId}`);
+    router.push(basePath);
     router.refresh();
   }
 
