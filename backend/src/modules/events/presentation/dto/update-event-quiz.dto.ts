@@ -36,6 +36,9 @@ export class UpdateEventQuizDto {
   @IsBoolean()
   enabled!: boolean;
 
+  @IsBoolean()
+  hasCorrectAnswers!: boolean;
+
   @IsString()
   @MaxLength(150)
   title!: string;

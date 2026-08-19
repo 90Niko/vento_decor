@@ -70,6 +70,7 @@ export function CreateEventForm({
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
   const [quizEnabled, setQuizEnabled] = useState(false);
+  const [quizHasCorrectAnswers, setQuizHasCorrectAnswers] = useState(true);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizQuestions, setQuizQuestions] = useState<QuizDraftQuestion[]>([]);
   const [selectedEventType, setSelectedEventType] = useState("wedding");
@@ -184,6 +185,7 @@ export function CreateEventForm({
           createdEvent.publicId,
           {
             enabled: true,
+            hasCorrectAnswers: quizHasCorrectAnswers,
             title: quizTitle,
             questions: quizQuestions,
           },
@@ -771,6 +773,18 @@ export function CreateEventForm({
           </label>
           {quizEnabled && (
             <div className="space-y-4">
+              <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+                <span>
+                  <span className="block text-sm font-semibold">Quiz с верни отговори</span>
+                  <span className="mt-1 block text-xs opacity-55">
+                    Изключи за въпроси като „Кой готви по-добре?“, при които няма грешен отговор.
+                  </span>
+                </span>
+                <ToggleSwitch
+                  checked={quizHasCorrectAnswers}
+                  onChange={(event) => setQuizHasCorrectAnswers(event.target.checked)}
+                />
+              </label>
               <Field label="Заглавие на quiz-а" hint="Незадължително">
                 <input
                   value={quizTitle}
@@ -818,7 +832,7 @@ export function CreateEventForm({
                   <div className="mt-3 space-y-2">
                     {question.options.map((option, optionIndex) => (
                       <div key={optionIndex} className="flex items-center gap-3">
-                        <input
+                        {quizHasCorrectAnswers && <input
                           type="radio"
                           name={`draft-correct-${questionIndex}`}
                           checked={question.correctOption === optionIndex}
@@ -828,7 +842,7 @@ export function CreateEventForm({
                             })
                           }
                           aria-label="Правилен отговор"
-                        />
+                        />}
                         <input
                           required
                           value={option}

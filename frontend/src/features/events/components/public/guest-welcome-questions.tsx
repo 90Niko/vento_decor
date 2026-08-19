@@ -14,6 +14,7 @@ interface GuestSession {
 
 interface PublicQuiz {
   enabled: boolean;
+  hasCorrectAnswers: boolean;
   completed: boolean;
   title: string;
   questions: Array<{ prompt: string; options: string[] }>;
@@ -145,13 +146,15 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
               className="mt-7 text-xs font-bold tracking-[0.18em] uppercase"
               style={{ color: theme.accent }}
             >
-              Твоят резултат
+              {quiz.hasCorrectAnswers ? "Твоят резултат" : "Благодарим за отговорите"}
             </p>
-            <h1 className="mt-3 text-5xl font-semibold tracking-[-0.06em]">
+            {quiz.hasCorrectAnswers && <h1 className="mt-3 text-5xl font-semibold tracking-[-0.06em]">
               {result.score} / {result.total}
-            </h1>
+            </h1>}
             <p className="mx-auto mt-4 max-w-md text-sm leading-6 opacity-65">
-              {resultMessage(result.score, result.total)}
+              {quiz.hasCorrectAnswers
+                ? resultMessage(result.score, result.total)
+                : "Можеш да сравниш избора си с отговорите на останалите гости."}
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button

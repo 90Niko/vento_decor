@@ -13,6 +13,7 @@ export interface QuizQuestion {
 
 export interface ManagerQuiz {
   enabled: boolean;
+  hasCorrectAnswers: boolean;
   title: string;
   questions: QuizQuestion[];
   stats: { attempts: number; averagePercent: number };
@@ -74,6 +75,7 @@ export function EventQuizBuilder({
     setNotice(null);
     const response = await eventsService.updateManagerQuizResponse(publicId, {
       enabled: quiz.enabled,
+      hasCorrectAnswers: quiz.hasCorrectAnswers,
       title: quiz.title,
       questions: quiz.questions,
     });
@@ -90,8 +92,8 @@ export function EventQuizBuilder({
           <p className="eyebrow">Guest quiz</p>
           <h2 className="mt-2 text-2xl font-semibold">Quiz преди снимките</h2>
           <p className="mt-2 text-sm text-[#173b57]/55">
-            {quiz.stats.attempts} участия · среден резултат{" "}
-            {quiz.stats.averagePercent}%
+            {quiz.stats.attempts} участия
+            {quiz.hasCorrectAnswers && <> · среден резултат {quiz.stats.averagePercent}%</>}
           </p>
         </div>
         <label className="flex cursor-pointer items-center gap-3 rounded-full bg-[#173b57]/5 px-4 py-3 text-sm font-bold">
@@ -107,6 +109,20 @@ export function EventQuizBuilder({
 
       {quiz.enabled && (
       <div className="quiz-settings-reveal">
+      <label className="mt-7 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+        <span>
+          <span className="block text-sm font-semibold">Quiz с верни отговори</span>
+          <span className="mt-1 block text-xs opacity-55">
+            Изключи за информативни въпроси без верен и грешен отговор.
+          </span>
+        </span>
+        <ToggleSwitch
+          checked={quiz.hasCorrectAnswers}
+          onChange={(event) =>
+            setQuiz({ ...quiz, hasCorrectAnswers: event.target.checked })
+          }
+        />
+      </label>
       <label className="mt-7 block">
         <span className="mb-2 block text-sm font-semibold">Заглавие</span>
         <input
@@ -178,7 +194,7 @@ export function EventQuizBuilder({
             <div className="mt-4 space-y-2">
               {question.options.map((option, optionIndex) => (
                 <div key={optionIndex} className="flex items-center gap-3">
-                  <input
+                  {quiz.hasCorrectAnswers && <input
                     type="radio"
                     name={`correct-${questionIndex}`}
                     checked={question.correctOption === optionIndex}
@@ -189,7 +205,7 @@ export function EventQuizBuilder({
                     }
                     aria-label="Правилен отговор"
                     className="h-4 w-4 accent-emerald-600"
-                  />
+                  />}
                   <input
                     value={option}
                     onChange={(event) => {

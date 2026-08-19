@@ -43,6 +43,7 @@ export class EventQuizService {
 
     return {
       enabled: event.quiz_enabled,
+      hasCorrectAnswers: event.quiz_has_correct_answers,
       title: event.quiz_title ?? '',
       questions: questions.map((question, questionIndex) => ({
         ...question,
@@ -62,7 +63,12 @@ export class EventQuizService {
   async update(
     publicId: string,
     creator: CreatorSession,
-    input: { enabled: boolean; title: string; questions: QuizQuestionDto[] },
+    input: {
+      enabled: boolean;
+      hasCorrectAnswers: boolean;
+      title: string;
+      questions: QuizQuestionDto[];
+    },
   ) {
     const event = await this.findManagedEvent(publicId, creator);
     const questions = input.questions.map((question) => ({
@@ -89,6 +95,7 @@ export class EventQuizService {
       where: { id: event.id },
       data: {
         quiz_enabled: input.enabled,
+        quiz_has_correct_answers: input.hasCorrectAnswers,
         quiz_title: input.title.trim() || null,
         quiz_questions: questions,
       },
@@ -106,6 +113,7 @@ export class EventQuizService {
         where: { id: event.id },
         select: {
           quiz_enabled: true,
+          quiz_has_correct_answers: true,
           quiz_title: true,
           quiz_questions: true,
         },
@@ -126,6 +134,7 @@ export class EventQuizService {
     }
     return {
       enabled: true,
+      hasCorrectAnswers: quiz.quiz_has_correct_answers,
       completed: false,
       title: quiz.quiz_title || 'Колко добре познаваш домакините?',
       questions: questions.map(({ prompt, options }) => ({ prompt, options })),
@@ -195,10 +204,14 @@ export class EventQuizService {
       publicId,
       token,
     );
-    const [quiz, attempt] = await Promise.all([
+    const [quiz, attempt, allAttempts] = await Promise.all([
       this.prisma.events.findUnique({
         where: { id: event.id },
-        select: { quiz_title: true, quiz_questions: true },
+        select: {
+          quiz_title: true,
+          quiz_questions: true,
+          quiz_has_correct_answers: true,
+        },
       }),
       this.prisma.event_quiz_attempts.findFirst({
         where: { event_id: event.id, guest_id: guest.id },
@@ -208,6 +221,10 @@ export class EventQuizService {
           answers: true,
           created_at: true,
         },
+      }),
+      this.prisma.event_quiz_attempts.findMany({
+        where: { event_id: event.id },
+        select: { answers: true },
       }),
     ]);
     if (!attempt) {
@@ -219,6 +236,7 @@ export class EventQuizService {
     return {
       title: quiz?.quiz_title || 'Колко добре познаваш домакините?',
       score: attempt.score,
+      hasCorrectAnswers: quiz?.quiz_has_correct_answers ?? true,
       total: attempt.total,
       percentage:
         attempt.total > 0
@@ -228,6 +246,14 @@ export class EventQuizService {
       questions: questions.map((question, index) => ({
         prompt: question.prompt,
         options: question.options,
+        optionPercentages: question.options.map((_, optionIndex) => {
+          if (allAttempts.length === 0) return 0;
+          const selectedCount = allAttempts.reduce((count, quizAttempt) => {
+            const attemptAnswers = this.readAnswers(quizAttempt.answers);
+            return count + (attemptAnswers[index] === optionIndex ? 1 : 0);
+          }, 0);
+          return Math.round((selectedCount / allAttempts.length) * 100);
+        }),
         selectedOption: answers[index] ?? null,
         correctOption: question.correctOption,
         isCorrect: answers[index] === question.correctOption,
@@ -244,6 +270,7 @@ export class EventQuizService {
       select: {
         id: true,
         quiz_enabled: true,
+        quiz_has_correct_answers: true,
         quiz_title: true,
         quiz_questions: true,
       },

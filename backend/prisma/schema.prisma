@@ -47,6 +47,7 @@ model events {
   theme_color           String                 @default("ocean") @db.VarChar(30)
   require_guest_otp     Boolean                @default(false)
   quiz_enabled          Boolean                @default(false)
+  quiz_has_correct_answers Boolean             @default(true)
   quiz_title            String?                @db.VarChar(150)
   quiz_questions        Json?
   is_active             Boolean                @default(true)

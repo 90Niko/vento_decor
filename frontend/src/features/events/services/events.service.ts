@@ -89,6 +89,7 @@ export const eventsService = {
     publicId: string,
     quiz: {
       enabled: boolean;
+      hasCorrectAnswers: boolean;
       title: string;
       questions: Array<{
         prompt: string;

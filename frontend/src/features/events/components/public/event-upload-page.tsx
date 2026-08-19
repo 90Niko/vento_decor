@@ -43,6 +43,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
   );
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   const [quizReviewPercentage, setQuizReviewPercentage] = useState<number | null>(null);
+  const [quizHasCorrectAnswers, setQuizHasCorrectAnswers] = useState(true);
   const lastViewerTap = useRef(0);
 
   useEffect(() => {
@@ -137,7 +138,11 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       .getQuizReviewResponse(publicId, session.token, controller.signal)
       .then(async (response) => {
         if (!response.ok) return;
-        const review = (await response.json()) as { percentage?: unknown };
+        const review = (await response.json()) as {
+          percentage?: unknown;
+          hasCorrectAnswers?: unknown;
+        };
+        setQuizHasCorrectAnswers(review.hasCorrectAnswers !== false);
         if (typeof review.percentage === "number") {
           setQuizReviewPercentage(review.percentage);
         }
@@ -242,14 +247,14 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           <div className="flex justify-end px-5 pt-4 sm:px-0">
             <Link
               href={`/event/${publicId}/quiz-review`}
-              aria-label={`Моят quiz резултат: ${quizReviewPercentage}%`}
+              aria-label={quizHasCorrectAnswers ? `Моят quiz резултат: ${quizReviewPercentage}%` : "Преглед на отговорите от quiz-а"}
               className="grid h-20 w-20 place-items-center rounded-full text-center text-white shadow-[0_12px_30px_rgba(0,0,0,.18)] ring-4 ring-white/70 transition active:scale-95"
               style={{
                 background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
               }}
             >
               <span>
-                <span className="block text-xl font-bold leading-none">{quizReviewPercentage}%</span>
+                <span className="block text-xl font-bold leading-none">{quizHasCorrectAnswers ? `${quizReviewPercentage}%` : "✓"}</span>
                 <span className="mt-1 block text-[9px] font-bold tracking-[0.12em] uppercase opacity-75">quiz</span>
               </span>
             </Link>

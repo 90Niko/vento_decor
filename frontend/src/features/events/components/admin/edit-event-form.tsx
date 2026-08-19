@@ -74,6 +74,7 @@ export function EditEventForm({
         publicId,
         {
           enabled: quiz.enabled,
+          hasCorrectAnswers: quiz.hasCorrectAnswers,
           title: quiz.title,
           questions: quiz.questions,
         },

@@ -12,10 +12,12 @@ interface QuizReview {
   score: number;
   total: number;
   percentage: number;
+  hasCorrectAnswers: boolean;
   completedAt: string;
   questions: Array<{
     prompt: string;
     options: string[];
+    optionPercentages: number[];
     selectedOption: number | null;
     correctOption: number;
     isCorrect: boolean;
@@ -95,10 +97,10 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
             Твоят quiz резултат
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">{review.title}</h1>
-          <div className="mt-8 flex items-end gap-4">
+          {review.hasCorrectAnswers ? <div className="mt-8 flex items-end gap-4">
             <span className="text-7xl font-semibold tracking-[-0.08em] sm:text-8xl">{review.percentage}%</span>
             <span className="pb-2 text-sm font-semibold opacity-55">{review.score} от {review.total} верни</span>
-          </div>
+          </div> : <p className="mt-6 text-sm font-semibold opacity-60">Виж как са отговорили всички гости.</p>}
         </section>
 
         <div className="mt-6 space-y-4">
@@ -107,14 +109,19 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
               <h2 className="font-semibold">{index + 1}. {question.prompt}</h2>
               <div className="mt-5 space-y-2">
                 {question.options.map((option, optionIndex) => {
-                  const isCorrect = optionIndex === question.correctOption;
+                  const isCorrect = review.hasCorrectAnswers && optionIndex === question.correctOption;
                   const isSelected = optionIndex === question.selectedOption;
                   return (
                     <div
                       key={`${option}-${optionIndex}`}
                       className={`rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-sky-300 bg-sky-50 text-sky-800" : "border-black/8 bg-white/45 opacity-60"}`}
                     >
-                      {option}{isSelected ? " · Твоят отговор" : ""}{isCorrect ? " · Верен отговор" : ""}
+                      <span className="flex items-center justify-between gap-4">
+                        <span>{option}{isSelected ? " · Твоят отговор" : ""}{isCorrect ? " · Верен отговор" : ""}</span>
+                        <span className="shrink-0 font-semibold tabular-nums">
+                          {question.optionPercentages[optionIndex] ?? 0}%
+                        </span>
+                      </span>
                     </div>
                   );
                 })}
