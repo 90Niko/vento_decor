@@ -1,12 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import Image from "next/image";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eventsService } from "@/features/events/services/events.service";
 import type { AdminEventDetails } from "@/features/events/types/events";
 import { EventQuizBuilder, type ManagerQuiz } from "./event-quiz-builder";
 import { customThemeValue, getEventTheme } from "@/features/events/lib/event-theme";
 import { ToggleSwitch } from "@/shared/components/toggle-switch";
+import { uploadImages } from "@/features/uploads/services/uploads.service";
 
 export function EditEventForm({
   publicId,
@@ -23,6 +25,15 @@ export function EditEventForm({
   const [customPrimary, setCustomPrimary] = useState("#173b57");
   const [customAccent, setCustomAccent] = useState("#5aa9d6");
   const [quiz, setQuiz] = useState<ManagerQuiz | null>(null);
+  const [cover, setCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const coverPreviewRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (coverPreviewRef.current) URL.revokeObjectURL(coverPreviewRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     void eventsService
@@ -33,6 +44,7 @@ export function EditEventForm({
         const loadedEvent = (await response.json()) as AdminEventDetails;
         const loadedTheme = getEventTheme(loadedEvent.themeColor);
         setEvent(loadedEvent);
+        setCoverPreview(loadedEvent.coverImageUrl);
         setSelectedTheme(
           loadedEvent.themeColor.startsWith("custom-")
             ? "custom"
@@ -43,6 +55,14 @@ export function EditEventForm({
       });
   }, [publicId]);
 
+  function handleCoverChange(file: File | null) {
+    if (coverPreviewRef.current) URL.revokeObjectURL(coverPreviewRef.current);
+    const nextPreview = file ? URL.createObjectURL(file) : event?.coverImageUrl ?? null;
+    coverPreviewRef.current = file ? nextPreview : null;
+    setCover(file);
+    setCoverPreview(nextPreview);
+  }
+
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSaving(true);
@@ -52,6 +72,15 @@ export function EditEventForm({
       const value = String(data.get(key) ?? "");
       return value ? new Date(value).toISOString() : undefined;
     };
+    let uploadedCover: { url: string; publicId: string } | undefined;
+    if (cover) {
+      const upload = await uploadImages({
+        files: [cover],
+        uploadPath: "/uploads/images",
+        onProgress: () => undefined,
+      });
+      uploadedCover = upload.images[0];
+    }
     const response = await eventsService.updateEventResponse(publicId, {
       title: String(data.get("title") ?? ""),
       description: String(data.get("description") ?? "") || undefined,
@@ -64,6 +93,8 @@ export function EditEventForm({
           ? customThemeValue(customPrimary, customAccent)
           : selectedTheme,
       requireGuestOtp: data.has("requireGuestOtp"),
+      coverImageUrl: uploadedCover?.url,
+      coverImagePublicId: uploadedCover?.publicId,
     });
     if (!response.ok) {
       setSaving(false);
@@ -156,6 +187,36 @@ export function EditEventForm({
             defaultValue={event.description ?? ""}
             className="field-input resize-none"
           />
+        </Field>
+        <Field label="Заглавна снимка">
+          <label className="group relative block cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-[#173b57]/15 bg-white/45 transition hover:border-[#5aa9d6]">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(event) =>
+                handleCoverChange(event.target.files?.[0] ?? null)
+              }
+            />
+            {coverPreview ? (
+              <span className="relative block aspect-[16/7]">
+                <Image
+                  src={coverPreview}
+                  alt="Преглед на заглавната снимка"
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+                <span className="absolute inset-0 grid place-items-center bg-[#173b57]/0 text-sm font-semibold text-white opacity-0 transition group-hover:bg-[#173b57]/45 group-hover:opacity-100">
+                  Смени снимката
+                </span>
+              </span>
+            ) : (
+              <span className="grid min-h-40 place-items-center p-6 text-center text-sm font-semibold">
+                Избери снимка
+              </span>
+            )}
+          </label>
         </Field>
         <Field label="Цветова тема">
           <select

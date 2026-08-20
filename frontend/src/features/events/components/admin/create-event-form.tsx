@@ -84,6 +84,7 @@ export function CreateEventForm({
     requireGuestOtp: false,
   });
   const formRef = useRef<HTMLFormElement>(null);
+  const coverPreviewRef = useRef<string | null>(null);
   const previewTheme = getEventTheme(
     selectedTheme === "custom"
       ? customThemeValue(customPrimary, customAccent)
@@ -92,9 +93,22 @@ export function CreateEventForm({
 
   useEffect(() => {
     return () => {
-      if (coverPreview) URL.revokeObjectURL(coverPreview);
+      if (coverPreviewRef.current) {
+        URL.revokeObjectURL(coverPreviewRef.current);
+      }
     };
-  }, [coverPreview]);
+  }, []);
+
+  function handleCoverChange(file: File | null) {
+    if (coverPreviewRef.current) {
+      URL.revokeObjectURL(coverPreviewRef.current);
+    }
+
+    const nextPreview = file ? URL.createObjectURL(file) : null;
+    coverPreviewRef.current = nextPreview;
+    setCover(file);
+    setCoverPreview(nextPreview);
+  }
 
   useEffect(() => {
     const root = document.documentElement;
@@ -596,8 +610,7 @@ export function CreateEventForm({
                 className="sr-only"
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
-                  setCover(file);
-                  setCoverPreview(file ? URL.createObjectURL(file) : null);
+                  handleCoverChange(file);
                 }}
               />
               {coverPreview ? (
