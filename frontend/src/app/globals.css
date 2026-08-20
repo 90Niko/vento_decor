@@ -592,6 +592,12 @@ a {
     grid-column: 1 / -1;
   }
 
+  .auth-canvas > .app-grid-container,
+  .admin-canvas > .app-grid-container,
+  .guest-gallery-container {
+    width: 100%;
+  }
+
   main.page-canvas.grid,
   main.auth-canvas,
   main.admin-canvas,
@@ -600,10 +606,15 @@ a {
     padding-left: 0 !important;
   }
 
-  .page-container :where(section, article, form, .surface-card),
-  .page-container > div,
-  .page-container > section > div {
-    border-radius: 0 !important;
+  .guest-gallery-container > :not(.guest-top-navbar):not(.guest-event-hero),
+  .guest-event-intro {
+    box-sizing: border-box;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .guest-event-hero > div:first-child {
+    border-radius: 0;
   }
 
   .guest-top-navbar {
@@ -631,16 +642,16 @@ a {
     border-radius: 9999px;
   }
 
-  .surface-card {
+  .wizard-form-surface,
+  .auth-card-shell {
+    border-width: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
   }
 
-  .auth-card-shell,
   .ai-chat-shell {
     border-right-width: 0 !important;
     border-left-width: 0 !important;
-    border-radius: 0 !important;
     box-shadow: none !important;
   }
 

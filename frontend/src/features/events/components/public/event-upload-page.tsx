@@ -227,7 +227,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         background: `radial-gradient(circle at 85% 8%, ${theme.accent}38, transparent 28rem), linear-gradient(145deg, ${theme.background}, #ffffff)`,
       }}
     >
-      <div className="page-container relative">
+      <div className="guest-gallery-container page-container relative">
         <header className="guest-top-navbar sm:pt-5">
           <div className="guest-top-navbar-surface flex items-center justify-between px-3.5 py-3 sm:px-5">
             <BrandLockup subtitle="Галерия за гости" />
