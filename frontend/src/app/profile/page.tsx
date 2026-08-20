@@ -35,7 +35,7 @@ export default function ProfilePage() {
 
   return (
     <main className="admin-canvas min-h-screen px-5 py-10 text-[#173b57] sm:px-8">
-      <section className="surface-card mx-auto w-full max-w-2xl rounded-[2rem] p-7 sm:p-10">
+      <section className="app-grid-container surface-card mx-auto w-full max-w-2xl rounded-[2rem] p-7 sm:p-10">
         <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
           Моят профил
         </p>

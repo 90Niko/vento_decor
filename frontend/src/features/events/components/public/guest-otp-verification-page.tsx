@@ -105,7 +105,7 @@ export function GuestOtpVerificationPage({ publicId }: { publicId: string }) {
 
   return (
     <main className="page-canvas grid min-h-screen place-items-center px-4 py-10 text-[#173b57]">
-      <section className="surface-card w-full max-w-lg rounded-[2rem] p-7 sm:p-10">
+      <section className="app-grid-container surface-card w-full max-w-lg rounded-[2rem] p-7 sm:p-10">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5aa9d6]/25 text-xl">
           ✉
         </span>

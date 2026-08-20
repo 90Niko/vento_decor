@@ -3,7 +3,7 @@ import { AdminEventsDashboard } from "@/features/events/components/admin/admin-e
 export default function CreatorDashboardPage() {
   return (
     <main className="admin-canvas min-h-screen text-[#173b57]">
-      <div className="creator-dashboard-content mx-auto max-w-[1400px] px-5 py-10 sm:px-8">
+      <div className="app-grid-container creator-dashboard-content mx-auto max-w-[1400px] py-10 sm:px-8">
         <h1 className="mb-8 text-4xl font-semibold tracking-[-0.045em]">Моите събития</h1>
         <aside className="mb-8 rounded-2xl bg-[#173b57] p-4 text-white sm:max-w-md">
           <p className="text-xs font-bold tracking-[0.14em] text-[#8ed3f4] uppercase">

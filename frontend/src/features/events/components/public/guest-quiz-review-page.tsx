@@ -91,7 +91,7 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
         background: `linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <div className="mx-auto max-w-3xl">
+      <div className="app-grid-container mx-auto max-w-3xl">
         <section className="surface-card p-6 sm:rounded-[2rem] sm:p-10">
           <p className="text-xs font-bold tracking-[0.18em] uppercase" style={{ color: theme.accent }}>
             Твоят quiz резултат

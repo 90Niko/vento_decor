@@ -15,9 +15,11 @@ export default function NotFoundPage() {
 
   return (
     <main className="page-canvas grid min-h-screen place-items-center px-5 py-12">
-      <button type="button" onClick={goBack} className="primary-action px-8 py-4">
-        ← Назад
-      </button>
+      <div className="app-grid-container w-full">
+        <button type="button" onClick={goBack} className="primary-action w-full px-8 py-4">
+          ← Назад
+        </button>
+      </div>
     </main>
   );
 }

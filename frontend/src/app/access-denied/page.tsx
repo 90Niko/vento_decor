@@ -4,7 +4,7 @@ import { BrandLockup } from "@/shared/components/brand-lockup";
 export default function AccessDeniedPage() {
   return (
     <main className="page-canvas grid min-h-screen place-items-center px-5 py-12 text-[#173b57]">
-      <section className="surface-card w-full max-w-2xl rounded-[2rem] p-8 text-center sm:p-12">
+      <section className="app-grid-container surface-card w-full max-w-2xl rounded-[2rem] p-8 text-center sm:p-12">
         <BrandLockup subtitle="Защитена зона" />
         <div className="mx-auto mt-10 grid h-16 w-16 place-items-center rounded-2xl bg-red-50 text-2xl text-red-600" aria-hidden="true">
           ×

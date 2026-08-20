@@ -60,7 +60,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
         ×
       </Link>
 
-      <section className="relative z-10 w-full max-w-[32rem]">
+      <section className="app-grid-container relative z-10 w-full max-w-[32rem]">
         <div className="mb-7 flex justify-center">
           <BrandLockup subtitle="Галерии за красиви моменти" />
         </div>

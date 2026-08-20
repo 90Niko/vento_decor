@@ -180,7 +180,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </p>
         </section>
       ) : event ? (
-        <section className="surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="app-grid-container surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
           <div
             className="relative overflow-hidden p-7 text-white sm:p-10 lg:p-12"
             style={{
@@ -322,7 +322,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </div>
         </section>
       ) : (
-        <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
+        <section className="app-grid-container surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#5aa9d6]/15 text-2xl">
             !
           </span>

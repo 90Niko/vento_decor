@@ -1,7 +1,7 @@
 import { CreateEventForm } from "@/features/events/components/admin/create-event-form";
 
 export default function CreatorNewEventPage() {
-  return <main className="admin-canvas min-h-screen px-0 py-2 text-[#173b57] sm:px-4 sm:py-4"><div className="mx-auto max-w-[1240px]">
+  return <main className="admin-canvas min-h-screen px-0 py-2 text-[#173b57] sm:px-4 sm:py-4"><div className="app-grid-container mx-auto max-w-[1240px]">
     <section className="hidden py-10 sm:block sm:py-12">
       <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">Създаване</p>
       <h1 className="mt-2 text-5xl font-semibold tracking-[-0.045em]">Създай ново събитие</h1>

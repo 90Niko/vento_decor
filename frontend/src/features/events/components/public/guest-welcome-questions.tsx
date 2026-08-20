@@ -128,7 +128,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <section className="surface-card reveal-up relative w-full max-w-2xl overflow-hidden rounded-[2.25rem] p-7 sm:p-11">
+      <section className="app-grid-container surface-card reveal-up relative w-full max-w-2xl overflow-hidden rounded-[2.25rem] p-7 sm:p-11">
         <div
           className="absolute top-0 left-0 h-1.5 transition-all duration-500"
           style={{ width: `${progress}%`, backgroundColor: theme.accent }}

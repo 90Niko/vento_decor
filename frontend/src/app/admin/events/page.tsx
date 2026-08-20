@@ -5,7 +5,7 @@ import { CreatorsAdminPanel } from "@/features/auth/components/creators-admin-pa
 export default function AdminEventsPage() {
   return (
     <main className="admin-canvas min-h-screen text-[#173b57]">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1500px]">
+      <div className="app-grid-container mx-auto flex min-h-screen w-full max-w-[1500px]">
         <aside className="sticky top-[76px] hidden h-[calc(100vh-76px)] w-64 shrink-0 self-start flex-col border-r border-[#173b57]/10 bg-white/60 px-5 py-7 backdrop-blur-xl lg:flex">
           <nav className="mt-12 space-y-2" aria-label="Админ навигация">
             <NavItem href="#overview" label="Общ преглед" active icon={<DashboardIcon />} />

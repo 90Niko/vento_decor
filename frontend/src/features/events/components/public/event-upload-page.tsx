@@ -564,7 +564,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
 
       {!activeImage && (
         <div
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pt-3 sm:hidden"
+          className="app-grid-container pointer-events-none fixed inset-x-0 bottom-0 z-50 pt-3 sm:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <label

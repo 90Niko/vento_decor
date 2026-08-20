@@ -98,11 +98,22 @@ export const eventsService = {
       }>;
     },
   ): Promise<Response> {
+    const payload = {
+      enabled: quiz.enabled,
+      hasCorrectAnswers: quiz.hasCorrectAnswers,
+      title: quiz.title,
+      questions: quiz.questions.map(({ prompt, options, correctOption }) => ({
+        prompt,
+        options,
+        correctOption,
+      })),
+    };
+
     return fetch(`${getApiUrl()}/events/admin/${publicId}/quiz`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(quiz),
+      body: JSON.stringify(payload),
     });
   },
 
