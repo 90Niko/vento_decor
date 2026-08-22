@@ -84,30 +84,26 @@ export function CreateEventForm({
     requireGuestOtp: false,
   });
   const formRef = useRef<HTMLFormElement>(null);
-  const coverPreviewRef = useRef<string | null>(null);
   const previewTheme = getEventTheme(
     selectedTheme === "custom"
       ? customThemeValue(customPrimary, customAccent)
       : selectedTheme,
   );
 
-  useEffect(() => {
-    return () => {
-      if (coverPreviewRef.current) {
-        URL.revokeObjectURL(coverPreviewRef.current);
-      }
-    };
-  }, []);
-
   function handleCoverChange(file: File | null) {
-    if (coverPreviewRef.current) {
-      URL.revokeObjectURL(coverPreviewRef.current);
+    setCover(file);
+
+    if (!file) {
+      setCoverPreview(null);
+      return;
     }
 
-    const nextPreview = file ? URL.createObjectURL(file) : null;
-    coverPreviewRef.current = nextPreview;
-    setCover(file);
-    setCoverPreview(nextPreview);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCoverPreview(typeof reader.result === "string" ? reader.result : null);
+    };
+    reader.onerror = () => setCoverPreview(null);
+    reader.readAsDataURL(file);
   }
 
   useEffect(() => {
