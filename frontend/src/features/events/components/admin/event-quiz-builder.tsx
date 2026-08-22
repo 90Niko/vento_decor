@@ -48,7 +48,7 @@ export function EventQuizBuilder({
 
   if (!quiz) {
     return (
-      <section className="surface-card rounded-[2rem] p-6 sm:p-9">
+      <section className="px-0 py-6 sm:p-9">
         <p className="text-sm text-[#173b57]/60">
           {notice ?? "Зареждане на quiz…"}
         </p>
@@ -86,7 +86,7 @@ export function EventQuizBuilder({
   }
 
   return (
-    <section className="surface-card rounded-[2rem] p-6 sm:p-9">
+    <section className="px-0 py-6 sm:p-9">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow">Guest quiz</p>
@@ -96,7 +96,7 @@ export function EventQuizBuilder({
             {quiz.hasCorrectAnswers && <> · среден резултат {quiz.stats.averagePercent}%</>}
           </p>
         </div>
-        <label className="flex cursor-pointer items-center gap-3 rounded-full bg-[#173b57]/5 px-4 py-3 text-sm font-bold">
+        <label className="flex cursor-pointer items-center gap-3 px-0 py-3 text-sm font-bold">
           <ToggleSwitch
             checked={quiz.enabled}
             onChange={(event) =>
@@ -109,7 +109,7 @@ export function EventQuizBuilder({
 
       {quiz.enabled && (
       <div className="quiz-settings-reveal">
-      <label className="mt-7 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4">
+      <label className="mt-7 flex cursor-pointer items-center justify-between gap-4 py-4">
         <span>
           <span className="block text-sm font-semibold">Quiz с верни отговори</span>
           <span className="mt-1 block text-xs opacity-55">
@@ -138,7 +138,7 @@ export function EventQuizBuilder({
         {quiz.questions.map((question, questionIndex) => (
           <article
             key={questionIndex}
-            className="rounded-2xl border border-[#173b57]/10 bg-white/55 p-5"
+            className="py-5"
           >
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-bold text-[#5aa9d6]">
@@ -217,12 +217,6 @@ export function EventQuizBuilder({
                     placeholder={`Отговор ${optionIndex + 1}`}
                     className="field-input py-2.5"
                   />
-                  <span
-                    className="w-11 shrink-0 text-right text-sm font-bold tabular-nums text-[#173b57]/55"
-                    title="Процент от всички гости, попълнили quiz-а"
-                  >
-                    {question.optionPercentages?.[optionIndex] ?? 0}%
-                  </span>
                   {question.options.length > 2 && (
                     <button
                       type="button"

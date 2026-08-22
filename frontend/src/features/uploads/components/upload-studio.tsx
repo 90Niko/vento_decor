@@ -3,13 +3,11 @@
 import {
   ChangeEvent,
   DragEvent,
-  FormEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { uploadImages } from "@/features/uploads/services/uploads.service";
-import type { UploadedImage } from "@/features/uploads/types/uploads";
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -91,7 +89,6 @@ export function UploadStudio({
   onUploaded,
 }: UploadStudioProps = {}) {
   const [selected, setSelected] = useState<SelectedImage[]>([]);
-  const [uploaded, setUploaded] = useState<UploadedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -185,8 +182,8 @@ export function UploadStudio({
     });
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleUpload = async () => {
+    if (isUploading) return;
     if (selected.length === 0) {
       setError("Избери поне една снимка.");
       return;
@@ -204,7 +201,6 @@ export function UploadStudio({
         authorizationToken,
         onProgress: setProgress,
       });
-      setUploaded((current) => [...response.images, ...current]);
       selected.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl));
       previewUrls.current = [];
       setSelected([]);
@@ -227,10 +223,13 @@ export function UploadStudio({
   };
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+    <div>
       <form
         ref={formRef}
-        onSubmit={handleSubmit}
+        onSubmit={(event) => {
+          event.preventDefault();
+          void handleUpload();
+        }}
         className="surface-card rounded-[2rem] p-0 sm:p-4"
       >
         {selected.length === 0 && <label
@@ -347,7 +346,8 @@ export function UploadStudio({
         )}
 
         {selected.length > 0 && <button
-          type="submit"
+          type="button"
+          onClick={() => void handleUpload()}
           disabled={isUploading}
           className="mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           style={{ backgroundColor: theme.primary }}
@@ -357,72 +357,6 @@ export function UploadStudio({
         </button>}
       </form>
 
-      <aside
-        className="rounded-none p-6 text-white shadow-none sm:rounded-[2rem] sm:p-8 sm:shadow-[0_24px_80px_rgba(23,59,87,0.18)] lg:sticky lg:top-28"
-        style={{
-          background: `linear-gradient(155deg, ${theme.primary}, ${theme.accent})`,
-        }}
-      >
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.18em] text-white/65 uppercase">
-              Последно качени
-            </p>
-            <h2 className="mt-2 text-2xl font-medium tracking-[-0.03em]">
-              Твоите моменти
-            </h2>
-          </div>
-          <span className="grid h-10 min-w-10 place-items-center rounded-full bg-white/10 text-sm font-semibold">
-            {uploaded.length}
-          </span>
-        </div>
-
-        {uploaded.length === 0 ? (
-          <div className="mt-10 flex min-h-72 flex-col items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-7 text-center">
-            <GalleryIcon />
-            <p className="mt-5 font-medium">Галерията те очаква</p>
-            <p className="mt-2 max-w-56 text-sm leading-6 text-white/70">
-              Снимките, които споделиш, ще се появят тук веднага след качването.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-7 grid grid-cols-2 gap-3">
-            {uploaded.map((image) => (
-              <a
-                key={image.publicId}
-                href={image.url}
-                target="_blank"
-                rel="noreferrer"
-                className="group relative aspect-square overflow-hidden rounded-2xl bg-white/10"
-                aria-label={`Отвори ${image.originalName}`}
-              >
-                {image.resourceType === "video" ? (
-                  <video
-                    src={image.url}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <span
-                    role="img"
-                    aria-label={image.originalName}
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                    style={{ backgroundImage: `url(${image.url})` }}
-                  />
-                )}
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-8 pb-3 text-[11px] text-white/80">
-                  {image.width} × {image.height}
-                </span>
-              </a>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-white/65">
-          Твоите снимки стават част от общата галерия на събитието.
-        </div>
-      </aside>
     </div>
   );
 }
@@ -448,16 +382,6 @@ function ArrowIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path d="M3.75 9h10.5m-4-4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function GalleryIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true" className="text-[#eaf6ff]">
-      <rect x="5" y="7" width="32" height="28" rx="5" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="15" cy="16" r="3" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 31l8.5-8 5.5 5 4.5-4 7.5 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
