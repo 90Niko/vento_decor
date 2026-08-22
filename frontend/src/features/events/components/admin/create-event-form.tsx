@@ -29,6 +29,14 @@ const COLOR_THEMES = [
   ["midnight", "#171b2e", "#59658f", "Полунощ"],
 ] as const;
 
+const COVER_RATIOS = {
+  "16:9": 16 / 9,
+  "4:3": 4 / 3,
+  "1:1": 1,
+} as const;
+
+type CoverRatio = keyof typeof COVER_RATIOS;
+
 interface QuizDraftQuestion {
   prompt: string;
   options: string[];
@@ -54,6 +62,11 @@ export function CreateEventForm({
   const router = useRouter();
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverRatio, setCoverRatio] = useState<CoverRatio>("16:9");
+  const [coverWidth, setCoverWidth] = useState(1600);
+  const [coverZoom, setCoverZoom] = useState(1);
+  const [coverPositionX, setCoverPositionX] = useState(50);
+  const [coverPositionY, setCoverPositionY] = useState(50);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -160,8 +173,15 @@ export function CreateEventForm({
     try {
       let uploadedCover: { url: string; publicId: string } | undefined;
       if (cover) {
+        const preparedCover = await cropCoverImage(cover, {
+          ratio: COVER_RATIOS[coverRatio],
+          width: coverWidth,
+          zoom: coverZoom,
+          positionX: coverPositionX,
+          positionY: coverPositionY,
+        });
         const upload = await uploadImages({
-          files: [cover],
+          files: [preparedCover],
           uploadPath: "/uploads/images",
           onProgress: setProgress,
         });
@@ -610,13 +630,20 @@ export function CreateEventForm({
                 }}
               />
               {coverPreview ? (
-                <div className="relative aspect-[16/7]">
+                <div
+                  className="relative overflow-hidden"
+                  style={{ aspectRatio: COVER_RATIOS[coverRatio] }}
+                >
                   <Image
                     src={coverPreview}
                     alt="Преглед на заглавната снимка"
                     fill
                     unoptimized
                     className="object-cover"
+                    style={{
+                      objectPosition: `${coverPositionX}% ${coverPositionY}%`,
+                      transform: `scale(${coverZoom})`,
+                    }}
                   />
                   <span className="absolute inset-0 grid place-items-center bg-[#173b57]/0 text-sm font-semibold text-white opacity-0 transition group-hover:bg-[#173b57]/45 group-hover:opacity-100">
                     Смени снимката
@@ -638,6 +665,35 @@ export function CreateEventForm({
                 </div>
               )}
             </label>
+            {coverPreview && (
+              <div className="mt-4 grid gap-4 rounded-2xl border border-[#173b57]/10 bg-white/55 p-4 sm:grid-cols-2">
+                <Field label="Съотношение">
+                  <select
+                    value={coverRatio}
+                    onChange={(event) => setCoverRatio(event.target.value as CoverRatio)}
+                    className="field-input"
+                  >
+                    <option value="16:9">16:9 · широко</option>
+                    <option value="4:3">4:3 · стандартно</option>
+                    <option value="1:1">1:1 · квадрат</option>
+                  </select>
+                </Field>
+                <Field label="Краен размер">
+                  <select
+                    value={coverWidth}
+                    onChange={(event) => setCoverWidth(Number(event.target.value))}
+                    className="field-input"
+                  >
+                    <option value={1200}>1200 px · по-малък файл</option>
+                    <option value={1600}>1600 px · препоръчително</option>
+                    <option value={2000}>2000 px · високо качество</option>
+                  </select>
+                </Field>
+                <RangeControl label="Мащаб" min={1} max={2} step={0.05} value={coverZoom} onChange={setCoverZoom} />
+                <RangeControl label="Хоризонтална позиция" min={0} max={100} step={1} value={coverPositionX} onChange={setCoverPositionX} />
+                <RangeControl label="Вертикална позиция" min={0} max={100} step={1} value={coverPositionY} onChange={setCoverPositionY} />
+              </div>
+            )}
           </div>
         </FormSection>
         </div>
@@ -1019,7 +1075,10 @@ export function CreateEventForm({
             background: `linear-gradient(145deg, ${previewTheme.primary}, ${previewTheme.accent})`,
           }}
         >
-          <div className="relative aspect-[16/9] bg-white/10">
+          <div
+            className="relative overflow-hidden bg-white/10"
+            style={{ aspectRatio: COVER_RATIOS[coverRatio] }}
+          >
             {coverPreview ? (
               <Image
                 src={coverPreview}
@@ -1027,6 +1086,10 @@ export function CreateEventForm({
                 fill
                 unoptimized
                 className="object-cover"
+                style={{
+                  objectPosition: `${coverPositionX}% ${coverPositionY}%`,
+                  transform: `scale(${coverZoom})`,
+                }}
               />
             ) : (
               <div className="grid h-full place-items-center px-5 text-center text-sm font-semibold text-white/60">
@@ -1153,6 +1216,111 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
       <dd className="font-semibold">{value || "—"}</dd>
     </div>
   );
+}
+
+function RangeControl({
+  label,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+}: {
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="block sm:col-span-2">
+      <span className="mb-2 flex justify-between text-sm font-semibold">
+        <span>{label}</span>
+        <span className="font-mono text-xs opacity-50">
+          {label === "Мащаб" ? `${Math.round(value * 100)}%` : `${value}%`}
+        </span>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="w-full cursor-pointer accent-[#5aa9d6]"
+      />
+    </label>
+  );
+}
+
+async function cropCoverImage(
+  file: File,
+  options: {
+    ratio: number;
+    width: number;
+    zoom: number;
+    positionX: number;
+    positionY: number;
+  },
+) {
+  const source = await loadImage(file);
+  const targetWidth = options.width;
+  const targetHeight = Math.round(targetWidth / options.ratio);
+  const scale = Math.max(
+    targetWidth / source.naturalWidth,
+    targetHeight / source.naturalHeight,
+  ) * options.zoom;
+  const cropWidth = targetWidth / scale;
+  const cropHeight = targetHeight / scale;
+  const sourceX =
+    (source.naturalWidth - cropWidth) * (options.positionX / 100);
+  const sourceY =
+    (source.naturalHeight - cropHeight) * (options.positionY / 100);
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Снимката не може да бъде обработена.");
+  context.drawImage(
+    source,
+    sourceX,
+    sourceY,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    targetWidth,
+    targetHeight,
+  );
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (result) =>
+        result ? resolve(result) : reject(new Error("Снимката не може да бъде изрязана.")),
+      "image/webp",
+      0.9,
+    );
+  });
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "cover";
+  return new File([blob], `${baseName}-${targetWidth}w.webp`, {
+    type: "image/webp",
+  });
+}
+
+function loadImage(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = document.createElement("img");
+    const url = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Снимката не може да бъде прочетена."));
+    };
+    image.src = url;
+  });
 }
 
 function formatReviewDate(value: string) {
