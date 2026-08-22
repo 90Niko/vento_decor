@@ -1018,24 +1018,44 @@ export function CreateEventForm({
 
       <aside className="theme-edit-surface surface-card hidden rounded-[2rem] p-5 transition-colors duration-300 lg:sticky lg:top-24 lg:block">
         <div
-          className="theme-guest-preview mb-6 overflow-hidden rounded-2xl p-5 text-white transition-colors duration-300"
+          className="theme-guest-preview mb-6 overflow-hidden rounded-2xl text-white transition-colors duration-300"
           style={{
             background: `linear-gradient(145deg, ${previewTheme.primary}, ${previewTheme.accent})`,
           }}
         >
-          <p className="text-xs font-bold tracking-[0.16em] text-white/65 uppercase">
-            Преглед на темата
-          </p>
-          <p className="mt-3 text-xl font-semibold">Твоето събитие</p>
-          <p className="mt-2 text-sm text-white/75">
-            Така ще изглеждат основните цветове за гостите.
-          </p>
-          <span
-            className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-xs font-bold"
-            style={{ color: previewTheme.primary }}
-          >
-            Акцентен бутон
-          </span>
+          <div className="relative aspect-[16/9] bg-white/10">
+            {coverPreview ? (
+              <Image
+                src={coverPreview}
+                alt="Live preview на заглавната снимка"
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            ) : (
+              <div className="grid h-full place-items-center px-5 text-center text-sm font-semibold text-white/60">
+                Избраната заглавна снимка ще се появи тук
+              </div>
+            )}
+            <span className="absolute top-3 left-3 rounded-full bg-black/35 px-3 py-1 text-[0.65rem] font-bold tracking-[0.14em] uppercase backdrop-blur-sm">
+              Live preview
+            </span>
+          </div>
+          <div className="p-5">
+            <p className="text-xs font-bold tracking-[0.16em] text-white/65 uppercase">
+              Преглед на темата
+            </p>
+            <p className="mt-3 text-xl font-semibold">Твоето събитие</p>
+            <p className="mt-2 text-sm text-white/75">
+              Така ще изглеждат снимката и основните цветове за гостите.
+            </p>
+            <span
+              className="mt-5 inline-flex rounded-full bg-white px-4 py-2 text-xs font-bold"
+              style={{ color: previewTheme.primary }}
+            >
+              Акцентен бутон
+            </span>
+          </div>
         </div>
         <p className="text-xs font-bold tracking-[0.16em] text-[#5aa9d6] uppercase">
           Добра форма
