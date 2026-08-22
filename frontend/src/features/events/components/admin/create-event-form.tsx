@@ -1432,16 +1432,18 @@ async function cropCoverImage(
 function loadImage(file: File) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = document.createElement("img");
-    const url = URL.createObjectURL(file);
-    image.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(image);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("Снимката не може да бъде прочетена."));
+        return;
+      }
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Снимката не може да бъде прочетена."));
+      image.src = reader.result;
     };
-    image.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Снимката не може да бъде прочетена."));
-    };
-    image.src = url;
+    reader.onerror = () => reject(new Error("Снимката не може да бъде прочетена."));
+    reader.readAsDataURL(file);
   });
 }
 

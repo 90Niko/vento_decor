@@ -171,7 +171,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
   }
 
   return (
-    <main className="page-canvas grid min-h-screen place-items-center px-3 py-8 text-[#173b57] sm:px-6 sm:py-14">
+    <main className="page-canvas grid min-h-screen place-items-center px-0 py-0 text-[#173b57] sm:px-6 sm:py-14">
       {isLoading ? (
         <section className="surface-card w-full max-w-xl rounded-[2rem] p-10 text-center">
           <span className="mx-auto block h-10 w-10 animate-spin rounded-full border-2 border-[#173b57]/15 border-t-[#173b57]" />
@@ -180,7 +180,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </p>
         </section>
       ) : event ? (
-        <section className="app-grid-container surface-card reveal-up grid w-full max-w-5xl overflow-hidden rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="app-grid-container surface-card reveal-up grid min-h-screen w-full max-w-none overflow-hidden rounded-none border-0 shadow-none sm:min-h-0 sm:max-w-5xl sm:rounded-[2.25rem] sm:border sm:shadow-[0_24px_80px_rgb(23_59_87/12%)] lg:grid-cols-[1.08fr_0.92fr]">
           <div
             className="relative overflow-hidden p-7 text-white sm:p-10 lg:p-12"
             style={{
