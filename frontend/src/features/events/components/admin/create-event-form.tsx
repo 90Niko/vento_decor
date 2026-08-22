@@ -36,6 +36,7 @@ const COVER_RATIOS = {
 } as const;
 
 type CoverRatio = keyof typeof COVER_RATIOS;
+type CoverFit = "contain" | "cover";
 
 interface QuizDraftQuestion {
   prompt: string;
@@ -64,6 +65,7 @@ export function CreateEventForm({
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverRatio, setCoverRatio] = useState<CoverRatio>("16:9");
   const [coverWidth, setCoverWidth] = useState(1600);
+  const [coverFit, setCoverFit] = useState<CoverFit>("contain");
   const [coverZoom, setCoverZoom] = useState(1);
   const [coverPositionX, setCoverPositionX] = useState(50);
   const [coverPositionY, setCoverPositionY] = useState(50);
@@ -176,6 +178,7 @@ export function CreateEventForm({
         const preparedCover = await cropCoverImage(cover, {
           ratio: COVER_RATIOS[coverRatio],
           width: coverWidth,
+          fit: coverFit,
           zoom: coverZoom,
           positionX: coverPositionX,
           positionY: coverPositionY,
@@ -639,12 +642,21 @@ export function CreateEventForm({
                     alt="Преглед на заглавната снимка"
                     fill
                     unoptimized
-                    className="object-cover"
+                    className={coverFit === "contain" ? "scale-110 object-cover blur-xl" : "object-cover"}
                     style={{
                       objectPosition: `${coverPositionX}% ${coverPositionY}%`,
-                      transform: `scale(${coverZoom})`,
+                      transform: coverFit === "cover" ? `scale(${coverZoom})` : undefined,
                     }}
                   />
+                  {coverFit === "contain" && (
+                    <Image
+                      src={coverPreview}
+                      alt="Цялата заглавна снимка"
+                      fill
+                      unoptimized
+                      className="object-contain"
+                    />
+                  )}
                   <span className="absolute inset-0 grid place-items-center bg-[#173b57]/0 text-sm font-semibold text-white opacity-0 transition group-hover:bg-[#173b57]/45 group-hover:opacity-100">
                     Смени снимката
                   </span>
@@ -689,9 +701,23 @@ export function CreateEventForm({
                     <option value={2000}>2000 px · високо качество</option>
                   </select>
                 </Field>
-                <RangeControl label="Мащаб" min={1} max={2} step={0.05} value={coverZoom} onChange={setCoverZoom} />
-                <RangeControl label="Хоризонтална позиция" min={0} max={100} step={1} value={coverPositionX} onChange={setCoverPositionX} />
-                <RangeControl label="Вертикална позиция" min={0} max={100} step={1} value={coverPositionY} onChange={setCoverPositionY} />
+                <Field label="Показване на снимката">
+                  <select
+                    value={coverFit}
+                    onChange={(event) => setCoverFit(event.target.value as CoverFit)}
+                    className="field-input"
+                  >
+                    <option value="contain">Цялата снимка · без изрязване</option>
+                    <option value="cover">Запълване · с изрязване</option>
+                  </select>
+                </Field>
+                {coverFit === "cover" && (
+                  <>
+                    <RangeControl label="Мащаб" min={1} max={2} step={0.05} value={coverZoom} onChange={setCoverZoom} />
+                    <RangeControl label="Хоризонтална позиция" min={0} max={100} step={1} value={coverPositionX} onChange={setCoverPositionX} />
+                    <RangeControl label="Вертикална позиция" min={0} max={100} step={1} value={coverPositionY} onChange={setCoverPositionY} />
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -1080,17 +1106,28 @@ export function CreateEventForm({
             style={{ aspectRatio: COVER_RATIOS[coverRatio] }}
           >
             {coverPreview ? (
-              <Image
-                src={coverPreview}
-                alt="Live preview на заглавната снимка"
-                fill
-                unoptimized
-                className="object-cover"
-                style={{
-                  objectPosition: `${coverPositionX}% ${coverPositionY}%`,
-                  transform: `scale(${coverZoom})`,
-                }}
-              />
+              <>
+                <Image
+                  src={coverPreview}
+                  alt="Live preview на заглавната снимка"
+                  fill
+                  unoptimized
+                  className={coverFit === "contain" ? "scale-110 object-cover blur-xl" : "object-cover"}
+                  style={{
+                    objectPosition: `${coverPositionX}% ${coverPositionY}%`,
+                    transform: coverFit === "cover" ? `scale(${coverZoom})` : undefined,
+                  }}
+                />
+                {coverFit === "contain" && (
+                  <Image
+                    src={coverPreview}
+                    alt="Цялата заглавна снимка"
+                    fill
+                    unoptimized
+                    className="object-contain"
+                  />
+                )}
+              </>
             ) : (
               <div className="grid h-full place-items-center px-5 text-center text-sm font-semibold text-white/60">
                 Избраната заглавна снимка ще се появи тук
@@ -1259,6 +1296,7 @@ async function cropCoverImage(
   options: {
     ratio: number;
     width: number;
+    fit: CoverFit;
     zoom: number;
     positionX: number;
     positionY: number;
@@ -1267,6 +1305,43 @@ async function cropCoverImage(
   const source = await loadImage(file);
   const targetWidth = options.width;
   const targetHeight = Math.round(targetWidth / options.ratio);
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Снимката не може да бъде обработена.");
+
+  if (options.fit === "contain") {
+    const backgroundScale = Math.max(
+      targetWidth / source.naturalWidth,
+      targetHeight / source.naturalHeight,
+    );
+    const backgroundWidth = source.naturalWidth * backgroundScale;
+    const backgroundHeight = source.naturalHeight * backgroundScale;
+    context.save();
+    context.filter = "blur(24px) brightness(0.72)";
+    context.drawImage(
+      source,
+      (targetWidth - backgroundWidth) / 2,
+      (targetHeight - backgroundHeight) / 2,
+      backgroundWidth,
+      backgroundHeight,
+    );
+    context.restore();
+    const foregroundScale = Math.min(
+      targetWidth / source.naturalWidth,
+      targetHeight / source.naturalHeight,
+    );
+    const foregroundWidth = source.naturalWidth * foregroundScale;
+    const foregroundHeight = source.naturalHeight * foregroundScale;
+    context.drawImage(
+      source,
+      (targetWidth - foregroundWidth) / 2,
+      (targetHeight - foregroundHeight) / 2,
+      foregroundWidth,
+      foregroundHeight,
+    );
+  } else {
   const scale = Math.max(
     targetWidth / source.naturalWidth,
     targetHeight / source.naturalHeight,
@@ -1277,11 +1352,6 @@ async function cropCoverImage(
     (source.naturalWidth - cropWidth) * (options.positionX / 100);
   const sourceY =
     (source.naturalHeight - cropHeight) * (options.positionY / 100);
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("Снимката не може да бъде обработена.");
   context.drawImage(
     source,
     sourceX,
@@ -1293,6 +1363,7 @@ async function cropCoverImage(
     targetWidth,
     targetHeight,
   );
+  }
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
       (result) =>
