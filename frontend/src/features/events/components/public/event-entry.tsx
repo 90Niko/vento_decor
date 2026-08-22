@@ -180,7 +180,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
           </p>
         </section>
       ) : event ? (
-        <section className="app-grid-container surface-card reveal-up grid min-h-screen w-full max-w-none overflow-hidden rounded-none border-0 shadow-none sm:min-h-0 sm:max-w-5xl sm:rounded-[2.25rem] sm:border sm:shadow-[0_24px_80px_rgb(23_59_87/12%)] lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="event-entry-container app-grid-container surface-card reveal-up grid min-h-screen w-full max-w-none overflow-hidden rounded-none border-0 shadow-none sm:min-h-0 sm:max-w-5xl sm:rounded-[2.25rem] sm:border sm:shadow-[0_24px_80px_rgb(23_59_87/12%)] lg:grid-cols-[1.08fr_0.92fr]">
           <div
             className="relative overflow-hidden p-7 text-white sm:p-10 lg:p-12"
             style={{

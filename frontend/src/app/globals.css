@@ -624,8 +624,30 @@ a {
 
   .auth-canvas > .app-grid-container,
   .admin-canvas > .app-grid-container,
-  .guest-gallery-container {
+  .guest-gallery-container,
+  .event-entry-container,
+  .quiz-review-container {
     width: 100%;
+  }
+
+  .quiz-review-flat {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .quiz-review-container article.quiz-review-flat + article.quiz-review-flat {
+    border-top: 1px solid rgb(23 59 87 / 12%) !important;
+  }
+
+  .quiz-review-option {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
   }
 
   main.page-canvas.grid,

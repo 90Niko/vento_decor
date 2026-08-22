@@ -91,8 +91,8 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
         background: `linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <div className="app-grid-container mx-auto max-w-3xl">
-        <section className="surface-card p-6 sm:rounded-[2rem] sm:p-10">
+      <div className="quiz-review-container app-grid-container mx-auto max-w-3xl">
+        <section className="quiz-review-flat surface-card p-6 sm:rounded-[2rem] sm:p-10">
           <p className="text-xs font-bold tracking-[0.18em] uppercase" style={{ color: theme.accent }}>
             Твоят quiz резултат
           </p>
@@ -105,7 +105,7 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
 
         <div className="mt-6 space-y-4">
           {review.questions.map((question, index) => (
-            <article key={`${question.prompt}-${index}`} className="surface-card p-5 sm:rounded-2xl sm:p-7">
+            <article key={`${question.prompt}-${index}`} className="quiz-review-flat surface-card p-5 sm:rounded-2xl sm:p-7">
               <h2 className="font-semibold">{index + 1}. {question.prompt}</h2>
               <div className="mt-5 space-y-2">
                 {question.options.map((option, optionIndex) => {
@@ -114,10 +114,10 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
                   return (
                     <div
                       key={`${option}-${optionIndex}`}
-                      className={`rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-sky-300 bg-sky-50 text-sky-800" : "border-black/8 bg-white/45 opacity-60"}`}
+                      className={`quiz-review-option rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-sky-300 bg-sky-50 text-sky-800" : "border-black/8 bg-white/45 opacity-60"}`}
                     >
                       <span className="flex items-center justify-between gap-4">
-                        <span>{option}{isSelected ? " · Твоят отговор" : ""}{isCorrect ? " · Верен отговор" : ""}</span>
+                        <span>{option}</span>
                         <span className="shrink-0 font-semibold tabular-nums">
                           {question.optionPercentages[optionIndex] ?? 0}%
                         </span>
