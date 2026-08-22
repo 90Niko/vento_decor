@@ -320,12 +320,7 @@ export function EditEventForm({
             </span>
           )}
         </Field>
-        <label className="flex cursor-pointer gap-3 py-4">
-            <ToggleSwitch
-              name="requireGuestOtp"
-              defaultChecked={event.requireGuestOtp}
-              className="mt-0.5"
-            />
+        <label className="flex cursor-pointer items-center justify-between gap-4 py-4">
             <span>
               <span className="block text-sm font-semibold">
                 Код за достъп по имейл
@@ -334,6 +329,11 @@ export function EditEventForm({
                 Изисквай 6-цифрен код преди достъп до галерията.
               </span>
             </span>
+            <ToggleSwitch
+              name="requireGuestOtp"
+              defaultChecked={event.requireGuestOtp}
+              className="shrink-0"
+            />
         </label>
         {error && (
           <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>

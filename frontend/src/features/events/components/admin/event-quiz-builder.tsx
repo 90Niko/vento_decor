@@ -48,7 +48,7 @@ export function EventQuizBuilder({
 
   if (!quiz) {
     return (
-      <section className="px-0 py-6 sm:p-9">
+      <section className="border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
         <p className="text-sm text-[#173b57]/60">
           {notice ?? "Зареждане на quiz…"}
         </p>
@@ -86,7 +86,7 @@ export function EventQuizBuilder({
   }
 
   return (
-    <section className="px-0 py-6 sm:p-9">
+    <section className="border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow">Guest quiz</p>
@@ -96,19 +96,18 @@ export function EventQuizBuilder({
             {quiz.hasCorrectAnswers && <> · среден резултат {quiz.stats.averagePercent}%</>}
           </p>
         </div>
-        <label className="flex cursor-pointer items-center gap-3 px-0 py-3 text-sm font-bold">
+        <label className="flex cursor-pointer items-center px-0 py-3">
           <ToggleSwitch
             checked={quiz.enabled}
             onChange={(event) =>
               setQuiz({ ...quiz, enabled: event.target.checked })
             }
           />
-          Включен
         </label>
       </div>
 
       {quiz.enabled && (
-      <div className="quiz-settings-reveal mt-7 divide-y divide-[#173b57]/12 border-t border-[#173b57]/12">
+      <div className="quiz-settings-reveal mt-7">
       <label className="flex cursor-pointer items-center justify-between gap-4 py-6">
         <span>
           <span className="block text-sm font-semibold">Quiz с верни отговори</span>
@@ -134,7 +133,7 @@ export function EventQuizBuilder({
         />
       </label>
 
-      <div className="divide-y divide-[#173b57]/12">
+      <div>
         {quiz.questions.map((question, questionIndex) => (
           <article
             key={questionIndex}
