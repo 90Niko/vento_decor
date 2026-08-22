@@ -54,6 +54,19 @@ function isAcceptedMedia(file: File): boolean {
   );
 }
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () =>
+      typeof reader.result === "string"
+        ? resolve(reader.result)
+        : reject(new Error("Снимката не може да бъде прочетена."));
+    reader.onerror = () =>
+      reject(new Error("Снимката не може да бъде прочетена."));
+    reader.readAsDataURL(file);
+  });
+}
+
 interface UploadStudioProps {
   uploadPath?: string;
   authorizationToken?: string;
@@ -93,7 +106,7 @@ export function UploadStudio({
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, []);
 
-  const addFiles = (files: FileList | File[]) => {
+  const addFiles = async (files: FileList | File[]) => {
     setError(null);
     setMessage(null);
 
@@ -109,15 +122,21 @@ export function UploadStudio({
         !existing.has(key);
     });
     const availableSlots = MAX_FILES - selected.length;
-    const accepted = incoming.slice(0, availableSlots).map((file) => {
-      const previewUrl = URL.createObjectURL(file);
-      previewUrls.current.push(previewUrl);
-      return {
-        id: `${file.name}-${file.size}-${file.lastModified}`,
-        file,
-        previewUrl,
-      };
-    });
+    const accepted = await Promise.all(
+      incoming.slice(0, availableSlots).map(async (file) => {
+        const previewUrl = file.type.startsWith("video/")
+          ? URL.createObjectURL(file)
+          : await readFileAsDataUrl(file);
+        if (file.type.startsWith("video/")) {
+          previewUrls.current.push(previewUrl);
+        }
+        return {
+          id: `${file.name}-${file.size}-${file.lastModified}`,
+          file,
+          previewUrl,
+        };
+      }),
+    );
 
     if (accepted.length < Array.from(files).length) {
       setError(
@@ -134,7 +153,7 @@ export function UploadStudio({
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      addFiles(event.target.files);
+      void addFiles(event.target.files);
       if (event.target.files.length > 0) {
         window.setTimeout(() => {
           formRef.current?.scrollIntoView({
@@ -150,7 +169,7 @@ export function UploadStudio({
   const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setIsDragging(false);
-    addFiles(event.dataTransfer.files);
+    void addFiles(event.dataTransfer.files);
   };
 
   const removeImage = (id: string) => {
