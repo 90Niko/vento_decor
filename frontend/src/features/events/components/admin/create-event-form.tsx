@@ -65,7 +65,7 @@ export function CreateEventForm({
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverRatio, setCoverRatio] = useState<CoverRatio>("16:9");
   const [coverWidth, setCoverWidth] = useState(1600);
-  const [coverFit, setCoverFit] = useState<CoverFit>("contain");
+  const [coverFit, setCoverFit] = useState<CoverFit>("stretch");
   const [coverZoom, setCoverZoom] = useState(1);
   const [coverPositionX, setCoverPositionX] = useState(50);
   const [coverPositionY, setCoverPositionY] = useState(50);
@@ -713,14 +713,28 @@ export function CreateEventForm({
                     onChange={(event) => setCoverFit(event.target.value as CoverFit)}
                     className="field-input"
                   >
-                    <option value="contain">Цялата снимка · без изрязване</option>
-                    <option value="cover">Запълване · с изрязване</option>
                     <option value="stretch">Разпъване · без празни полета</option>
+                    <option value="contain">Цялата снимка · с мек фон</option>
+                    <option value="cover">Ръчно позициониране · с изрязване</option>
                   </select>
                 </Field>
                 {coverFit === "cover" && (
                   <>
                     <RangeControl label="Мащаб" min={1} max={2} step={0.05} value={coverZoom} onChange={setCoverZoom} />
+                    <div className="sm:col-span-2">
+                      <span className="mb-2 block text-sm font-semibold">Премести снимката</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <span />
+                        <PositionButton label="Нагоре" icon="↑" onClick={() => setCoverPositionY((value) => Math.max(0, value - 5))} />
+                        <span />
+                        <PositionButton label="Наляво" icon="←" onClick={() => setCoverPositionX((value) => Math.max(0, value - 5))} />
+                        <PositionButton label="Център" icon="●" onClick={() => { setCoverPositionX(50); setCoverPositionY(50); }} />
+                        <PositionButton label="Надясно" icon="→" onClick={() => setCoverPositionX((value) => Math.min(100, value + 5))} />
+                        <span />
+                        <PositionButton label="Надолу" icon="↓" onClick={() => setCoverPositionY((value) => Math.min(100, value + 5))} />
+                        <span />
+                      </div>
+                    </div>
                     <RangeControl label="Хоризонтална позиция" min={0} max={100} step={1} value={coverPositionX} onChange={setCoverPositionX} />
                     <RangeControl label="Вертикална позиция" min={0} max={100} step={1} value={coverPositionY} onChange={setCoverPositionY} />
                   </>
@@ -1301,6 +1315,28 @@ function RangeControl({
         className="w-full cursor-pointer accent-[#5aa9d6]"
       />
     </label>
+  );
+}
+
+function PositionButton({
+  label,
+  icon,
+  onClick,
+}: {
+  label: string;
+  icon: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="grid min-h-11 place-items-center rounded-xl border border-[#173b57]/12 bg-white text-lg font-bold transition hover:border-[#5aa9d6] hover:bg-[#5aa9d6]/10"
+    >
+      {icon}
+    </button>
   );
 }
 
