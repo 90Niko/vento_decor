@@ -349,7 +349,7 @@ export function UploadStudio({
           type="button"
           onClick={() => void handleUpload()}
           disabled={isUploading}
-          className="mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+          className="primary-button-effect mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           style={{ backgroundColor: theme.primary }}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}

@@ -159,7 +159,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 onClick={() => router.push(`/event/${publicId}/quiz-review`)}
-                className="rounded-full px-8 py-4 text-sm font-bold text-white"
+                className="primary-button-effect rounded-full px-8 py-4 text-sm font-bold text-white"
                 style={{
                   background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
                 }}
@@ -225,7 +225,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
               type="button"
               onClick={() => void continueQuiz()}
               disabled={selected === null || submitting}
-              className="mt-7 w-full rounded-full px-8 py-4 text-sm font-bold text-white disabled:opacity-40"
+              className="primary-button-effect mt-7 w-full rounded-full px-8 py-4 text-sm font-bold text-white disabled:opacity-40"
               style={{
                 background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
               }}

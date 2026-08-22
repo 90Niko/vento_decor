@@ -569,7 +569,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         >
           <label
             htmlFor="guest-mobile-photo-upload"
-            className="pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white shadow-[0_12px_32px_rgba(0,0,0,.22)] active:scale-[0.98]"
+            className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98]"
             style={{ backgroundColor: theme.primary }}
           >
             <UploadIcon />
