@@ -36,7 +36,7 @@ const COVER_RATIOS = {
 } as const;
 
 type CoverRatio = keyof typeof COVER_RATIOS;
-type CoverFit = "contain" | "cover";
+type CoverFit = "contain" | "cover" | "stretch";
 
 interface QuizDraftQuestion {
   prompt: string;
@@ -642,7 +642,13 @@ export function CreateEventForm({
                     alt="Преглед на заглавната снимка"
                     fill
                     unoptimized
-                    className={coverFit === "contain" ? "scale-110 object-cover blur-xl" : "object-cover"}
+                    className={
+                      coverFit === "contain"
+                        ? "scale-110 object-cover blur-xl"
+                        : coverFit === "stretch"
+                          ? "object-fill"
+                          : "object-cover"
+                    }
                     style={{
                       objectPosition: `${coverPositionX}% ${coverPositionY}%`,
                       transform: coverFit === "cover" ? `scale(${coverZoom})` : undefined,
@@ -709,6 +715,7 @@ export function CreateEventForm({
                   >
                     <option value="contain">Цялата снимка · без изрязване</option>
                     <option value="cover">Запълване · с изрязване</option>
+                    <option value="stretch">Разпъване · без празни полета</option>
                   </select>
                 </Field>
                 {coverFit === "cover" && (
@@ -1112,7 +1119,13 @@ export function CreateEventForm({
                   alt="Live preview на заглавната снимка"
                   fill
                   unoptimized
-                  className={coverFit === "contain" ? "scale-110 object-cover blur-xl" : "object-cover"}
+                  className={
+                    coverFit === "contain"
+                      ? "scale-110 object-cover blur-xl"
+                      : coverFit === "stretch"
+                        ? "object-fill"
+                        : "object-cover"
+                  }
                   style={{
                     objectPosition: `${coverPositionX}% ${coverPositionY}%`,
                     transform: coverFit === "cover" ? `scale(${coverZoom})` : undefined,
@@ -1311,7 +1324,9 @@ async function cropCoverImage(
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Снимката не може да бъде обработена.");
 
-  if (options.fit === "contain") {
+  if (options.fit === "stretch") {
+    context.drawImage(source, 0, 0, targetWidth, targetHeight);
+  } else if (options.fit === "contain") {
     const backgroundScale = Math.max(
       targetWidth / source.naturalWidth,
       targetHeight / source.naturalHeight,
