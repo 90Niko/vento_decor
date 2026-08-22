@@ -108,8 +108,8 @@ export function EventQuizBuilder({
       </div>
 
       {quiz.enabled && (
-      <div className="quiz-settings-reveal">
-      <label className="mt-7 flex cursor-pointer items-center justify-between gap-4 py-4">
+      <div className="quiz-settings-reveal mt-7 divide-y divide-[#173b57]/12 border-t border-[#173b57]/12">
+      <label className="flex cursor-pointer items-center justify-between gap-4 py-6">
         <span>
           <span className="block text-sm font-semibold">Quiz с верни отговори</span>
           <span className="mt-1 block text-xs opacity-55">
@@ -123,7 +123,7 @@ export function EventQuizBuilder({
           }
         />
       </label>
-      <label className="mt-7 block">
+      <label className="block py-6">
         <span className="mb-2 block text-sm font-semibold">Заглавие</span>
         <input
           value={quiz.title}
@@ -134,11 +134,11 @@ export function EventQuizBuilder({
         />
       </label>
 
-      <div className="mt-7 space-y-5">
+      <div className="divide-y divide-[#173b57]/12">
         {quiz.questions.map((question, questionIndex) => (
           <article
             key={questionIndex}
-            className="py-5"
+            className="py-6"
           >
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-bold text-[#5aa9d6]">
@@ -273,7 +273,7 @@ export function EventQuizBuilder({
               ],
             })
           }
-          className="secondary-action mt-5 w-full justify-center"
+        className="secondary-action mt-6 w-full justify-center"
         >
           + Добави въпрос
         </button>

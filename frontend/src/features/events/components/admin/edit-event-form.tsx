@@ -153,7 +153,7 @@ export function EditEventForm({
       <form
         id="edit-event-form"
         onSubmit={submit}
-        className="space-y-6 px-0 py-6 sm:p-9"
+        className="divide-y divide-[#173b57]/12 px-0 py-6 sm:px-9 sm:py-9 [&>*]:py-6 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0"
       >
         <Field label="Име на събитието">
           <input

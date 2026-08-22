@@ -263,7 +263,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 autoFocus
                 required
                 placeholder="Напиши името си"
-                className="field-input mt-3 bg-white"
+                className="guest-entry-field field-input mt-3 bg-white"
                 style={{
                   borderColor: `${theme.accent}66`,
                   color: theme.primary,
@@ -283,7 +283,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
                 onChange={(inputEvent) => setEmail(inputEvent.target.value)}
                 autoComplete="email"
                 required
-                className="field-input mt-3 bg-white"
+                className="guest-entry-field field-input mt-3 bg-white"
                 style={{
                   borderColor: `${theme.accent}66`,
                   color: theme.primary,

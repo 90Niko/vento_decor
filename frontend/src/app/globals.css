@@ -223,6 +223,16 @@ a {
     background: #ffffff;
     box-shadow: 0 0 0 4px rgb(90 169 214 / 16%);
   }
+
+  .guest-entry-field:-webkit-autofill,
+  .guest-entry-field:-webkit-autofill:hover,
+  .guest-entry-field:-webkit-autofill:focus,
+  .guest-entry-field:autofill {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: currentColor !important;
+    caret-color: currentColor;
+  }
 }
 
 @keyframes reveal-up {
