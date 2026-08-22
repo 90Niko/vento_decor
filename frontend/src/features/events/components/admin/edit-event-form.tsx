@@ -42,6 +42,11 @@ export function EditEventForm({
   const [coverZoom, setCoverZoom] = useState(1);
   const [coverPositionX, setCoverPositionX] = useState(50);
   const [coverPositionY, setCoverPositionY] = useState(50);
+  const activeTheme = getEventTheme(
+    selectedTheme === "custom"
+      ? customThemeValue(customPrimary, customAccent)
+      : selectedTheme,
+  );
 
   useEffect(() => {
     void eventsService
@@ -153,7 +158,7 @@ export function EditEventForm({
       <form
         id="edit-event-form"
         onSubmit={submit}
-        className="divide-y divide-[#173b57]/12 px-0 py-6 sm:px-9 sm:py-9 [&>*]:py-6 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0"
+        className="divide-y divide-[#173b57]/12 px-0 py-6 sm:py-9 [&>*]:py-6 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0 [&>*]:sm:px-9"
       >
         <Field label="Име на събитието">
           <input
@@ -299,20 +304,26 @@ export function EditEventForm({
           )}
         </div>
         <Field label="Цветова тема">
-          <select
-            name="themeColor"
-            value={selectedTheme}
-            onChange={(event) => setSelectedTheme(event.target.value)}
-            className="field-input"
-          >
-            <option value="ocean">Океан</option>
-            <option value="rose">Роза</option>
-            <option value="sage">Градински чай</option>
-            <option value="lavender">Лавандула</option>
-            <option value="terracotta">Теракота</option>
-            <option value="midnight">Полунощ</option>
-            <option value="custom">Персонална палитра</option>
-          </select>
+          <span className="relative block">
+            <select
+              name="themeColor"
+              value={selectedTheme}
+              onChange={(event) => setSelectedTheme(event.target.value)}
+              className="field-input pr-24"
+            >
+              <option value="ocean">Океан</option>
+              <option value="rose">Роза</option>
+              <option value="sage">Градински чай</option>
+              <option value="lavender">Лавандула</option>
+              <option value="terracotta">Теракота</option>
+              <option value="midnight">Полунощ</option>
+              <option value="custom">Персонална палитра</option>
+            </select>
+            <span className="pointer-events-none absolute top-1/2 right-10 flex -translate-y-1/2 -space-x-1" aria-hidden="true">
+              <span className="h-6 w-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: activeTheme.primary }} />
+              <span className="h-6 w-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: activeTheme.accent }} />
+            </span>
+          </span>
           {selectedTheme === "custom" && (
             <span className="mt-3 grid gap-3 p-0 sm:grid-cols-2">
               <ColorPicker label="Основен цвят" value={customPrimary} onChange={setCustomPrimary} />
