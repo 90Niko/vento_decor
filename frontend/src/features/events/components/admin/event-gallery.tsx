@@ -421,12 +421,12 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   }
 
   return (
-    <div className="mt-8 flex flex-col items-center rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:p-6 lg:mt-0 lg:rounded-[2rem] lg:p-7">
-      <p className="text-center text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
+    <div className="mt-8 flex flex-col items-center text-[#173b57] lg:mt-0">
+      <p className="text-center text-xs font-semibold tracking-[0.16em] uppercase">
         Постоянен код за сканиране и линк
       </p>
 
-      <div className="mt-5 w-full max-w-sm rounded-[1.5rem] bg-white p-3.5">
+      <div className="mt-5 w-full max-w-sm">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
@@ -434,7 +434,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
             width={360}
             height={360}
             unoptimized
-            className="h-auto w-full rounded-xl"
+            className="h-auto w-full"
           />
         ) : (
           <div className="aspect-square animate-pulse rounded-xl bg-[#eaf6ff]" />
@@ -442,12 +442,12 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
       </div>
 
       {qrError && (
-        <p className="mt-3 text-center text-xs text-[#eaf6ff]/80">
+        <p className="mt-3 text-center text-xs text-[#173b57]/70">
           Кодът за сканиране не можа да бъде генериран.
         </p>
       )}
       {copyError && (
-        <p className="mt-3 text-center text-xs text-[#eaf6ff]/80">
+        <p className="mt-3 text-center text-xs text-[#173b57]/70">
           Линкът не можа да бъде копиран. Опитай отново.
         </p>
       )}
@@ -455,7 +455,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
         <button
           type="button"
           onClick={() => void copyLink()}
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-white/20"
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#173b57] text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#5aa9d6]"
           aria-label={copied ? "Линкът е копиран" : "Копирай линка"}
           title={copied ? "Линкът е копиран" : "Копирай линка"}
         >
@@ -465,7 +465,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
           <a
             href={qrDataUrl}
             download={`vento-decor-${event.publicId}.png`}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#eaf6ff] text-[#173b57] transition hover:-translate-y-0.5 hover:bg-white"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-[#173b57] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#eaf6ff]"
             aria-label="Свали кода за сканиране"
             title="Свали кода за сканиране"
           >

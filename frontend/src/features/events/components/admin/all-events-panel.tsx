@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { TouchEvent as ReactTouchEvent } from "react";
+import type { CSSProperties, TouchEvent as ReactTouchEvent } from "react";
 import { eventsService } from "@/features/events/services/events.service";
+import { getEventTheme } from "@/features/events/lib/event-theme";
 
 interface AdminEvent {
   id: number;
@@ -16,6 +17,7 @@ interface AdminEvent {
   createdAt: string;
   guestCount: number;
   imageCount: number;
+  themeColor: string;
 }
 
 type EventFilter = "all" | "active" | "inactive";
@@ -235,17 +237,24 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
             {visibleEvents.map((event) => {
               const swipeOffset = swipe?.id === event.id ? swipe.offset : 0;
               const isDeleting = deletingId === event.id;
+              const theme = getEventTheme(event.themeColor);
+              const eventThemeStyle = {
+                "--event-theme-primary": theme.primary,
+                "--event-theme-accent": theme.accent,
+                "--event-theme-background": theme.background,
+              } as CSSProperties;
               return (
               <div
                 key={event.id}
                 className="relative overflow-hidden bg-white"
+                style={eventThemeStyle}
               >
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex w-28 items-center justify-center gap-2 bg-red-500 text-sm font-bold text-white sm:hidden">
                   <TrashIcon />
                   Изтрий
                 </div>
                 <div
-                  className={`group grid touch-pan-y gap-4 bg-white p-5 hover:bg-[#eaf6ff] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${isDeleting ? "pointer-events-none transition-all duration-300 ease-in" : swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
+                  className={`group relative grid touch-pan-y gap-4 bg-white p-5 transition-colors hover:bg-[var(--event-theme-background)] sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:px-7 ${isDeleting ? "pointer-events-none transition-all duration-300 ease-in" : swipe?.id === event.id ? "" : "transition-transform duration-200"}`}
                   style={{
                     opacity: isDeleting ? 0 : 1,
                     transform: isDeleting
@@ -263,14 +272,21 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                     suppressSwipeClick.current = false;
                   }}
                 >
+                <span
+                  className="pointer-events-none absolute inset-y-3 left-0 w-1 rounded-r-full bg-[linear-gradient(to_bottom,var(--event-theme-primary),var(--event-theme-accent))] opacity-75"
+                  aria-hidden="true"
+                />
                 <Link href={`${basePath}/${event.publicId}`} className="contents">
                 <div className="flex min-w-0 items-center gap-4">
-                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#173b57] text-sm font-bold text-white shadow-lg shadow-[#173b57]/10">
+                  <div
+                    className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-sm font-bold text-white shadow-lg"
+                    style={{ backgroundColor: theme.primary, boxShadow: `0 10px 24px ${theme.primary}22` }}
+                  >
                     {getInitials(event.title)}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="truncate font-semibold group-hover:text-[#5aa9d6]">
+                      <h3 className="truncate font-semibold transition-colors group-hover:text-[var(--event-theme-accent)]">
                         {event.title}
                       </h3>
                       <span
@@ -293,13 +309,16 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                 </Link>
                 <div className="ml-16 flex min-h-10 items-center justify-end gap-2 sm:ml-0">
                   {openMenuId === event.id && (
-                    <div className="event-actions-menu flex items-center gap-2 rounded-full bg-[#173b57]/5 p-1.5">
+                    <div
+                      className="event-actions-menu flex items-center gap-2 rounded-full p-1.5"
+                      style={{ backgroundColor: theme.background }}
+                    >
                       <Link
                         href={`${basePath}/${event.publicId}/edit`}
                         onClick={() => setOpenMenuId(null)}
                         aria-label={`Редактирай ${event.title}`}
                         title="Редактирай събитието"
-                        className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#5aa9d6] shadow-sm transition hover:bg-[#5aa9d6] hover:text-white"
+                        className="grid h-9 w-9 place-items-center rounded-full bg-white text-[var(--event-theme-accent)] shadow-sm transition hover:bg-[var(--event-theme-accent)] hover:text-white"
                       >
                         <EditIcon />
                       </Link>
@@ -325,11 +344,11 @@ export function AllEventsPanel({ refreshVersion, basePath = "/admin/events" }: {
                     aria-expanded={openMenuId === event.id}
                     aria-label={`Действия за ${event.title}`}
                     title="Действия"
-                    className={`grid h-10 w-10 place-items-center rounded-full transition ${
-                      openMenuId === event.id
-                        ? "rotate-90 bg-[#173b57] text-white"
-                        : "bg-[#173b57]/5 text-[#173b57]/55 hover:bg-[#173b57]/10 hover:text-[#173b57]"
-                    }`}
+                    className={`grid h-10 w-10 place-items-center rounded-full transition ${openMenuId === event.id ? "rotate-90 text-white" : "hover:-translate-y-0.5"}`}
+                    style={{
+                      backgroundColor: openMenuId === event.id ? theme.primary : `${theme.primary}12`,
+                      color: openMenuId === event.id ? "#ffffff" : theme.primary,
+                    }}
                   >
                     <MoreIcon />
                   </button>

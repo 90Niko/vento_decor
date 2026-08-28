@@ -38,6 +38,7 @@ export interface AdminEventSummary {
   createdAt: string;
   guestCount: number;
   imageCount: number;
+  themeColor: string;
 }
 
 export interface AdminEventDetails extends AdminEventSummary {
