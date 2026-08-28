@@ -421,8 +421,8 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   }
 
   return (
-    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:grid-cols-[180px_1fr] sm:p-6 lg:mt-0 lg:grid-cols-[132px_minmax(0,1fr)] lg:gap-5 lg:rounded-[2rem] lg:p-6 xl:grid-cols-[150px_minmax(0,1fr)]">
-      <div className="mx-auto w-full max-w-[180px] rounded-2xl bg-[#ffffff] p-3 lg:max-w-[150px]">
+    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:grid-cols-[200px_1fr] sm:p-6 lg:mt-0 lg:grid-cols-[190px_minmax(0,1fr)] lg:gap-5 lg:rounded-[2rem] lg:p-6">
+      <div className="mx-auto w-full max-w-[220px] rounded-2xl bg-[#ffffff] p-3 sm:max-w-[200px] lg:max-w-[190px]">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
@@ -457,21 +457,25 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
             Линкът не можа да бъде копиран. Маркирай го и го копирай ръчно.
           </p>
         )}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
+        <div className="mt-4 flex items-center justify-center gap-3 sm:justify-start">
           <button
             type="button"
             onClick={() => void copyLink()}
-            className="rounded-full border border-white/15 px-4 py-3 text-sm font-semibold transition hover:bg-white/10"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-white/20"
+            aria-label={copied ? "Линкът е копиран" : "Копирай линка"}
+            title={copied ? "Линкът е копиран" : "Копирай линка"}
           >
-            {copied ? "Линкът е копиран" : "Копирай линка"}
+            {copied ? <CheckIcon /> : <CopyIcon />}
           </button>
           {qrDataUrl && (
             <a
               href={qrDataUrl}
               download={`vento-decor-${event.publicId}.png`}
-              className="rounded-full bg-[#eaf6ff] px-4 py-3 text-center text-sm font-semibold text-[#173b57] transition hover:bg-[#5aa9d6]"
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#eaf6ff] text-[#173b57] transition hover:-translate-y-0.5 hover:bg-white"
+              aria-label="Свали кода за сканиране"
+              title="Свали кода за сканиране"
             >
-              Свали кода за сканиране
+              <QrDownloadIcon />
             </a>
           )}
         </div>
@@ -549,6 +553,31 @@ function DownloadIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function QrDownloadIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
