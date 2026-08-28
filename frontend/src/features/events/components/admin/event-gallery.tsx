@@ -384,6 +384,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   const [copied, setCopied] = useState(false);
   const [qrError, setQrError] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const copiedResetTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -410,11 +411,26 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
     };
   }, [publicUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (copiedResetTimeout.current !== null) {
+        window.clearTimeout(copiedResetTimeout.current);
+      }
+    };
+  }, []);
+
   async function copyLink() {
     try {
       await copyToClipboard(publicUrl);
       setCopied(true);
       setCopyError(false);
+      if (copiedResetTimeout.current !== null) {
+        window.clearTimeout(copiedResetTimeout.current);
+      }
+      copiedResetTimeout.current = window.setTimeout(() => {
+        setCopied(false);
+        copiedResetTimeout.current = null;
+      }, 5000);
     } catch {
       setCopyError(true);
     }

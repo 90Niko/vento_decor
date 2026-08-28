@@ -266,11 +266,14 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             className="relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,.15)] sm:p-10"
             style={{
               background: event.coverImageUrl
-                ? `linear-gradient(120deg, ${theme.primary}f2, ${theme.accent}a8), url("${event.coverImageUrl}") center / cover`
+                ? `url("${event.coverImageUrl}") center / cover no-repeat`
                 : `linear-gradient(120deg, ${theme.primary}, ${theme.accent})`,
             }}
           >
-            <div className="relative max-w-3xl">
+            <div
+              className="relative max-w-3xl"
+              style={{ textShadow: "0 2px 10px rgba(0, 0, 0, 0.72)" }}
+            >
               <p className="text-xs font-bold tracking-[0.2em] text-white/70 uppercase">
                 {getEventTypeLabel(event.eventType)}
               </p>
@@ -285,14 +288,14 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
               <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold">
                 <span
                   className="rounded-full border border-white/70 bg-white/85 px-4 py-2 shadow-[0_6px_18px_rgba(0,0,0,.12)] backdrop-blur-sm transition hover:bg-white"
-                  style={{ color: theme.primary }}
+                  style={{ color: theme.primary, textShadow: "none" }}
                 >
                   ◉ {event.location}
                 </span>
                 {event.startAt && (
                   <span
                     className="rounded-full border border-white/70 bg-white/85 px-4 py-2 shadow-[0_6px_18px_rgba(0,0,0,.12)] backdrop-blur-sm transition hover:bg-white"
-                    style={{ color: theme.primary }}
+                    style={{ color: theme.primary, textShadow: "none" }}
                   >
                     {formatEventDate(event.startAt)}
                   </span>
