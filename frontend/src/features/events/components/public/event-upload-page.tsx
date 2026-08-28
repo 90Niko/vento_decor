@@ -244,20 +244,14 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         </header>
 
         {quizReviewPercentage !== null && (
-          <div className="flex justify-end px-5 pt-4 sm:px-0">
-            <Link
-              href={`/event/${publicId}/quiz-review`}
-              aria-label={quizHasCorrectAnswers ? `Моят quiz резултат: ${quizReviewPercentage}%` : "Преглед на отговорите от quiz-а"}
-              className="grid h-20 w-20 place-items-center rounded-full text-center text-white shadow-[0_12px_30px_rgba(0,0,0,.18)] ring-4 ring-white/70 transition active:scale-95"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
-              }}
-            >
-              <span>
-                <span className="block text-xl font-bold leading-none">{quizHasCorrectAnswers ? `${quizReviewPercentage}%` : "✓"}</span>
-                <span className="mt-1 block text-[9px] font-bold tracking-[0.12em] uppercase opacity-75">quiz</span>
-              </span>
-            </Link>
+          <div className="hidden justify-end px-5 pt-4 sm:flex sm:px-0">
+            <QuizReviewButton
+              publicId={publicId}
+              percentage={quizReviewPercentage}
+              hasCorrectAnswers={quizHasCorrectAnswers}
+              primary={theme.primary}
+              accent={theme.accent}
+            />
           </div>
         )}
 
@@ -327,6 +321,16 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           theme={theme}
           onUploaded={() => void loadGallery()}
           mobileStickyAction
+          mobileStickyAccessory={quizReviewPercentage !== null ? (
+            <QuizReviewButton
+              publicId={publicId}
+              percentage={quizReviewPercentage}
+              hasCorrectAnswers={quizHasCorrectAnswers}
+              primary={theme.primary}
+              accent={theme.accent}
+              compact
+            />
+          ) : undefined}
         />
 
         <section className="mt-14 border-t border-black/10 pt-10 sm:mt-20 sm:pt-14">
@@ -573,6 +577,40 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
       </div>
 
     </main>
+  );
+}
+
+function QuizReviewButton({
+  publicId,
+  percentage,
+  hasCorrectAnswers,
+  primary,
+  accent,
+  compact = false,
+}: {
+  publicId: string;
+  percentage: number;
+  hasCorrectAnswers: boolean;
+  primary: string;
+  accent: string;
+  compact?: boolean;
+}) {
+  return (
+    <Link
+      href={`/event/${publicId}/quiz-review`}
+      aria-label={hasCorrectAnswers ? `Моят quiz резултат: ${percentage}%` : "Преглед на отговорите от quiz-а"}
+      className={`pointer-events-auto grid shrink-0 place-items-center rounded-full text-center text-white shadow-[0_12px_30px_rgba(0,0,0,.18)] ring-white/70 transition active:scale-95 ${compact ? "h-14 w-14 ring-2" : "h-20 w-20 ring-4"}`}
+      style={{ background: `linear-gradient(135deg, ${primary}, ${accent})` }}
+    >
+      <span>
+        <span className={`block font-bold leading-none ${compact ? "text-sm" : "text-xl"}`}>
+          {hasCorrectAnswers ? `${percentage}%` : "✓"}
+        </span>
+        <span className={`block font-bold tracking-[0.12em] uppercase opacity-75 ${compact ? "mt-0.5 text-[7px]" : "mt-1 text-[9px]"}`}>
+          quiz
+        </span>
+      </span>
+    </Link>
   );
 }
 

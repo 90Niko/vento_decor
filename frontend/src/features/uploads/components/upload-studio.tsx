@@ -3,6 +3,7 @@
 import {
   ChangeEvent,
   DragEvent,
+  ReactNode,
   useEffect,
   useRef,
   useState,
@@ -76,6 +77,7 @@ interface UploadStudioProps {
   };
   onUploaded?: () => void;
   mobileStickyAction?: boolean;
+  mobileStickyAccessory?: ReactNode;
 }
 
 export function UploadStudio({
@@ -89,6 +91,7 @@ export function UploadStudio({
   },
   onUploaded,
   mobileStickyAction = false,
+  mobileStickyAccessory,
 }: UploadStudioProps = {}) {
   const [selected, setSelected] = useState<SelectedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -368,7 +371,10 @@ export function UploadStudio({
         )}
 
         {isUploading && (
-          <div className="mt-2" aria-label={`Качване ${progress}%`}>
+          <div
+            className={`mt-2 ${mobileStickyAction ? "hidden sm:block" : ""}`}
+            aria-label={`Качване ${progress}%`}
+          >
             <div className="mb-2 flex justify-between text-xs font-medium">
               <span>Качване към галерията</span>
               <span>{progress}%</span>
@@ -399,29 +405,41 @@ export function UploadStudio({
           className="app-grid-container pointer-events-none fixed inset-x-0 bottom-0 z-50 pt-3 sm:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
-          {selected.length === 0 ? (
-            <label
-              htmlFor={inputId}
-              className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98]"
-              style={{ backgroundColor: theme.primary }}
-            >
-              <UploadIcon />
-              Избери снимки или видео
-            </label>
-          ) : (
-            <button
+          <div className="pointer-events-none mx-auto flex w-full max-w-md items-center gap-3">
+            {selected.length === 0 ? (
+              <label
+                htmlFor={inputId}
+                className="primary-button-effect pointer-events-auto flex min-h-14 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-4 text-sm font-bold text-white active:scale-[0.98]"
+                style={{ backgroundColor: theme.primary }}
+              >
+                <UploadIcon />
+                Избери снимки или видео
+              </label>
+            ) : (
+              <button
               type="button"
               onClick={() => void handleUpload()}
               disabled={isUploading}
-              className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+              aria-label={isUploading ? `Качване ${progress}%` : undefined}
+              className="primary-button-effect pointer-events-auto flex min-h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-4 py-4 text-sm font-bold text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
               style={{ backgroundColor: theme.primary }}
             >
-              {isUploading
-                ? `Качване… ${progress}%`
-                : `Качи избраните файлове (${selected.length})`}
-              {!isUploading && <ArrowIcon />}
-            </button>
-          )}
+                {isUploading ? (
+                  <>
+                    <span>Качване</span>
+                    <span className="upload-progress-dots" aria-hidden="true">
+                      <span>•</span>
+                      <span>•</span>
+                      <span>•</span>
+                    </span>
+                    <span>{progress}%</span>
+                  </>
+                ) : `Качи файловете (${selected.length})`}
+                {!isUploading && <ArrowIcon />}
+              </button>
+            )}
+            {mobileStickyAccessory}
+          </div>
         </div>
       )}
     </div>
