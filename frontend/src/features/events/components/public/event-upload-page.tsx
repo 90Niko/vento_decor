@@ -283,11 +283,17 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                 </p>
               )}
               <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold">
-                <span className="rounded-full border border-white/15 bg-white/10 px-4 py-2">
+                <span
+                  className="rounded-full border border-white/70 bg-white/85 px-4 py-2 shadow-[0_6px_18px_rgba(0,0,0,.12)] backdrop-blur-sm transition hover:bg-white"
+                  style={{ color: theme.primary }}
+                >
                   ◉ {event.location}
                 </span>
                 {event.startAt && (
-                  <span className="rounded-full border border-white/15 bg-white/10 px-4 py-2">
+                  <span
+                    className="rounded-full border border-white/70 bg-white/85 px-4 py-2 shadow-[0_6px_18px_rgba(0,0,0,.12)] backdrop-blur-sm transition hover:bg-white"
+                    style={{ color: theme.primary }}
+                  >
                     {formatEventDate(event.startAt)}
                   </span>
                 )}

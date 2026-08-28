@@ -174,35 +174,38 @@ export function EventGallery({ publicId }: { publicId: string }) {
 
   return (
     <div>
-      <section className="surface-card overflow-hidden rounded-[2rem] p-6 sm:p-9">
-        <div className="flex flex-wrap items-start justify-between gap-6">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Преглед на събитието</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">
-              {event.title}
-            </h1>
-            {event.description && (
-              <p className="mt-4 leading-7 text-[#173b57]/68">{event.description}</p>
-            )}
-            {event.location && (
-              <p className="mt-4 text-sm font-semibold">📍 {event.location}</p>
-            )}
+      <section className="surface-card overflow-hidden rounded-[2rem] p-6 sm:p-9 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1.45fr)_minmax(22rem,0.85fr)] lg:items-start lg:gap-10 xl:gap-14">
+          <div className="min-w-0 lg:py-5">
+            <div className="max-w-3xl">
+              <p className="eyebrow">Преглед на събитието</p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-6xl">
+                {event.title}
+              </h1>
+              {event.description && (
+                <p className="mt-4 leading-7 text-[#173b57]/68">{event.description}</p>
+              )}
+              {event.location && (
+                <p className="mt-4 text-sm font-semibold">📍 {event.location}</p>
+              )}
+            </div>
+
+            <div className="mt-8 grid max-w-lg grid-cols-2 gap-4 border-t border-[#173b57]/10 pt-6">
+              <Stat value={event.imageCount} label="снимки" />
+              <Stat value={event.guestCount} label="регистрирани гости" />
+            </div>
+
+            <Link
+              href={`/event/${event.publicId}`}
+              target="_blank"
+              className="primary-action mt-7"
+            >
+              Отвори публичното събитие ↗
+            </Link>
           </div>
-          <Link
-            href={`/event/${event.publicId}`}
-            target="_blank"
-            className="primary-action"
-          >
-            Отвори публичното събитие ↗
-          </Link>
-        </div>
 
-        <div className="mt-8 grid max-w-lg grid-cols-2 gap-4 border-t border-[#173b57]/10 pt-6">
-          <Stat value={event.imageCount} label="снимки" />
-          <Stat value={event.guestCount} label="регистрирани гости" />
+          <EventShareCard event={event} />
         </div>
-
-        <EventShareCard event={event} />
       </section>
 
       <section className="mt-10">
@@ -418,8 +421,8 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   }
 
   return (
-    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white sm:grid-cols-[180px_1fr] sm:p-6">
-      <div className="mx-auto w-full max-w-[180px] rounded-2xl bg-[#ffffff] p-3">
+    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:grid-cols-[180px_1fr] sm:p-6 lg:mt-0 lg:grid-cols-[132px_minmax(0,1fr)] lg:gap-5 lg:rounded-[2rem] lg:p-6 xl:grid-cols-[150px_minmax(0,1fr)]">
+      <div className="mx-auto w-full max-w-[180px] rounded-2xl bg-[#ffffff] p-3 lg:max-w-[150px]">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
@@ -438,7 +441,10 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
         <p className="text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
           Постоянен код за сканиране и линк
         </p>
-        <p className="mt-3 break-all rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm leading-6 text-white/90">
+        <p
+          className="mt-3 break-all rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm leading-6 text-white/90 lg:truncate lg:break-normal"
+          title={publicUrl}
+        >
           {publicUrl}
         </p>
         {qrError && (
@@ -451,7 +457,7 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
             Линкът не можа да бъде копиран. Маркирай го и го копирай ръчно.
           </p>
         )}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
           <button
             type="button"
             onClick={() => void copyLink()}
