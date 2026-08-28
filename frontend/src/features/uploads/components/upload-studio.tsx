@@ -263,9 +263,22 @@ export function UploadStudio({
           event.preventDefault();
           void handleUpload();
         }}
-        className="surface-card rounded-[2rem] p-0 sm:p-4"
+        className={`surface-card rounded-[2rem] p-0 sm:p-4 ${mobileStickyAction ? "mobile-sticky-upload-form" : ""}`}
       >
+        <input
+          ref={inputRef}
+          id={inputId}
+          type="file"
+          accept="image/*,video/mp4,video/quicktime,video/webm,video/x-m4v,video/mpeg,.heic,.heif,.jfif,.avif,.svg"
+          multiple
+          onChange={handleInput}
+          className="sr-only"
+          disabled={isUploading}
+          suppressHydrationWarning
+        />
+
         {selected.length === 0 && <label
+          htmlFor={inputId}
           onDragEnter={(event) => {
             event.preventDefault();
             setIsDragging(true);
@@ -273,23 +286,12 @@ export function UploadStudio({
           onDragOver={(event) => event.preventDefault()}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-none border border-dashed px-6 py-12 text-center transition duration-300 sm:min-h-96 sm:rounded-[1.6rem] ${
+          className={`group relative hidden min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-none border border-dashed px-6 py-12 text-center transition duration-300 sm:flex sm:min-h-96 sm:rounded-[1.6rem] ${
             isDragging
               ? "scale-[0.99] border-[#5aa9d6] bg-[#eaf6ff]"
               : "border-[#173b57]/20 bg-[linear-gradient(145deg,rgba(234,246,255,.82),rgba(255,255,255,.72))] hover:border-[#5aa9d6]/60 hover:bg-[#eaf6ff]"
           }`}
         >
-          <input
-            ref={inputRef}
-            id={inputId}
-            type="file"
-            accept="image/*,video/mp4,video/quicktime,video/webm,video/x-m4v,video/mpeg,.heic,.heif,.jfif,.avif,.svg"
-            multiple
-            onChange={handleInput}
-            className="sr-only"
-            disabled={isUploading}
-            suppressHydrationWarning
-          />
           <span
             className="mb-6 grid h-16 w-16 place-items-center rounded-2xl text-white shadow-[0_14px_35px_rgba(23,59,87,.22)] transition duration-300 group-hover:-translate-y-1 group-hover:-rotate-3"
             style={{ backgroundColor: theme.primary }}
@@ -358,10 +360,12 @@ export function UploadStudio({
           </div>
         )}
 
-        <div aria-live="polite" className="mt-5 min-h-6 text-sm">
-          {error && <p className="font-medium text-[#173b57]">{error}</p>}
-          {message && <p className="font-medium text-[#5aa9d6]">{message}</p>}
-        </div>
+        {(error || message) && (
+          <div aria-live="polite" className="mt-5 min-h-6 text-sm">
+            {error && <p className="font-medium text-[#173b57]">{error}</p>}
+            {message && <p className="hidden font-medium text-[#5aa9d6] sm:block">{message}</p>}
+          </div>
+        )}
 
         {isUploading && (
           <div className="mt-2" aria-label={`Качване ${progress}%`}>

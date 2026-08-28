@@ -665,6 +665,13 @@ a {
     padding-left: 0 !important;
   }
 
+  .mobile-sticky-upload-form {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
   main.page-canvas.grid,
   main.auth-canvas,
   main.admin-canvas,
