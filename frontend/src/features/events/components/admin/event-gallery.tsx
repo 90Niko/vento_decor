@@ -421,8 +421,12 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   }
 
   return (
-    <div className="mt-8 grid gap-6 rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:grid-cols-[200px_1fr] sm:p-6 lg:mt-0 lg:grid-cols-[190px_minmax(0,1fr)] lg:gap-5 lg:rounded-[2rem] lg:p-6">
-      <div className="mx-auto w-full max-w-[220px] rounded-2xl bg-[#ffffff] p-3 sm:max-w-[200px] lg:max-w-[190px]">
+    <div className="mt-8 flex flex-col items-center rounded-[1.75rem] bg-[linear-gradient(145deg,#173b57,#5aa9d6)] p-5 text-white shadow-[0_22px_55px_rgba(23,59,87,.18)] sm:p-6 lg:mt-0 lg:rounded-[2rem] lg:p-7">
+      <p className="text-center text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
+        Постоянен код за сканиране и линк
+      </p>
+
+      <div className="mt-5 w-full max-w-sm rounded-[1.5rem] bg-white p-3.5">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
@@ -437,48 +441,37 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
         )}
       </div>
 
-      <div className="flex min-w-0 flex-col justify-center">
-        <p className="text-xs font-semibold tracking-[0.16em] text-[#eaf6ff] uppercase">
-          Постоянен код за сканиране и линк
+      {qrError && (
+        <p className="mt-3 text-center text-xs text-[#eaf6ff]/80">
+          Кодът за сканиране не можа да бъде генериран.
         </p>
-        <p
-          className="mt-3 break-all rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm leading-6 text-white/90 lg:truncate lg:break-normal"
-          title={publicUrl}
+      )}
+      {copyError && (
+        <p className="mt-3 text-center text-xs text-[#eaf6ff]/80">
+          Линкът не можа да бъде копиран. Опитай отново.
+        </p>
+      )}
+      <div className="mt-5 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => void copyLink()}
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-white/20"
+          aria-label={copied ? "Линкът е копиран" : "Копирай линка"}
+          title={copied ? "Линкът е копиран" : "Копирай линка"}
         >
-          {publicUrl}
-        </p>
-        {qrError && (
-          <p className="mt-2 text-xs text-[#eaf6ff]/80">
-            Кодът за сканиране не можа да бъде генериран.
-          </p>
-        )}
-        {copyError && (
-          <p className="mt-2 text-xs text-[#eaf6ff]/80">
-            Линкът не можа да бъде копиран. Маркирай го и го копирай ръчно.
-          </p>
-        )}
-        <div className="mt-4 flex items-center justify-center gap-3 sm:justify-start">
-          <button
-            type="button"
-            onClick={() => void copyLink()}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-white/20"
-            aria-label={copied ? "Линкът е копиран" : "Копирай линка"}
-            title={copied ? "Линкът е копиран" : "Копирай линка"}
+          {copied ? <CheckIcon /> : <CopyIcon />}
+        </button>
+        {qrDataUrl && (
+          <a
+            href={qrDataUrl}
+            download={`vento-decor-${event.publicId}.png`}
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#eaf6ff] text-[#173b57] transition hover:-translate-y-0.5 hover:bg-white"
+            aria-label="Свали кода за сканиране"
+            title="Свали кода за сканиране"
           >
-            {copied ? <CheckIcon /> : <CopyIcon />}
-          </button>
-          {qrDataUrl && (
-            <a
-              href={qrDataUrl}
-              download={`vento-decor-${event.publicId}.png`}
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#eaf6ff] text-[#173b57] transition hover:-translate-y-0.5 hover:bg-white"
-              aria-label="Свали кода за сканиране"
-              title="Свали кода за сканиране"
-            >
-              <QrDownloadIcon />
-            </a>
-          )}
-        </div>
+            <QrDownloadIcon />
+          </a>
+        )}
       </div>
     </div>
   );
