@@ -159,7 +159,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 onClick={() => router.push(`/event/${publicId}/quiz-review`)}
-                className="primary-button-effect rounded-full px-8 py-4 text-sm font-bold text-white"
+                className="primary-button-effect min-h-14 w-full max-w-md self-center rounded-full px-8 py-4 text-sm font-bold text-white sm:w-auto sm:max-w-none"
                 style={{
                   background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
                 }}
@@ -168,7 +168,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
               </button>
               <button
                 onClick={() => router.replace(`/event/${publicId}/upload`)}
-                className="rounded-full border border-black/10 bg-white/70 px-8 py-4 text-sm font-bold"
+                className="min-h-14 w-full max-w-md self-center rounded-full border border-black/10 bg-white/70 px-8 py-4 text-sm font-bold sm:w-auto sm:max-w-none"
               >
                 Към снимките →
               </button>
@@ -225,7 +225,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
               type="button"
               onClick={() => void continueQuiz()}
               disabled={selected === null || submitting}
-              className="primary-button-effect mt-7 w-full rounded-full px-8 py-4 text-sm font-bold text-white disabled:opacity-40"
+              className="primary-button-effect mx-auto mt-7 min-h-14 w-full max-w-md rounded-full px-8 py-4 text-sm font-bold text-white sm:max-w-none disabled:opacity-40"
               style={{
                 background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
               }}

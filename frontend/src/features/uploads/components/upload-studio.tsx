@@ -75,6 +75,7 @@ interface UploadStudioProps {
     background: string;
   };
   onUploaded?: () => void;
+  mobileStickyAction?: boolean;
 }
 
 export function UploadStudio({
@@ -87,6 +88,7 @@ export function UploadStudio({
     background: "#eaf6ff",
   },
   onUploaded,
+  mobileStickyAction = false,
 }: UploadStudioProps = {}) {
   const [selected, setSelected] = useState<SelectedImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -94,6 +96,7 @@ export function UploadStudio({
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const previewUrls = useRef<string[]>([]);
@@ -102,6 +105,12 @@ export function UploadStudio({
     const urls = previewUrls.current;
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, []);
+
+  useEffect(() => {
+    if (!successToast) return;
+    const timeoutId = window.setTimeout(() => setSuccessToast(null), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [successToast]);
 
   const addFiles = async (files: FileList | File[]) => {
     setError(null);
@@ -141,7 +150,7 @@ export function UploadStudio({
       );
     } else if (accepted.length > 0) {
       setMessage(
-        `${accepted.length} ${accepted.length === 1 ? "снимка е избрана" : "снимки са избрани"}. Натисни зеления бутон „Качи избраните снимки“.`,
+        `${accepted.length} ${accepted.length === 1 ? "файл е избран" : "файла са избрани"}. Готови са за качване.`,
       );
     }
 
@@ -210,6 +219,16 @@ export function UploadStudio({
           ? "Файлът е качен успешно."
           : `${response.images.length} файла са качени успешно.`;
       setMessage(uploadMessage);
+      const uploadedOnlyImages = selected.every(({ file }) =>
+        file.type.startsWith("image/"),
+      );
+      setSuccessToast(
+        uploadedOnlyImages
+          ? response.images.length === 1
+            ? "Снимката беше качена успешно!"
+            : "Снимките бяха качени успешно!"
+          : "Файловете бяха качени успешно!",
+      );
       onUploaded?.();
     } catch (uploadError) {
       setError(
@@ -224,6 +243,20 @@ export function UploadStudio({
 
   return (
     <div>
+      {successToast && (
+        <div
+          className="upload-success-toast pointer-events-none fixed inset-x-4 z-[110] mx-auto flex w-fit max-w-[calc(100%-2rem)] items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_45px_rgba(5,150,105,.3)]"
+          style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20" aria-hidden="true">
+            ✓
+          </span>
+          {successToast}
+        </div>
+      )}
+
       <form
         ref={formRef}
         onSubmit={(event) => {
@@ -349,7 +382,7 @@ export function UploadStudio({
           type="button"
           onClick={() => void handleUpload()}
           disabled={isUploading}
-          className="primary-button-effect mt-5 flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+          className={`primary-button-effect mt-5 w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 ${mobileStickyAction ? "hidden sm:flex" : "flex"}`}
           style={{ backgroundColor: theme.primary }}
         >
           {isUploading ? "Качване…" : "Качи избраните снимки"}
@@ -357,6 +390,36 @@ export function UploadStudio({
         </button>}
       </form>
 
+      {mobileStickyAction && (
+        <div
+          className="app-grid-container pointer-events-none fixed inset-x-0 bottom-0 z-50 pt-3 sm:hidden"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          {selected.length === 0 ? (
+            <label
+              htmlFor={inputId}
+              className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98]"
+              style={{ backgroundColor: theme.primary }}
+            >
+              <UploadIcon />
+              Избери снимки или видео
+            </label>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void handleUpload()}
+              disabled={isUploading}
+              className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+              style={{ backgroundColor: theme.primary }}
+            >
+              {isUploading
+                ? `Качване… ${progress}%`
+                : `Качи избраните файлове (${selected.length})`}
+              {!isUploading && <ArrowIcon />}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -133,7 +133,7 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
         <button
           type="button"
           onClick={() => router.replace(`/event/${publicId}/upload`)}
-          className="primary-button-effect mt-7 w-full rounded-full px-8 py-4 text-sm font-bold text-white"
+          className="primary-button-effect mx-auto mt-7 flex min-h-14 w-[calc(100%-3rem)] max-w-md rounded-full px-8 py-4 text-sm font-bold text-white sm:w-full sm:max-w-none"
           style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})` }}
         >
           Към снимките →

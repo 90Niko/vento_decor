@@ -317,6 +317,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           authorizationToken={session.token}
           theme={theme}
           onUploaded={() => void loadGallery()}
+          mobileStickyAction
         />
 
         <section className="mt-14 border-t border-black/10 pt-10 sm:mt-20 sm:pt-14">
@@ -562,21 +563,6 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
         )}
       </div>
 
-      {!activeImage && (
-        <div
-          className="app-grid-container pointer-events-none fixed inset-x-0 bottom-0 z-50 pt-3 sm:hidden"
-          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
-        >
-          <label
-            htmlFor="guest-mobile-photo-upload"
-            className="primary-button-effect pointer-events-auto mx-auto flex min-h-14 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-bold text-white active:scale-[0.98]"
-            style={{ backgroundColor: theme.primary }}
-          >
-            <UploadIcon />
-            Качи снимки или видео
-          </label>
-        </div>
-      )}
     </main>
   );
 }
@@ -638,20 +624,6 @@ function DownloadIcon() {
     >
       <path
         d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function UploadIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
