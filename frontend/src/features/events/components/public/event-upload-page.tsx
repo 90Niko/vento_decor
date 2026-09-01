@@ -699,8 +699,9 @@ function GalleryViewButton({
     <button
       type="button"
       onClick={onClick}
+      aria-label={label}
       aria-pressed={active}
-      className="flex min-h-10 items-center gap-2 rounded-full px-3.5 text-xs font-bold transition active:scale-95"
+      className="grid h-10 w-10 place-items-center rounded-full transition active:scale-95"
       style={
         active
           ? { backgroundColor: accent, color: "white" }
@@ -708,7 +709,6 @@ function GalleryViewButton({
       }
     >
       {icon}
-      {label}
     </button>
   );
 }
