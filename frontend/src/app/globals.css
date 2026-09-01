@@ -737,7 +737,25 @@ a {
   }
 
   .guest-top-navbar-surface {
-    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
+
+  .guest-top-navbar .brand-lockup {
+    gap: 0.6rem;
+  }
+
+  .guest-top-navbar .brand-lockup-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+  }
+
+  .guest-top-navbar .brand-lockup-title {
+    font-size: 0.75rem;
+  }
+
+  .guest-top-navbar .brand-lockup-subtitle {
+    font-size: 0.65rem;
   }
 
   .route-navbar {
