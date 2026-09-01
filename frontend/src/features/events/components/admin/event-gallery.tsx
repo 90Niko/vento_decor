@@ -42,6 +42,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [openPhotoMenuId, setOpenPhotoMenuId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,6 +95,22 @@ export function EventGallery({ publicId }: { publicId: string }) {
       root.style.removeProperty("--active-event-theme-background");
     };
   }, [event]);
+
+  useEffect(() => {
+    if (openPhotoMenuId === null) return;
+    function closePhotoMenu(pointerEvent: PointerEvent) {
+      const target = pointerEvent.target;
+      if (
+        target instanceof Element &&
+        target.closest(`[data-photo-menu="${openPhotoMenuId}"]`)
+      ) {
+        return;
+      }
+      setOpenPhotoMenuId(null);
+    }
+    document.addEventListener("pointerdown", closePhotoMenu);
+    return () => document.removeEventListener("pointerdown", closePhotoMenu);
+  }, [openPhotoMenuId]);
 
   async function deleteImage(image: EventImage) {
     const confirmed = window.confirm(
@@ -200,14 +217,16 @@ export function EventGallery({ publicId }: { publicId: string }) {
             {event.images.map((image, index) => (
               <article
                 key={image.id}
-                className="group relative aspect-square overflow-hidden rounded-xl bg-black/5 shadow-[0_8px_24px_rgba(23,59,87,.14)] sm:rounded-2xl"
+                className={`group relative aspect-square rounded-xl bg-black/5 shadow-[0_8px_24px_rgba(23,59,87,.14)] sm:rounded-2xl ${
+                  openPhotoMenuId === image.id ? "z-20" : ""
+                }`}
               >
                 <a
                   href={image.url}
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`Виж ${isVideoUrl(image.url) ? "видео" : "снимка"} ${index + 1}`}
-                  className="absolute inset-0 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60"
+                  className="absolute inset-0 overflow-hidden rounded-xl focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60 sm:rounded-2xl"
                 >
                       {isVideoUrl(image.url) ? (
                         <>
@@ -236,35 +255,61 @@ export function EventGallery({ publicId }: { publicId: string }) {
                       )}
                 </a>
 
-                <div className="absolute right-2 bottom-2 z-10 flex gap-1.5 sm:right-3 sm:bottom-3">
+                <div
+                  className="absolute top-2 right-2 z-10 sm:top-3 sm:right-3"
+                  data-photo-menu={image.id}
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenPhotoMenuId((current) =>
+                        current === image.id ? null : image.id,
+                      )
+                    }
+                    aria-label={`Действия за снимка ${index + 1}`}
+                    aria-expanded={openPhotoMenuId === image.id}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-black/55 text-white shadow-md backdrop-blur-md transition hover:bg-black/80"
+                  >
+                    <MoreIcon />
+                  </button>
+
+                  {openPhotoMenuId === image.id && (
+                    <div className="absolute top-12 right-0 w-36 overflow-hidden rounded-xl border border-black/10 bg-white p-1.5 text-sm font-semibold text-[#173b57] shadow-xl">
                       <a
                         href={image.url}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={() => setOpenPhotoMenuId(null)}
                         aria-label={`Виж снимка ${index + 1}`}
-                        title="Виж"
-                        className={getPhotoActionClass()}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-[#eaf6ff]"
                       >
                         <ViewIcon />
+                        Виж
                       </a>
                       <a
                         href={`${getApiUrl()}/admin/event-images/${image.id}/download`}
+                        onClick={() => setOpenPhotoMenuId(null)}
                         aria-label={`Свали снимка ${index + 1}`}
-                        title="Свали"
-                        className={getPhotoActionClass()}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-[#eaf6ff]"
                       >
                         <DownloadIcon />
+                        Свали
                       </a>
                       <button
                         type="button"
-                        onClick={() => void deleteImage(image)}
+                        onClick={() => {
+                          setOpenPhotoMenuId(null);
+                          void deleteImage(image);
+                        }}
                         disabled={deletingId === image.id}
                         aria-label={`Изтрий снимка ${index + 1}`}
-                        title="Изтрий"
-                        className={`${getPhotoActionClass()} hover:bg-[#5aa9d6] disabled:opacity-50`}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-red-600 hover:bg-red-50 disabled:opacity-50"
                       >
                         <TrashIcon />
+                        Изтрий
                       </button>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}
@@ -390,15 +435,21 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   );
 }
 
-function getPhotoActionClass(): string {
-  return "grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-md backdrop-blur-md transition hover:scale-105 hover:bg-black/80";
-}
-
 function ViewIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="12" cy="12" r="2.75" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function MoreIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
     </svg>
   );
 }
