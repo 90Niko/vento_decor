@@ -43,8 +43,6 @@ export function EventGallery({ publicId }: { publicId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -107,7 +105,6 @@ export function EventGallery({ publicId }: { publicId: string }) {
 
     setDeletingId(image.id);
     setError(null);
-    const deletedIndex = event?.images.findIndex((item) => item.id === image.id) ?? -1;
     try {
       const response = await eventsService.deleteImageResponse(image.id);
       if (!response.ok) {
@@ -122,19 +119,6 @@ export function EventGallery({ publicId }: { publicId: string }) {
             }
           : current,
       );
-      const remainingCount = Math.max(0, (event?.images.length ?? 1) - 1);
-      setActiveImageIndex((current) => {
-        if (remainingCount === 0) {
-          return 0;
-        }
-        if (deletedIndex >= 0 && deletedIndex < current) {
-          return current - 1;
-        }
-        if (deletedIndex === current) {
-          return Math.min(current, remainingCount - 1);
-        }
-        return current;
-      });
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -159,22 +143,9 @@ export function EventGallery({ publicId }: { publicId: string }) {
     );
   }
 
-  const activeImage = event.images[activeImageIndex];
-  const carouselImageCount = event.images.length;
-
-  function showPreviousImage() {
-    setActiveImageIndex((current) =>
-      current === 0 ? carouselImageCount - 1 : current - 1,
-    );
-  }
-
-  function showNextImage() {
-    setActiveImageIndex((current) => (current + 1) % carouselImageCount);
-  }
-
   return (
     <div>
-      <section className="surface-card overflow-hidden rounded-[2rem] p-6 sm:p-9 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
+      <section>
         <div className="lg:grid lg:grid-cols-[minmax(0,1.45fr)_minmax(22rem,0.85fr)] lg:items-start lg:gap-10 xl:gap-14">
           <div className="min-w-0 lg:py-5">
             <div className="max-w-3xl">
@@ -224,74 +195,25 @@ export function EventGallery({ publicId }: { publicId: string }) {
           <div className="rounded-[2rem] border border-dashed border-[#173b57]/20 bg-white/45 p-14 text-center text-[#173b57]/68">
             Все още няма качени снимки за това събитие.
           </div>
-        ) : activeImage ? (
-          <div
-            role="region"
-            aria-roledescription="въртележка"
-            aria-label="Снимки от събитието"
-            tabIndex={0}
-            onKeyDown={(keyEvent) => {
-              if (keyEvent.key === "ArrowLeft") {
-                showPreviousImage();
-              }
-              if (keyEvent.key === "ArrowRight") {
-                showNextImage();
-              }
-            }}
-            onTouchStart={(touchEvent) => {
-              touchStartX.current = touchEvent.changedTouches[0]?.clientX ?? null;
-            }}
-            onTouchEnd={(touchEvent) => {
-              const touchEndX = touchEvent.changedTouches[0]?.clientX;
-              if (touchStartX.current === null || touchEndX === undefined) {
-                return;
-              }
-              const distance = touchStartX.current - touchEndX;
-              if (distance > 45) {
-                showNextImage();
-              } else if (distance < -45) {
-                showPreviousImage();
-              }
-              touchStartX.current = null;
-            }}
-            className="outline-none focus-visible:ring-4 focus-visible:ring-[#5aa9d6]/25"
-          >
-            <div className="relative aspect-[5/4] sm:aspect-[16/9] lg:aspect-[16/8]">
-              {event.images.map((image, index) => {
-                const offset = getCircularOffset(
-                  index,
-                  activeImageIndex,
-                  event.images.length,
-                );
-                if (offset === null) {
-                  return null;
-                }
-
-                return (
-                  <div
-                    key={image.id}
-                    className={`absolute top-1/2 transform-gpu overflow-hidden rounded-[1.25rem] shadow-[0_16px_40px_rgba(23,59,87,.22)] ring-0 ring-[#5aa9d6]/0 transition-[left,width,height,opacity,transform,box-shadow] duration-500 ease-[cubic-bezier(.22,1,.36,1)] [backface-visibility:hidden] will-change-[left,width,height,opacity,transform] hover:shadow-[0_20px_48px_rgba(23,59,87,.27)] hover:ring-2 hover:ring-[#5aa9d6]/45 sm:rounded-[1.5rem] ${getCarouselPositionClass(offset)}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setActiveImageIndex(index)}
-                      aria-label={
-                        offset === 0
-                          ? `Активна снимка ${index + 1}`
-                          : `Покажи снимка ${index + 1}`
-                      }
-                      aria-current={offset === 0 ? "true" : undefined}
-                      className="absolute inset-0 h-full w-full focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60"
-                    >
+        ) : (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {event.images.map((image, index) => (
+              <article
+                key={image.id}
+                className="group relative aspect-square overflow-hidden rounded-xl bg-black/5 shadow-[0_8px_24px_rgba(23,59,87,.14)] sm:rounded-2xl"
+              >
+                <a
+                  href={image.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Виж ${isVideoUrl(image.url) ? "видео" : "снимка"} ${index + 1}`}
+                  className="absolute inset-0 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/60"
+                >
                       {isVideoUrl(image.url) ? (
                         <>
                           <video
                             src={image.url}
-                            className={`absolute inset-0 h-full w-full object-cover transition-[filter] duration-500 ${
-                              offset === 0
-                                ? "grayscale-0 saturate-100"
-                                : "grayscale saturate-0"
-                            }`}
+                            className="absolute inset-0 h-full w-full object-cover"
                             muted
                             playsInline
                             preload="metadata"
@@ -308,25 +230,20 @@ export function EventGallery({ publicId }: { publicId: string }) {
                           alt={image.originalName ?? "Снимка от събитието"}
                           fill
                           unoptimized
-                          sizes="(max-width: 640px) 56vw, 48vw"
-                          className={`object-cover transition-[filter] duration-500 [backface-visibility:hidden] ${
-                            offset === 0
-                              ? "blur-none grayscale-0 saturate-100"
-                              : "grayscale saturate-0"
-                          }`}
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          className="object-cover transition duration-500 group-hover:scale-105"
                         />
                       )}
-                    </button>
+                </a>
 
-                    {offset === 0 && (
-                    <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-4">
+                <div className="absolute right-2 bottom-2 z-10 flex gap-1.5 sm:right-3 sm:bottom-3">
                       <a
                         href={image.url}
                         target="_blank"
                         rel="noreferrer"
                         aria-label={`Виж снимка ${index + 1}`}
                         title="Виж"
-                        className={getPhotoActionClass(offset)}
+                        className={getPhotoActionClass()}
                       >
                         <ViewIcon />
                       </a>
@@ -334,7 +251,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
                         href={`${getApiUrl()}/admin/event-images/${image.id}/download`}
                         aria-label={`Свали снимка ${index + 1}`}
                         title="Свали"
-                        className={getPhotoActionClass(offset)}
+                        className={getPhotoActionClass()}
                       >
                         <DownloadIcon />
                       </a>
@@ -344,35 +261,15 @@ export function EventGallery({ publicId }: { publicId: string }) {
                         disabled={deletingId === image.id}
                         aria-label={`Изтрий снимка ${index + 1}`}
                         title="Изтрий"
-                        className={`${getPhotoActionClass(offset)} hover:bg-[#5aa9d6] disabled:opacity-50`}
+                        className={`${getPhotoActionClass()} hover:bg-[#5aa9d6] disabled:opacity-50`}
                       >
                         <TrashIcon />
                       </button>
-                    </div>
-                    )}
-                  </div>
-                );
-              })}
-
-              {event.images.length > 1 && (
-                <>
-                  <CarouselButton
-                    direction="previous"
-                    label="Предишна снимка"
-                    onClick={showPreviousImage}
-                  />
-                  <CarouselButton
-                    direction="next"
-                    label="Следваща снимка"
-                    onClick={showNextImage}
-                  />
-                </>
-              )}
-
-            </div>
-
+                </div>
+              </article>
+            ))}
           </div>
-        ) : null}
+        )}
       </section>
     </div>
   );
@@ -493,47 +390,8 @@ function EventShareCard({ event }: { event: AdminEventDetails }) {
   );
 }
 
-function getCircularOffset(
-  index: number,
-  activeIndex: number,
-  imageCount: number,
-): number | null {
-  let offset = index - activeIndex;
-  if (offset > imageCount / 2) {
-    offset -= imageCount;
-  } else if (offset < -imageCount / 2) {
-    offset += imageCount;
-  }
-
-  return Math.abs(offset) <= 2 ? offset : null;
-}
-
-function getCarouselPositionClass(offset: number): string {
-  const positions: Record<number, string> = {
-    [-2]:
-      "left-[11%] z-10 h-[46%] w-[22%] -translate-x-1/2 -translate-y-1/2 opacity-60",
-    [-1]:
-      "left-[26%] z-20 h-[68%] w-[36%] -translate-x-1/2 -translate-y-1/2 opacity-85 sm:w-[32%]",
-    [0]:
-      "left-1/2 z-30 h-[88%] w-[56%] -translate-x-1/2 -translate-y-1/2 opacity-100 sm:w-[48%]",
-    [1]:
-      "left-[74%] z-20 h-[68%] w-[36%] -translate-x-1/2 -translate-y-1/2 opacity-85 sm:w-[32%]",
-    [2]:
-      "left-[89%] z-10 h-[46%] w-[22%] -translate-x-1/2 -translate-y-1/2 opacity-60",
-  };
-
-  return positions[offset] ?? "pointer-events-none opacity-0";
-}
-
-function getPhotoActionClass(offset: number): string {
-  const size =
-    offset === 0
-      ? "h-9 w-9"
-      : Math.abs(offset) === 1
-        ? "h-7 w-7 sm:h-8 sm:w-8"
-        : "h-5 w-5 sm:h-6 sm:w-6";
-
-  return `grid ${size} place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-md backdrop-blur-md transition hover:scale-105 hover:bg-black/80`;
+function getPhotoActionClass(): string {
+  return "grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/55 text-white shadow-md backdrop-blur-md transition hover:scale-105 hover:bg-black/80";
 }
 
 function ViewIcon() {
@@ -596,29 +454,6 @@ function TrashIcon() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function CarouselButton({
-  direction,
-  label,
-  onClick,
-}: {
-  direction: "previous" | "next";
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className={`absolute top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/35 text-xl text-white shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-black/55 sm:h-12 sm:w-12 ${
-        direction === "previous" ? "left-5" : "right-5"
-      }`}
-    >
-      <span aria-hidden="true">{direction === "previous" ? "←" : "→"}</span>
-    </button>
   );
 }
 

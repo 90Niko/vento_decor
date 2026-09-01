@@ -117,7 +117,16 @@ export function GuestQuizReviewPage({ publicId }: { publicId: string }) {
                       className={`quiz-review-option rounded-xl border px-4 py-3 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-800" : isSelected ? "border-sky-300 bg-sky-50 text-sky-800" : "border-black/8 bg-white/45 opacity-60"}`}
                     >
                       <span className="flex items-center justify-between gap-4">
-                        <span>{option}</span>
+                        <span className="flex min-w-0 items-center gap-3">
+                          {isSelected && (
+                            <span
+                              className="h-7 w-1 shrink-0 rounded-full"
+                              style={{ backgroundColor: theme.accent }}
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span>{option}</span>
+                        </span>
                         <span className="shrink-0 font-semibold tabular-nums">
                           {question.optionPercentages[optionIndex] ?? 0}%
                         </span>

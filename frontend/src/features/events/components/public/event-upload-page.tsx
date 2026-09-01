@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  type ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -356,33 +355,31 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                 Разгледай моментите, споделени от всички присъстващи на събитието.
               </p>
             </div>
-            <span className="rounded-full border border-black/10 bg-white/60 px-4 py-2 text-sm font-semibold">
-              {gallery.length} {gallery.length === 1 ? "снимка" : "снимки"}
-            </span>
-          </div>
-
-          {gallery.length > 0 && (
-            <div
-              className="mt-5 flex w-fit rounded-full border border-black/10 bg-white/70 p-1 shadow-sm backdrop-blur sm:hidden"
-              role="group"
-              aria-label="Изглед на галерията"
-            >
-              <GalleryViewButton
-                active={galleryView === "grid"}
-                label="Решетка"
-                onClick={() => setGalleryView("grid")}
-                icon={<GridViewIcon />}
-                accent={theme.accent}
-              />
-              <GalleryViewButton
-                active={galleryView === "feed"}
-                label="Големи"
-                onClick={() => setGalleryView("feed")}
-                icon={<FeedViewIcon />}
-                accent={theme.accent}
-              />
+            <div className="flex items-center gap-2">
+              <span className="rounded-full border border-black/10 bg-white/60 px-4 py-2 text-sm font-semibold">
+                {gallery.length} {gallery.length === 1 ? "снимка" : "снимки"}
+              </span>
+              {gallery.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setGalleryView((current) =>
+                      current === "grid" ? "feed" : "grid",
+                    )
+                  }
+                  aria-label={
+                    galleryView === "grid"
+                      ? "Покажи големи снимки"
+                      : "Покажи снимките в решетка"
+                  }
+                  className="grid h-10 w-10 place-items-center rounded-full border border-black/10 text-white shadow-sm transition active:scale-95 sm:hidden"
+                  style={{ backgroundColor: theme.accent }}
+                >
+                  {galleryView === "grid" ? <FeedViewIcon /> : <GridViewIcon />}
+                </button>
+              )}
             </div>
-          )}
+          </div>
 
           {isGalleryLoading ? (
             <div className="mt-8 grid grid-cols-3 gap-1.5 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
@@ -680,37 +677,6 @@ function formatImageDate(value: string) {
     day: "2-digit",
     month: "short",
   }).format(new Date(value));
-}
-
-function GalleryViewButton({
-  active,
-  label,
-  onClick,
-  icon,
-  accent,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-  icon: ReactNode;
-  accent: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={active}
-      className="grid h-10 w-10 place-items-center rounded-full transition active:scale-95"
-      style={
-        active
-          ? { backgroundColor: accent, color: "white" }
-          : { color: "currentColor" }
-      }
-    >
-      {icon}
-    </button>
-  );
 }
 
 function GridViewIcon() {
