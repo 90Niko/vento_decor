@@ -235,9 +235,9 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
     >
       <div className="guest-gallery-container page-container relative">
         <header className="guest-top-navbar sticky top-0 z-50 sm:static sm:pt-5">
-          <div className="guest-top-navbar-surface flex items-center justify-center gap-3 border-b border-black/8 bg-white/80 px-3.5 py-2 shadow-sm backdrop-blur-xl sm:justify-between sm:border-0 sm:bg-transparent sm:px-5 sm:py-3 sm:shadow-none sm:backdrop-blur-none">
+          <div className="guest-top-navbar-surface flex items-center justify-center gap-3 border-b border-black/8 bg-white/80 px-3.5 py-1 shadow-sm backdrop-blur-xl sm:justify-between sm:border-0 sm:bg-transparent sm:px-5 sm:py-3 sm:shadow-none sm:backdrop-blur-none">
             <BrandLockup subtitle="Галерия за гости" />
-            <span className="flex items-center gap-2 rounded-full border border-black/10 bg-white/65 px-2.5 py-1.5 text-xs font-bold sm:px-4 sm:py-2">
+            <span className="flex items-center gap-2 rounded-full border border-black/10 bg-white/65 px-2.5 py-1 text-xs font-bold sm:px-4 sm:py-2">
               <span
                 className="grid h-6 w-6 place-items-center rounded-full text-[10px] text-white"
                 style={{ backgroundColor: theme.accent }}
@@ -261,7 +261,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           </div>
         )}
 
-        <section className="guest-event-hero py-8 sm:py-12">
+        <section className="guest-event-hero pt-2 pb-8 sm:py-12">
           <div
             className="relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,.15)] sm:p-10"
             style={{
