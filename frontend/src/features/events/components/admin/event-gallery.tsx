@@ -43,6 +43,10 @@ export function EventGallery({ publicId }: { publicId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [openPhotoMenuId, setOpenPhotoMenuId] = useState<number | null>(null);
+  const [selectedImageIds, setSelectedImageIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -147,6 +151,63 @@ export function EventGallery({ publicId }: { publicId: string }) {
     }
   }
 
+  function toggleImageSelection(imageId: number) {
+    setSelectedImageIds((current) => {
+      const next = new Set(current);
+      if (next.has(imageId)) next.delete(imageId);
+      else next.add(imageId);
+      return next;
+    });
+  }
+
+  async function deleteSelectedImages() {
+    const imageIds = [...selectedImageIds];
+    if (
+      imageIds.length === 0 ||
+      !window.confirm(
+        `Да изтрия ли ${imageIds.length} избрани снимки? Действието е необратимо.`,
+      )
+    ) {
+      return;
+    }
+
+    setIsBulkDeleting(true);
+    setError(null);
+    const results = await Promise.all(
+      imageIds.map(async (imageId) => {
+        try {
+          const response = await eventsService.deleteImageResponse(imageId);
+          return { imageId, deleted: response.ok };
+        } catch {
+          return { imageId, deleted: false };
+        }
+      }),
+    );
+    const deletedIds = new Set(
+      results.filter((result) => result.deleted).map((result) => result.imageId),
+    );
+    const failedIds = new Set(
+      results.filter((result) => !result.deleted).map((result) => result.imageId),
+    );
+
+    setEvent((current) =>
+      current
+        ? {
+            ...current,
+            imageCount: current.imageCount - deletedIds.size,
+            images: current.images.filter((image) => !deletedIds.has(image.id)),
+          }
+        : current,
+    );
+    setSelectedImageIds(failedIds);
+    if (failedIds.size > 0) {
+      setError(
+        `${deletedIds.size} снимки са изтрити, но ${failedIds.size} не можаха да бъдат изтрити.`,
+      );
+    }
+    setIsBulkDeleting(false);
+  }
+
   if (isLoading) {
     return <p className="py-24 text-center text-[#173b57]/68">Зареждане…</p>;
   }
@@ -199,13 +260,49 @@ export function EventGallery({ publicId }: { publicId: string }) {
       <section className="mt-10">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-3xl font-medium tracking-[-0.04em]">Снимки</h2>
-          <span className="text-sm text-[#173b57]/68">{event.images.length} общо</span>
+          {event.images.length > 0 && (
+            <span className="text-sm text-[#173b57]/68">
+              {event.images.length} общо
+            </span>
+          )}
         </div>
 
         {error && (
           <p className="mb-5 rounded-2xl bg-[#5aa9d6]/15 px-4 py-3 text-sm font-medium text-[#173b57]" role="alert">
             {error}
           </p>
+        )}
+
+        {selectedImageIds.size > 0 && (
+          <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-[#173b57]/10 bg-white/80 p-3 shadow-sm">
+            <span className="mr-auto px-2 text-sm font-bold">
+              Избрани: {selectedImageIds.size}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedImageIds(new Set(event.images.map((image) => image.id)))
+              }
+              className="rounded-full px-4 py-2 text-xs font-bold hover:bg-[#eaf6ff]"
+            >
+              Избери всички
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedImageIds(new Set())}
+              className="rounded-full px-4 py-2 text-xs font-bold hover:bg-[#eaf6ff]"
+            >
+              Отказ
+            </button>
+            <button
+              type="button"
+              onClick={() => void deleteSelectedImages()}
+              disabled={isBulkDeleting}
+              className="rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+            >
+              {isBulkDeleting ? "Изтриване…" : "Изтрий избраните"}
+            </button>
+          </div>
         )}
 
         {event.images.length === 0 ? (
@@ -219,7 +316,7 @@ export function EventGallery({ publicId }: { publicId: string }) {
                 key={image.id}
                 className={`group relative aspect-square rounded-xl bg-black/5 shadow-[0_8px_24px_rgba(23,59,87,.14)] sm:rounded-2xl ${
                   openPhotoMenuId === image.id ? "z-20" : ""
-                }`}
+                } ${selectedImageIds.has(image.id) ? "ring-4 ring-[#5aa9d6]" : ""}`}
               >
                 <a
                   href={image.url}
@@ -255,6 +352,25 @@ export function EventGallery({ publicId }: { publicId: string }) {
                       )}
                 </a>
 
+                {selectedImageIds.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => toggleImageSelection(image.id)}
+                    aria-label={
+                      selectedImageIds.has(image.id)
+                        ? `Премахни снимка ${index + 1} от избраните`
+                        : `Маркирай снимка ${index + 1}`
+                    }
+                    className={`absolute top-2 left-2 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-white shadow-md sm:top-3 sm:left-3 ${
+                      selectedImageIds.has(image.id)
+                        ? "bg-[#5aa9d6] text-white"
+                        : "bg-black/45 text-transparent backdrop-blur"
+                    }`}
+                  >
+                    <CheckIcon />
+                  </button>
+                )}
+
                 <div
                   className="absolute top-2 right-2 z-10 sm:top-3 sm:right-3"
                   data-photo-menu={image.id}
@@ -275,6 +391,17 @@ export function EventGallery({ publicId }: { publicId: string }) {
 
                   {openPhotoMenuId === image.id && (
                     <div className="absolute top-12 right-0 w-36 overflow-hidden rounded-xl border border-black/10 bg-white p-1.5 text-sm font-semibold text-[#173b57] shadow-xl">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toggleImageSelection(image.id);
+                          setOpenPhotoMenuId(null);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-[#eaf6ff]"
+                      >
+                        <SelectIcon />
+                        Маркирай
+                      </button>
                       <a
                         href={image.url}
                         target="_blank"
@@ -450,6 +577,15 @@ function MoreIcon() {
       <circle cx="5" cy="12" r="1.8" />
       <circle cx="12" cy="12" r="1.8" />
       <circle cx="19" cy="12" r="1.8" />
+    </svg>
+  );
+}
+
+function SelectIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m8 12 2.7 2.7L16.5 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
