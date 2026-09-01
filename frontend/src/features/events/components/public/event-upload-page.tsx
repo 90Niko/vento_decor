@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { getEventTheme } from "@/features/events/lib/event-theme";
 import { UploadStudio } from "@/features/uploads/components/upload-studio";
@@ -36,6 +42,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
   const [session, setSession] = useState<GuestSession | null>(null);
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [galleryView, setGalleryView] = useState<"grid" | "feed">("grid");
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [likingImageId, setLikingImageId] = useState<number | null>(null);
   const [downloadingImageId, setDownloadingImageId] = useState<number | null>(
@@ -354,8 +361,31 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             </span>
           </div>
 
+          {gallery.length > 0 && (
+            <div
+              className="mt-5 flex w-fit rounded-full border border-black/10 bg-white/70 p-1 shadow-sm backdrop-blur sm:hidden"
+              role="group"
+              aria-label="Изглед на галерията"
+            >
+              <GalleryViewButton
+                active={galleryView === "grid"}
+                label="Решетка"
+                onClick={() => setGalleryView("grid")}
+                icon={<GridViewIcon />}
+                accent={theme.accent}
+              />
+              <GalleryViewButton
+                active={galleryView === "feed"}
+                label="Големи"
+                onClick={() => setGalleryView("feed")}
+                icon={<FeedViewIcon />}
+                accent={theme.accent}
+              />
+            </div>
+          )}
+
           {isGalleryLoading ? (
-            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-3 gap-1.5 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
               {[1, 2, 3, 4].map((item) => (
                 <div key={item} className="aspect-[4/3] animate-pulse rounded-2xl bg-black/5" />
               ))}
@@ -372,11 +402,19 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
               <p className="mt-1 text-sm opacity-55">Качи снимки и те ще се появят тук.</p>
             </div>
           ) : (
-            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
+            <div
+              className={`mt-5 grid md:mt-8 md:grid-cols-3 md:gap-3 lg:grid-cols-4 ${
+                galleryView === "grid"
+                  ? "grid-cols-3 gap-1.5"
+                  : "grid-cols-1 gap-4"
+              }`}
+            >
               {gallery.map((image, index) => (
                 <article
                   key={image.id}
-                  className="group overflow-hidden rounded-xl border border-black/15 bg-white shadow-[0_3px_10px_rgba(0,0,0,0.1)]"
+                  className={`group overflow-hidden border border-black/15 bg-white shadow-[0_3px_10px_rgba(0,0,0,0.1)] ${
+                    galleryView === "grid" ? "rounded-lg" : "rounded-xl"
+                  } md:rounded-xl`}
                 >
                   <button
                     type="button"
@@ -418,7 +456,11 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                       />
                     )}
                   </button>
-                  <div className="flex items-center justify-between gap-2 px-2.5 py-2 text-[#173b57]">
+                  <div
+                    className={`items-center justify-between gap-2 px-2.5 py-2 text-[#173b57] ${
+                      galleryView === "grid" ? "hidden md:flex" : "flex"
+                    }`}
+                  >
                     <span className="min-w-0 truncate text-[11px] font-semibold sm:text-xs">
                       {image.guestName ?? "Гост"}
                     </span>
@@ -638,6 +680,54 @@ function formatImageDate(value: string) {
     day: "2-digit",
     month: "short",
   }).format(new Date(value));
+}
+
+function GalleryViewButton({
+  active,
+  label,
+  onClick,
+  icon,
+  accent,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+  icon: ReactNode;
+  accent: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="flex min-h-10 items-center gap-2 rounded-full px-3.5 text-xs font-bold transition active:scale-95"
+      style={
+        active
+          ? { backgroundColor: accent, color: "white" }
+          : { color: "currentColor" }
+      }
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function GridViewIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 2h4.5v4.5H2zM9.5 2H14v4.5H9.5zM2 9.5h4.5V14H2zM9.5 9.5H14V14H9.5z" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function FeedViewIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="12" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+      <rect x="2" y="9" width="12" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  );
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {

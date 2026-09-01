@@ -8,7 +8,51 @@ interface UploadImagesInput {
   onProgress: (value: number) => void;
 }
 
-export function uploadImages({
+const UPLOAD_BATCH_SIZE = 2;
+
+export class PartialUploadError extends Error {
+  constructor(
+    message: string,
+    readonly uploadedCount: number,
+  ) {
+    super(message);
+    this.name = "PartialUploadError";
+  }
+}
+
+export async function uploadImages({
+  files,
+  uploadPath,
+  authorizationToken,
+  onProgress,
+}: UploadImagesInput): Promise<UploadResponse> {
+  const images: UploadResponse["images"] = [];
+
+  for (let offset = 0; offset < files.length; offset += UPLOAD_BATCH_SIZE) {
+    const batch = files.slice(offset, offset + UPLOAD_BATCH_SIZE);
+    try {
+      const response = await uploadBatch({
+        files: batch,
+        uploadPath,
+        authorizationToken,
+        onProgress: (batchProgress) => {
+          const completed = offset;
+          const current = (batchProgress / 100) * batch.length;
+          onProgress(Math.round(((completed + current) / files.length) * 100));
+        },
+      });
+      images.push(...response.images);
+    } catch (error) {
+      const reason =
+        error instanceof Error ? error.message : "Възникна неочаквана грешка.";
+      throw new PartialUploadError(reason, images.length);
+    }
+  }
+
+  return { images };
+}
+
+function uploadBatch({
   files,
   uploadPath,
   authorizationToken,

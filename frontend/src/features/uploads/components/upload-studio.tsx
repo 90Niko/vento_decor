@@ -8,10 +8,14 @@ import {
   useRef,
   useState,
 } from "react";
-import { uploadImages } from "@/features/uploads/services/uploads.service";
+import {
+  PartialUploadError,
+  uploadImages,
+} from "@/features/uploads/services/uploads.service";
 
-const MAX_FILES = 5;
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
+const MAX_FILES = 10;
+const MAX_IMAGE_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_VIDEO_FILE_SIZE = 25 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = [
   ".jpg",
   ".jpeg",
@@ -51,6 +55,18 @@ function isAcceptedMedia(file: File): boolean {
     file.type.startsWith("video/") ||
     ACCEPTED_EXTENSIONS.includes(extension)
   );
+}
+
+function isVideo(file: File): boolean {
+  const extension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+  return (
+    file.type.startsWith("video/") ||
+    [".mp4", ".mov", ".webm", ".m4v", ".mpeg", ".mpg"].includes(extension)
+  );
+}
+
+function isWithinSizeLimit(file: File): boolean {
+  return file.size <= (isVideo(file) ? MAX_VIDEO_FILE_SIZE : MAX_IMAGE_FILE_SIZE);
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {
@@ -127,7 +143,7 @@ export function UploadStudio({
     const incoming = Array.from(files).filter((file) => {
       const key = `${file.name}-${file.size}-${file.lastModified}`;
       return isAcceptedMedia(file) &&
-        file.size <= MAX_FILE_SIZE &&
+        isWithinSizeLimit(file) &&
         !existing.has(key);
     });
     const availableSlots = MAX_FILES - selected.length;
@@ -149,7 +165,7 @@ export function UploadStudio({
 
     if (accepted.length < Array.from(files).length) {
       setError(
-        "Някои файлове са пропуснати. Избери снимки или видеа до 100 MB.",
+        "Някои файлове са пропуснати. Можеш да избереш до 10 файла; снимките трябва да са до 10 MB, а видеата до 25 MB.",
       );
     } else if (accepted.length > 0) {
       setMessage(
@@ -234,9 +250,20 @@ export function UploadStudio({
       );
       onUploaded?.();
     } catch (uploadError) {
+      if (uploadError instanceof PartialUploadError && uploadError.uploadedCount > 0) {
+        const uploadedItems = selected.slice(0, uploadError.uploadedCount);
+        uploadedItems.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl));
+        previewUrls.current = previewUrls.current.filter(
+          (url) => !uploadedItems.some(({ previewUrl }) => previewUrl === url),
+        );
+        setSelected((current) => current.slice(uploadError.uploadedCount));
+        onUploaded?.();
+      }
       setError(
-        uploadError instanceof Error
-          ? uploadError.message
+        uploadError instanceof PartialUploadError && uploadError.uploadedCount > 0
+          ? `${uploadError.uploadedCount} файла са качени успешно. Останалите не бяха качени: ${uploadError.message}`
+          : uploadError instanceof Error
+            ? uploadError.message
           : "Възникна неочаквана грешка.",
       );
     } finally {
@@ -308,7 +335,7 @@ export function UploadStudio({
             или натисни, за да избереш от устройството
           </span>
           <span className="mt-5 rounded-full bg-white/80 px-4 py-2 text-xs font-medium text-[#173b57]/68 shadow-sm">
-            Снимки, MP4, MOV и WebM · до 100 MB · максимум 10
+            Снимки до 10 MB · видео до 25 MB · максимум 10 файла
           </span>
         </label>}
 
