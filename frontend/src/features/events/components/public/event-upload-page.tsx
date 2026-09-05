@@ -458,7 +458,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                       type="button"
                       onClick={() => void toggleLike(image.id)}
                       disabled={likingImageId === image.id}
-                      className={`absolute right-1.5 bottom-1.5 z-10 flex min-h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-black/55 px-2 text-[11px] font-bold shadow-md backdrop-blur-sm transition active:scale-90 disabled:opacity-50 md:hidden ${
+                      className={`absolute right-0.5 bottom-0.5 z-10 flex min-h-7 min-w-7 items-center justify-center gap-1 px-1.5 text-[11px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] transition active:scale-90 disabled:opacity-50 md:hidden ${
                         image.likedByGuest ? "text-rose-500" : "text-white"
                       }`}
                       aria-label={
