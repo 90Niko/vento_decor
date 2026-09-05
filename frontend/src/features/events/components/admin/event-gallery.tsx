@@ -252,7 +252,7 @@ export function EventGallery({
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href={`${basePath}/${event.publicId}/edit#event-quiz`}
+                href={`${basePath}/${event.publicId}/quiz-preview`}
                 className="primary-action"
               >
                 Отвори въпросите

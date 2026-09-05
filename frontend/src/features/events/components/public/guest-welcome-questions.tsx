@@ -17,10 +17,20 @@ interface PublicQuiz {
   hasCorrectAnswers: boolean;
   completed: boolean;
   title: string;
-  questions: Array<{ prompt: string; options: string[] }>;
+  questions: Array<{
+    prompt: string;
+    options: string[];
+    correctOption?: number;
+  }>;
 }
 
-export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
+export function GuestWelcomeQuestions({
+  publicId,
+  adminPreview = false,
+}: {
+  publicId: string;
+  adminPreview?: boolean;
+}) {
   const router = useRouter();
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [session, setSession] = useState<GuestSession | null>(null);
@@ -35,6 +45,33 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (adminPreview) {
+      const controller = new AbortController();
+      void Promise.all([
+        eventsService.getAdminEventResponse(publicId, controller.signal),
+        eventsService.getManagerQuizResponse(publicId),
+      ])
+        .then(async ([eventResponse, quizResponse]) => {
+          if (!eventResponse.ok || !quizResponse.ok) throw new Error();
+          const loadedEvent = (await eventResponse.json()) as PublicEvent;
+          const loadedQuiz = (await quizResponse.json()) as PublicQuiz;
+          if (loadedQuiz.questions.length === 0) {
+            throw new Error("Този quiz все още няма въпроси.");
+          }
+          setSession({ token: "preview", name: "Гост" });
+          setEvent(loadedEvent);
+          setQuiz({ ...loadedQuiz, completed: false });
+        })
+        .catch((previewError) =>
+          setError(
+            previewError instanceof Error && previewError.message
+              ? previewError.message
+              : "Quiz preview-то не може да бъде заредено.",
+          ),
+        );
+      return () => controller.abort();
+    }
+
     const rawSession = readGuestSession(publicId);
     if (!rawSession) {
       router.replace(`/event/${publicId}`);
@@ -70,7 +107,7 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
       })
       .catch(() => setError("Quiz-ът не може да бъде зареден."));
     return () => controller.abort();
-  }, [publicId, router]);
+  }, [adminPreview, publicId, router]);
 
   async function continueQuiz() {
     if (selected === null || !quiz || !session) return;
@@ -79,6 +116,18 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
       setAnswers(nextAnswers);
       setSelected(null);
       setQuestionIndex((current) => current + 1);
+      return;
+    }
+
+    if (adminPreview) {
+      const score = quiz.hasCorrectAnswers
+        ? quiz.questions.reduce(
+            (total, item, index) =>
+              total + (item.correctOption === nextAnswers[index] ? 1 : 0),
+            0,
+          )
+        : 0;
+      setResult({ score, total: quiz.questions.length });
       return;
     }
 
@@ -97,7 +146,12 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
   }
 
   const theme = getEventTheme(event?.themeColor);
-  if (!session || !event || !quiz || !quiz.enabled || quiz.completed) {
+  if (
+    !session ||
+    !event ||
+    !quiz ||
+    (!adminPreview && (!quiz.enabled || quiz.completed))
+  ) {
     return (
       <main className="page-canvas grid min-h-screen place-items-center">
         {error ? (
@@ -157,20 +211,41 @@ export function GuestWelcomeQuestions({ publicId }: { publicId: string }) {
                 : "Можеш да сравниш избора си с отговорите на останалите гости."}
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              {adminPreview ? (
+                <button
+                  onClick={() => {
+                    setQuestionIndex(0);
+                    setAnswers([]);
+                    setSelected(null);
+                    setResult(null);
+                  }}
+                  className="primary-button-effect min-h-14 w-full max-w-md self-center rounded-full px-8 py-4 text-sm font-bold text-white sm:w-auto sm:max-w-none"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                  }}
+                >
+                  Прегледай отново
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push(`/event/${publicId}/quiz-review`)}
+                  className="primary-button-effect min-h-14 w-full max-w-md self-center rounded-full px-8 py-4 text-sm font-bold text-white sm:w-auto sm:max-w-none"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                  }}
+                >
+                  Преглед на отговорите
+                </button>
+              )}
               <button
-                onClick={() => router.push(`/event/${publicId}/quiz-review`)}
-                className="primary-button-effect min-h-14 w-full max-w-md self-center rounded-full px-8 py-4 text-sm font-bold text-white sm:w-auto sm:max-w-none"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
-                }}
-              >
-                Преглед на отговорите
-              </button>
-              <button
-                onClick={() => router.replace(`/event/${publicId}/upload`)}
+                onClick={() =>
+                  adminPreview
+                    ? router.back()
+                    : router.replace(`/event/${publicId}/upload`)
+                }
                 className="min-h-14 w-full max-w-md self-center rounded-full border border-black/10 bg-white/70 px-8 py-4 text-sm font-bold sm:w-auto sm:max-w-none"
               >
-                Към снимките →
+                {adminPreview ? "Назад към събитието" : "Към снимките →"}
               </button>
             </div>
           </div>

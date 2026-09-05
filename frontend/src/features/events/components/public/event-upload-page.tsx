@@ -41,7 +41,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
   const [session, setSession] = useState<GuestSession | null>(null);
   const [event, setEvent] = useState<PublicEvent | null>(null);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
-  const [galleryView, setGalleryView] = useState<"grid" | "feed">("grid");
+  const [galleryView, setGalleryView] = useState<"grid" | "feed">("feed");
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [likingImageId, setLikingImageId] = useState<number | null>(null);
   const [downloadingImageId, setDownloadingImageId] = useState<number | null>(
@@ -409,7 +409,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
               {gallery.map((image, index) => (
                 <article
                   key={image.id}
-                  className={`group overflow-hidden border border-black/15 bg-white shadow-[0_3px_10px_rgba(0,0,0,0.1)] ${
+                  className={`group relative overflow-hidden border border-black/15 bg-white shadow-[0_3px_10px_rgba(0,0,0,0.1)] ${
                     galleryView === "grid" ? "rounded-lg" : "rounded-xl"
                   } md:rounded-xl`}
                 >
@@ -453,6 +453,22 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                       />
                     )}
                   </button>
+                  {galleryView === "grid" && (
+                    <button
+                      type="button"
+                      onClick={() => void toggleLike(image.id)}
+                      disabled={likingImageId === image.id}
+                      className="absolute right-1.5 bottom-1.5 z-10 flex min-h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-black/55 px-2 text-[11px] font-bold text-white shadow-md backdrop-blur-sm transition active:scale-90 disabled:opacity-50 md:hidden"
+                      aria-label={
+                        image.likedByGuest
+                          ? "Премахни харесването"
+                          : "Харесай снимката"
+                      }
+                    >
+                      <HeartIcon filled={image.likedByGuest} />
+                      <span>{image.likeCount}</span>
+                    </button>
+                  )}
                   <div
                     className={`items-center justify-between gap-2 px-2.5 py-2 text-[#173b57] ${
                       galleryView === "grid" ? "hidden md:flex" : "flex"
