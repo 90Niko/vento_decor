@@ -176,14 +176,14 @@ export function GuestWelcomeQuestions({
 
   return (
     <main
-      className="guest-flow-page grid min-h-screen place-items-center overflow-hidden px-4 py-10"
+      className="guest-flow-page grid min-h-screen place-items-center overflow-hidden px-4 py-0 sm:py-10"
       style={{
         color: theme.primary,
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <section className="quiz-question-container app-grid-container surface-card reveal-up relative max-h-[calc(100dvh-5rem)] w-full max-w-2xl overflow-y-auto rounded-[2.25rem] p-7 sm:max-h-[calc(100dvh-5rem)] sm:p-11">
-        <div className="sticky top-0 z-20 -mx-7 -mt-7 mb-0 h-7 bg-white/80 backdrop-blur-sm sm:-mx-11 sm:-mt-11">
+      <section className="quiz-question-container app-grid-container surface-card reveal-up relative max-h-dvh w-full max-w-2xl overflow-y-auto rounded-[2.25rem] p-7 sm:max-h-[calc(100dvh-5rem)] sm:p-11">
+        <div className="sticky top-0 z-20 -mx-7 -mt-7 mb-0 h-7 sm:-mx-11 sm:-mt-11">
           <div
             className="absolute inset-y-0 left-0 transition-all duration-500"
             style={{ width: `${progress}%`, backgroundColor: `${theme.accent}30` }}
@@ -304,7 +304,7 @@ export function GuestWelcomeQuestions({
             {error && (
               <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>
             )}
-            <div className="sticky bottom-0 z-20 -mx-7 -mb-7 mt-7 bg-white/85 px-7 pt-3 pb-4 backdrop-blur-sm sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
+            <div className="sticky bottom-0 z-20 -mx-7 -mb-7 mt-7 bg-white/85 px-7 pt-3 pb-1 backdrop-blur-sm sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
               <button
                 type="button"
                 onClick={() => void continueQuiz()}

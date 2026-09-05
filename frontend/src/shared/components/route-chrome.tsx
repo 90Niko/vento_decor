@@ -14,9 +14,14 @@ export function RouteChrome() {
   const isEventCreationRoute =
     pathname === "/admin/events/new" ||
     pathname === "/dashboard/events/new";
+  const isQuizPreviewRoute =
+    (pathname.startsWith("/admin/events/") ||
+      pathname.startsWith("/dashboard/events/")) &&
+    pathname.endsWith("/quiz-preview");
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<"ADMIN" | "CREATOR" | null>(null);
   const hasNavigation =
+    !isQuizPreviewRoute &&
     (["/", "/ai-chat", "/profile"].includes(pathname) ||
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/admin"));
@@ -54,6 +59,8 @@ export function RouteChrome() {
       .catch(() => undefined);
     return () => controller.abort();
   }, [pathname]);
+
+  if (isQuizPreviewRoute) return null;
 
   const isPublicNavigationRoute = pathname === "/";
   if (isPublicNavigationRoute) {
