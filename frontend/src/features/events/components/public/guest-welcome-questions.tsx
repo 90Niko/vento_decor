@@ -182,11 +182,22 @@ export function GuestWelcomeQuestions({
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <section className="quiz-question-container app-grid-container surface-card reveal-up relative w-full max-w-2xl overflow-hidden rounded-[2.25rem] p-7 sm:p-11">
-        <div
-          className="absolute top-0 left-0 h-1.5 transition-all duration-500"
-          style={{ width: `${progress}%`, backgroundColor: theme.accent }}
-        />
+      <section className="quiz-question-container app-grid-container surface-card reveal-up relative max-h-[calc(100dvh-5rem)] w-full max-w-2xl overflow-y-auto rounded-[2.25rem] p-7 sm:max-h-[calc(100dvh-5rem)] sm:p-11">
+        <div className="sticky top-0 z-20 -mx-7 -mt-7 mb-0 h-7 bg-white/80 backdrop-blur-sm sm:-mx-11 sm:-mt-11">
+          <div
+            className="absolute inset-y-0 left-0 transition-all duration-500"
+            style={{ width: `${progress}%`, backgroundColor: `${theme.accent}30` }}
+          />
+          <div
+            className="absolute inset-x-0 bottom-0 h-1 transition-all duration-500"
+            style={{
+              background: `linear-gradient(to right, ${theme.accent} ${progress}%, transparent ${progress}%)`,
+            }}
+          />
+          <span className="relative flex h-full items-center justify-end px-4 text-[11px] font-bold tabular-nums opacity-60 sm:px-6">
+            {result ? quiz.questions.length : questionIndex + 1} / {quiz.questions.length}
+          </span>
+        </div>
 
         {result ? (
           <div className="py-6 text-center">
@@ -251,21 +262,18 @@ export function GuestWelcomeQuestions({
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <span
                 className="text-xs font-bold tracking-[0.18em] uppercase"
                 style={{ color: theme.accent }}
               >
                 {quiz.title}
               </span>
-              <span className="text-xs font-semibold opacity-50">
-                {questionIndex + 1} / {quiz.questions.length}
-              </span>
             </div>
             <p className="mt-8 text-sm font-medium opacity-55">
               Здравей, {session.name}!
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
               {question.prompt}
             </h1>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -296,21 +304,23 @@ export function GuestWelcomeQuestions({
             {error && (
               <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>
             )}
-            <button
-              type="button"
-              onClick={() => void continueQuiz()}
-              disabled={selected === null || submitting}
-              className="primary-button-effect mx-auto mt-7 min-h-14 w-full max-w-md rounded-full px-8 py-4 text-sm font-bold text-white sm:max-w-none disabled:opacity-40"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
-              }}
-            >
-              {submitting
-                ? "Изчисляване…"
-                : questionIndex === quiz.questions.length - 1
-                  ? "Виж резултата"
-                  : "Следващ въпрос →"}
-            </button>
+            <div className="sticky bottom-0 z-20 -mx-7 -mb-7 mt-7 bg-white/85 px-7 pt-3 pb-4 backdrop-blur-sm sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
+              <button
+                type="button"
+                onClick={() => void continueQuiz()}
+                disabled={selected === null || submitting}
+                className="primary-button-effect mx-auto min-h-14 w-full max-w-md rounded-full px-8 py-4 text-sm font-bold text-white sm:max-w-none disabled:opacity-40"
+                style={{
+                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+                }}
+              >
+                {submitting
+                  ? "Изчисляване…"
+                  : questionIndex === quiz.questions.length - 1
+                    ? "Виж резултата"
+                    : "Следващ въпрос →"}
+              </button>
+            </div>
           </>
         )}
       </section>
