@@ -458,7 +458,9 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                       type="button"
                       onClick={() => void toggleLike(image.id)}
                       disabled={likingImageId === image.id}
-                      className="absolute right-1.5 bottom-1.5 z-10 flex min-h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-black/55 px-2 text-[11px] font-bold text-white shadow-md backdrop-blur-sm transition active:scale-90 disabled:opacity-50 md:hidden"
+                      className={`absolute right-1.5 bottom-1.5 z-10 flex min-h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-black/55 px-2 text-[11px] font-bold shadow-md backdrop-blur-sm transition active:scale-90 disabled:opacity-50 md:hidden ${
+                        image.likedByGuest ? "text-rose-500" : "text-white"
+                      }`}
                       aria-label={
                         image.likedByGuest
                           ? "Премахни харесването"
@@ -485,7 +487,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                         className={`flex h-8 min-w-8 items-center justify-center gap-1 px-1 text-xs font-bold transition disabled:opacity-50 ${
                           image.likedByGuest
                             ? "text-rose-500 active:scale-90 sm:hover:text-rose-600"
-                            : "text-rose-500 active:scale-90 sm:hover:text-rose-600"
+                            : "text-black/55 active:scale-90 sm:hover:text-rose-500"
                         }`}
                         aria-label={
                           image.likedByGuest
@@ -580,12 +582,12 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
 
               <aside className="flex min-h-0 flex-col bg-white p-5 text-[#173b57] max-sm:absolute max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-20 max-sm:rounded-t-2xl max-sm:shadow-[0_-16px_45px_rgba(0,0,0,.2)]">
                 <div className="flex items-center justify-between border-b border-black/10 pb-4">
-                  <div>
-                    <p className="font-semibold">{activeImage.guestName ?? "Гост"}</p>
-                    <p className="mt-0.5 text-xs text-black/45">
-                      {formatImageDate(activeImage.createdAt)}
-                    </p>
-                  </div>
+                  <p className="min-w-0 truncate font-semibold">
+                    {activeImage.guestName ?? "Гост"}
+                    <span className="ml-2 text-xs font-normal text-black/45">
+                      {formatImageTime(activeImage.createdAt)}
+                    </span>
+                  </p>
                   <button
                     type="button"
                     onClick={() => setActiveImageIndex(null)}
@@ -605,7 +607,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                       className={`flex h-11 items-center gap-2 px-2 text-sm font-bold transition ${
                         activeImage.likedByGuest
                           ? "text-rose-500 active:scale-90 sm:hover:text-rose-600"
-                          : "text-rose-500 active:scale-90 sm:hover:text-rose-600"
+                          : "text-black/55 active:scale-90 sm:hover:text-rose-500"
                       }`}
                     >
                       <HeartIcon filled={activeImage.likedByGuest} />
@@ -688,10 +690,10 @@ function getEventTypeLabel(value: string) {
   return labels[value] ?? value;
 }
 
-function formatImageDate(value: string) {
+function formatImageTime(value: string) {
   return new Intl.DateTimeFormat("bg-BG", {
-    day: "2-digit",
-    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(new Date(value));
 }
 
