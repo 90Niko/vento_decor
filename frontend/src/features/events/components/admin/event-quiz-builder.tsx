@@ -48,7 +48,7 @@ export function EventQuizBuilder({
 
   if (!quiz) {
     return (
-      <section className="border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
+      <section id="event-quiz" className="scroll-mt-24 border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
         <p className="text-sm text-[#173b57]/60">
           {notice ?? "Зареждане на quiz…"}
         </p>
@@ -86,7 +86,7 @@ export function EventQuizBuilder({
   }
 
   return (
-    <section className="border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
+    <section id="event-quiz" className="scroll-mt-24 border-t border-[#173b57]/12 px-0 py-8 sm:px-9 sm:py-9">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow">Guest quiz</p>

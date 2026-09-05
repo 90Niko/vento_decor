@@ -681,8 +681,17 @@ a {
   .admin-canvas > .app-grid-container,
   .guest-gallery-container,
   .event-entry-container,
+  .quiz-question-container,
   .quiz-review-container {
     width: 100%;
+  }
+
+  .quiz-question-container {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
   }
 
   .quiz-review-flat {

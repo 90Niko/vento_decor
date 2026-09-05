@@ -38,7 +38,13 @@ interface AdminEventDetails {
   images: EventImage[];
 }
 
-export function EventGallery({ publicId }: { publicId: string }) {
+export function EventGallery({
+  publicId,
+  basePath = "/admin/events",
+}: {
+  publicId: string;
+  basePath?: string;
+}) {
   const [event, setEvent] = useState<AdminEventDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -244,13 +250,21 @@ export function EventGallery({ publicId }: { publicId: string }) {
               <Stat value={event.guestCount} label="регистрирани гости" />
             </div>
 
-            <Link
-              href={`/event/${event.publicId}`}
-              target="_blank"
-              className="primary-action mt-7"
-            >
-              Отвори публичното събитие ↗
-            </Link>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href={`${basePath}/${event.publicId}/edit#event-quiz`}
+                className="primary-action"
+              >
+                Отвори въпросите
+              </Link>
+              <Link
+                href={`/event/${event.publicId}`}
+                target="_blank"
+                className="secondary-action"
+              >
+                Отвори публичното събитие ↗
+              </Link>
+            </div>
           </div>
 
           <EventShareCard event={event} />
