@@ -182,14 +182,10 @@ export function GuestWelcomeQuestions({
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <section className="quiz-question-container app-grid-container surface-card reveal-up relative max-h-dvh w-full max-w-2xl overflow-y-auto rounded-[2.25rem] p-7 sm:max-h-[calc(100dvh-5rem)] sm:p-11">
-        <div className="sticky top-0 z-20 -mx-7 -mt-7 mb-0 h-7 sm:-mx-11 sm:-mt-11">
+      <section className="quiz-question-container surface-card reveal-up relative flex h-dvh w-full max-w-2xl flex-col overflow-hidden rounded-[2.25rem] p-7 sm:h-auto sm:max-h-[calc(100dvh-5rem)] sm:p-11">
+        <div className="relative z-20 -mx-7 -mt-7 h-7 shrink-0 sm:-mx-11 sm:-mt-11">
           <div
-            className="absolute inset-y-0 left-0 transition-all duration-500"
-            style={{ width: `${progress}%`, backgroundColor: `${theme.accent}30` }}
-          />
-          <div
-            className="absolute inset-x-0 bottom-0 h-1 transition-all duration-500"
+            className="absolute inset-x-0 top-0 h-1 transition-all duration-500"
             style={{
               background: `linear-gradient(to right, ${theme.accent} ${progress}%, transparent ${progress}%)`,
             }}
@@ -200,7 +196,7 @@ export function GuestWelcomeQuestions({
         </div>
 
         {result ? (
-          <div className="py-6 text-center">
+          <div className="min-h-0 flex-1 overflow-y-auto py-6 text-center">
             <span
               className="mx-auto grid h-16 w-16 place-items-center rounded-full text-2xl text-white"
               style={{ backgroundColor: theme.accent }}
@@ -262,49 +258,51 @@ export function GuestWelcomeQuestions({
           </div>
         ) : (
           <>
-            <div className="flex items-center">
-              <span
-                className="text-xs font-bold tracking-[0.18em] uppercase"
-                style={{ color: theme.accent }}
-              >
-                {quiz.title}
-              </span>
-            </div>
-            <p className="mt-8 text-sm font-medium opacity-55">
-              Здравей, {session.name}!
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
-              {question.prompt}
-            </h1>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {question.options.map((option, optionIndex) => (
-                <button
-                  key={optionIndex}
-                  type="button"
-                  onClick={() => setSelected(optionIndex)}
-                  className="rounded-2xl border p-5 text-left text-sm font-bold transition hover:-translate-y-0.5"
-                  style={{
-                    borderColor:
-                      selected === optionIndex
-                        ? theme.accent
-                        : `${theme.primary}20`,
-                    backgroundColor:
-                      selected === optionIndex
-                        ? `${theme.accent}22`
-                        : "#ffffffaa",
-                  }}
+            <div className="min-h-0 flex-1 overflow-y-auto pt-1">
+              <div className="flex items-center">
+                <span
+                  className="text-xs font-bold tracking-[0.18em] uppercase"
+                  style={{ color: theme.accent }}
                 >
-                  <span className="mr-3 opacity-40">
-                    {String.fromCharCode(65 + optionIndex)}.
-                  </span>
-                  {option}
-                </button>
-              ))}
+                  {quiz.title}
+                </span>
+              </div>
+              <p className="mt-8 text-sm font-medium opacity-55">
+                Здравей, {session.name}!
+              </p>
+              <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
+                {question.prompt}
+              </h1>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {question.options.map((option, optionIndex) => (
+                  <button
+                    key={optionIndex}
+                    type="button"
+                    onClick={() => setSelected(optionIndex)}
+                    className="rounded-2xl border p-5 text-left text-sm font-bold transition hover:-translate-y-0.5"
+                    style={{
+                      borderColor:
+                        selected === optionIndex
+                          ? theme.accent
+                          : `${theme.primary}20`,
+                      backgroundColor:
+                        selected === optionIndex
+                          ? `${theme.accent}22`
+                          : "#ffffffaa",
+                    }}
+                  >
+                    <span className="mr-3 opacity-40">
+                      {String.fromCharCode(65 + optionIndex)}.
+                    </span>
+                    {option}
+                  </button>
+                ))}
+              </div>
+              {error && (
+                <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>
+              )}
             </div>
-            {error && (
-              <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>
-            )}
-            <div className="sticky bottom-0 z-20 -mx-7 -mb-7 mt-7 bg-white/85 px-7 pt-3 pb-1 backdrop-blur-sm sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
+            <div className="z-20 -mx-7 -mb-7 mt-3 shrink-0 px-7 pt-3 pb-0 sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
               <button
                 type="button"
                 onClick={() => void continueQuiz()}
