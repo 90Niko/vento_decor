@@ -176,13 +176,13 @@ export function GuestWelcomeQuestions({
 
   return (
     <main
-      className="guest-flow-page grid min-h-screen place-items-center overflow-hidden px-4 py-0 sm:py-10"
+      className="guest-flow-page grid h-dvh min-h-0 place-items-center overflow-hidden px-4 py-0 sm:py-10"
       style={{
         color: theme.primary,
         background: `radial-gradient(circle at 15% 15%, ${theme.accent}35, transparent 35%), linear-gradient(145deg, #ffffff, ${theme.accent}20)`,
       }}
     >
-      <section className="quiz-question-container surface-card reveal-up relative flex h-dvh w-full max-w-2xl flex-col overflow-hidden rounded-[2.25rem] p-7 sm:h-auto sm:max-h-[calc(100dvh-5rem)] sm:p-11">
+      <section className="quiz-question-container surface-card reveal-up relative flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-[2.25rem] p-7 sm:h-auto sm:max-h-[calc(100dvh-5rem)] sm:p-11">
         <div className="relative z-20 -mx-7 -mt-7 h-7 shrink-0 sm:-mx-11 sm:-mt-11">
           <div
             className="absolute inset-x-0 top-0 h-1 transition-all duration-500"
@@ -267,7 +267,7 @@ export function GuestWelcomeQuestions({
                   {quiz.title}
                 </span>
               </div>
-              <p className="mt-8 text-sm font-medium opacity-55">
+              <p className="mt-4 text-sm font-medium opacity-55">
                 Здравей, {session.name}!
               </p>
               <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
@@ -302,7 +302,7 @@ export function GuestWelcomeQuestions({
                 <p className="mt-4 text-sm font-semibold text-red-700">{error}</p>
               )}
             </div>
-            <div className="z-20 -mx-7 -mb-7 mt-3 shrink-0 px-7 pt-3 pb-0 sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
+            <div className="z-20 -mx-7 -mb-7 mt-3 shrink-0 px-7 pt-3 pb-[max(0.25rem,env(safe-area-inset-bottom))] sm:-mx-11 sm:-mb-11 sm:px-11 sm:pb-6">
               <button
                 type="button"
                 onClick={() => void continueQuiz()}
