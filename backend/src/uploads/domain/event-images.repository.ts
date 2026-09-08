@@ -27,6 +27,11 @@ export interface GuestGalleryImage {
   likedByGuest: boolean;
 }
 
+export interface GuestGalleryPage {
+  images: GuestGalleryImage[];
+  nextCursor: number | null;
+}
+
 export abstract class EventImagesRepository {
   abstract createMany(data: {
     eventId: number;
@@ -41,6 +46,7 @@ export abstract class EventImagesRepository {
   abstract findAllByEventId(
     eventId: number,
     guestId: number,
+    page?: { beforeId?: number; take: number },
   ): Promise<GuestGalleryImage[]>;
   abstract toggleLike(data: {
     imageId: number;

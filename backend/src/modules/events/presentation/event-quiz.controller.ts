@@ -68,6 +68,14 @@ export class EventQuizController {
   ): Promise<unknown> {
     return this.quizService.getReview(publicId, bearerToken(authorization));
   }
+
+  @Get('public/:publicId/quiz/summary')
+  getSummary(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<unknown> {
+    return this.quizService.getSummary(publicId, bearerToken(authorization));
+  }
 }
 
 function bearerToken(authorization: string | undefined) {

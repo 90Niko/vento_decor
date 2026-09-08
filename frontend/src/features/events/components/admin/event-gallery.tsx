@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { galleryImageLoader } from "@/shared/lib/gallery-image-loader";
 import QRCode from "qrcode";
 import { eventsService } from "@/features/events/services/events.service";
 import { getApiUrl } from "@/shared/api/client";
@@ -341,12 +342,13 @@ export function EventGallery({
                 >
                       {isVideoUrl(image.url) ? (
                         <>
-                          <video
+                          <Image
                             src={image.url}
-                            className="absolute inset-0 h-full w-full object-cover"
-                            muted
-                            playsInline
-                            preload="metadata"
+                            alt="Видео"
+                            fill
+                            loader={galleryImageLoader}
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            className="object-cover"
                           />
                           <span className="pointer-events-none absolute inset-0 grid place-items-center bg-black/10">
                             <span className="grid h-14 w-14 place-items-center rounded-full border border-white/50 bg-black/55 text-white shadow-xl backdrop-blur-sm">
@@ -359,7 +361,7 @@ export function EventGallery({
                           src={image.url}
                           alt={image.originalName ?? "Снимка от събитието"}
                           fill
-                          unoptimized
+                          loader={galleryImageLoader}
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           className="object-cover transition duration-500 group-hover:scale-105"
                         />

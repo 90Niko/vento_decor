@@ -142,6 +142,18 @@ export const eventsService = {
     });
   },
 
+  getQuizSummaryResponse(
+    publicId: string,
+    guestToken: string,
+    signal?: AbortSignal,
+  ): Promise<Response> {
+    return fetch(`${getApiUrl()}/events/public/${publicId}/quiz/summary`, {
+      headers: { Authorization: `Bearer ${guestToken}` },
+      cache: "no-store",
+      signal,
+    });
+  },
+
   getQuizReviewResponse(
     publicId: string,
     guestToken: string,
@@ -213,6 +225,20 @@ export const eventsService = {
     signal?: AbortSignal,
   ): Promise<Response> {
     return fetch(`${getApiUrl()}/events/public/${publicId}/images`, {
+      headers: { Authorization: `Bearer ${guestToken}` },
+      cache: "no-store",
+      signal,
+    });
+  },
+
+  getGuestGalleryPageResponse(
+    publicId: string,
+    guestToken: string,
+    before?: number,
+    signal?: AbortSignal,
+  ): Promise<Response> {
+    const query = before === undefined ? "" : `?before=${before}`;
+    return fetch(`${getApiUrl()}/events/public/${publicId}/images/page${query}`, {
       headers: { Authorization: `Bearer ${guestToken}` },
       cache: "no-store",
       signal,

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { galleryImageLoader } from "@/shared/lib/gallery-image-loader";
 import Link from "next/link";
 import {
   useCallback,
@@ -43,6 +44,9 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [galleryView, setGalleryView] = useState<"grid" | "feed">("feed");
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
+  const [nextCursor, setNextCursor] = useState<number | null>(null);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+  const galleryRequest = useRef<AbortController | null>(null);
   const [likingImageId, setLikingImageId] = useState<number | null>(null);
   const [downloadingImageId, setDownloadingImageId] = useState<number | null>(
     null,
@@ -91,27 +95,55 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
     return () => controller.abort();
   }, [publicId]);
 
-  const loadGallery = useCallback(async () => {
+  const loadGallery = useCallback(async (before?: number) => {
     if (!session) return;
+    galleryRequest.current?.abort();
+    const controller = new AbortController();
+    galleryRequest.current = controller;
     setIsGalleryLoading(true);
+    setGalleryError(null);
     try {
-      const response = await eventsService.getGuestGalleryResponse(
+      const response = await eventsService.getGuestGalleryPageResponse(
         publicId,
         session.token,
+        before,
+        controller.signal,
       );
       if (response.ok) {
-        setGallery((await response.json()) as GalleryImage[]);
+        const page = (await response.json()) as {
+          images: GalleryImage[];
+          nextCursor: number | null;
+        };
+        if (controller.signal.aborted) return;
+        setGallery((current) => {
+          if (before === undefined) return page.images;
+          const existingIds = new Set(current.map((image) => image.id));
+          return [...current, ...page.images.filter((image) => !existingIds.has(image.id))];
+        });
+        setNextCursor(page.nextCursor);
+        if (before === undefined) setActiveImageIndex(null);
       } else if (response.status === 401) {
         clearGuestSession(publicId);
         router.replace(`/event/${publicId}`);
+      } else {
+        throw new Error(`Галерията не можа да се зареди (код ${response.status}).`);
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setGalleryError(error instanceof Error ? error.message : "Няма връзка със сървъра.");
       }
     } finally {
-      setIsGalleryLoading(false);
+      if (!controller.signal.aborted) setIsGalleryLoading(false);
     }
   }, [publicId, router, session]);
 
   useEffect(() => {
-    queueMicrotask(() => void loadGallery());
+    let active = true;
+    queueMicrotask(() => { if (active) void loadGallery(); });
+    return () => {
+      active = false;
+      galleryRequest.current?.abort();
+    };
   }, [loadGallery]);
 
   useEffect(() => {
@@ -141,7 +173,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
     if (!session) return;
     const controller = new AbortController();
     void eventsService
-      .getQuizReviewResponse(publicId, session.token, controller.signal)
+      .getQuizSummaryResponse(publicId, session.token, controller.signal)
       .then(async (response) => {
         if (!response.ok) return;
         const review = (await response.json()) as {
@@ -266,7 +298,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             className="relative overflow-hidden rounded-[2rem] p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,.15)] sm:p-10"
             style={{
               background: event.coverImageUrl
-                ? `url("${event.coverImageUrl}") center / cover no-repeat`
+                ? `url("${galleryImageLoader({ src: event.coverImageUrl, width: 1280 })}") center / cover no-repeat`
                 : `linear-gradient(120deg, ${theme.primary}, ${theme.accent})`,
             }}
           >
@@ -358,7 +390,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             {gallery.length > 0 && (
               <div className="flex items-center gap-2">
               <span className="rounded-full border border-black/10 bg-white/60 px-4 py-2 text-sm font-semibold">
-                {gallery.length} {gallery.length === 1 ? "снимка" : "снимки"}
+                {gallery.length}{nextCursor !== null ? "+" : ""} {gallery.length === 1 ? "снимка" : "снимки"}
               </span>
                 <button
                   type="button"
@@ -381,13 +413,22 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
             )}
           </div>
 
-          {isGalleryLoading ? (
+          {galleryError && (
+            <div className="mt-4 text-center" role="alert">
+              <p>{galleryError}</p>
+              <button type="button" className="secondary-action mt-3" disabled={isGalleryLoading}
+                onClick={() => void loadGallery(nextCursor ?? undefined)}>
+                Опитай отново
+              </button>
+            </div>
+          )}
+          {isGalleryLoading && gallery.length === 0 ? (
             <div className="mt-8 grid grid-cols-3 gap-1.5 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
               {[1, 2, 3, 4].map((item) => (
                 <div key={item} className="aspect-[4/3] animate-pulse rounded-2xl bg-black/5" />
               ))}
             </div>
-          ) : gallery.length === 0 ? (
+          ) : gallery.length === 0 && !galleryError ? (
             <div className="mt-8 rounded-[2rem] border border-dashed border-black/15 bg-white/45 p-12 text-center">
               <span
                 className="mx-auto grid h-12 w-12 place-items-center rounded-2xl text-xl text-white"
@@ -429,12 +470,13 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                   >
                     {isVideoUrl(image.url) ? (
                       <>
-                        <video
+                        <Image
                           src={image.url}
-                          className="absolute inset-0 h-full w-full object-cover"
-                          muted
-                          playsInline
-                          preload="metadata"
+                          alt="Видео"
+                          fill
+                          loader={galleryImageLoader}
+                          sizes={galleryView === "grid" ? "(max-width: 1024px) 33vw, 25vw" : "(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 25vw"}
+                          className="object-cover"
                         />
                         <span className="pointer-events-none absolute inset-0 grid place-items-center bg-black/10">
                           <span className="grid h-14 w-14 place-items-center rounded-full border border-white/50 bg-black/55 text-white shadow-xl backdrop-blur-sm">
@@ -447,8 +489,8 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                         src={image.url}
                         alt={image.originalName ?? `Снимка от ${image.guestName ?? "гост"}`}
                         fill
-                        unoptimized
-                        sizes="(max-width: 640px) 33vw, 25vw"
+                        loader={galleryImageLoader}
+                        sizes={galleryView === "grid" ? "(max-width: 1024px) 33vw, 25vw" : "(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 25vw"}
                         className="object-cover transition duration-500 group-hover:scale-105"
                       />
                     )}
@@ -515,6 +557,15 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
           )}
         </section>
 
+        {nextCursor !== null && !galleryError && (
+          <div className="mt-6 text-center">
+            <button type="button" className="secondary-action" disabled={isGalleryLoading}
+              onClick={() => void loadGallery(nextCursor)}>
+              {isGalleryLoading ? "Зареждане…" : "Покажи още снимки"}
+            </button>
+          </div>
+        )}
+
         {activeImage && activeImageIndex !== null && (
           <div
             className="fixed inset-0 z-[100] grid place-items-center bg-black/90 p-0 sm:p-6"
@@ -555,7 +606,7 @@ export function EventUploadPage({ publicId }: { publicId: string }) {
                     src={activeImage.url}
                     alt={activeImage.originalName ?? "Снимка от събитието"}
                     fill
-                    unoptimized
+                    loader={galleryImageLoader}
                     sizes="(max-width: 640px) 100vw, 75vw"
                     className="object-contain"
                   />

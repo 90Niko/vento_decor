@@ -69,19 +69,6 @@ function isWithinSizeLimit(file: File): boolean {
   return file.size <= (isVideo(file) ? MAX_VIDEO_FILE_SIZE : MAX_IMAGE_FILE_SIZE);
 }
 
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () =>
-      typeof reader.result === "string"
-        ? resolve(reader.result)
-        : reject(new Error("Снимката не може да бъде прочетена."));
-    reader.onerror = () =>
-      reject(new Error("Снимката не може да бъде прочетена."));
-    reader.readAsDataURL(file);
-  });
-}
-
 interface UploadStudioProps {
   uploadPath?: string;
   authorizationToken?: string;
@@ -121,8 +108,7 @@ export function UploadStudio({
   const previewUrls = useRef<string[]>([]);
 
   useEffect(() => {
-    const urls = previewUrls.current;
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+    return () => previewUrls.current.forEach((url) => URL.revokeObjectURL(url));
   }, []);
 
   useEffect(() => {
@@ -147,21 +133,15 @@ export function UploadStudio({
         !existing.has(key);
     });
     const availableSlots = MAX_FILES - selected.length;
-    const accepted = await Promise.all(
-      incoming.slice(0, availableSlots).map(async (file) => {
-        const previewUrl = file.type.startsWith("video/")
-          ? URL.createObjectURL(file)
-          : await readFileAsDataUrl(file);
-        if (file.type.startsWith("video/")) {
-          previewUrls.current.push(previewUrl);
-        }
-        return {
-          id: `${file.name}-${file.size}-${file.lastModified}`,
-          file,
-          previewUrl,
-        };
-      }),
-    );
+    const accepted = incoming.slice(0, availableSlots).map((file) => {
+      const previewUrl = URL.createObjectURL(file);
+      previewUrls.current.push(previewUrl);
+      return {
+        id: `${file.name}-${file.size}-${file.lastModified}`,
+        file,
+        previewUrl,
+      };
+    });
 
     if (accepted.length < Array.from(files).length) {
       setError(

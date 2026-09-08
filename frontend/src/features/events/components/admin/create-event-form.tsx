@@ -150,7 +150,6 @@ export function CreateEventForm({
 
   useEffect(() => {
     if (!created) return;
-    setRedirectSeconds(5);
     const interval = window.setInterval(
       () => setRedirectSeconds((seconds) => Math.max(0, seconds - 1)),
       1000,
@@ -213,6 +212,7 @@ export function CreateEventForm({
         throw new Error(await readError(response));
       }
       const createdEvent = (await response.json()) as CreatedEvent;
+      setRedirectSeconds(5);
       if (quizEnabled) {
         const quizResponse = await eventsService.updateManagerQuizResponse(
           createdEvent.publicId,

@@ -96,11 +96,15 @@ export class PrismaEventImagesRepository implements EventImagesRepository {
   async findAllByEventId(
     eventId: number,
     guestId: number,
+    page?: { beforeId?: number; take: number },
   ): Promise<GuestGalleryImage[]> {
     const images = await this.prisma.event_images.findMany({
-      where: { event_id: eventId },
-      orderBy: { created_at: 'desc' },
-      take: 500,
+      where: {
+        event_id: eventId,
+        ...(page?.beforeId ? { id: { lt: page.beforeId } } : {}),
+      },
+      orderBy: page ? { id: 'desc' } : { created_at: 'desc' },
+      take: page?.take ?? 500,
       include: {
         event_guests: { select: { name: true } },
         _count: { select: { event_image_likes: true } },

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BrandLockup } from "@/shared/components/brand-lockup";
 import { eventsService } from "@/features/events/services/events.service";
 import { getEventTheme } from "@/features/events/lib/event-theme";
+import { galleryImageLoader } from "@/shared/lib/gallery-image-loader";
 
 interface PublicEvent {
   publicId: string;
@@ -185,7 +186,7 @@ export function EventEntry({ publicId }: { publicId: string }) {
             className="relative overflow-hidden p-7 text-white sm:p-10 lg:p-12"
             style={{
               background: event.coverImageUrl
-                ? `linear-gradient(145deg, ${theme.primary}ee, ${theme.accent}bb), url("${event.coverImageUrl}") center / cover`
+                ? `linear-gradient(145deg, ${theme.primary}ee, ${theme.accent}bb), url("${galleryImageLoader({ src: event.coverImageUrl, width: 1280 })}") center / cover`
                 : `linear-gradient(145deg, ${theme.primary}, ${theme.accent})`,
             }}
           >

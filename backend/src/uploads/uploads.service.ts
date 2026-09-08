@@ -14,6 +14,7 @@ import {
 import {
   EventImagesRepository,
   GuestGalleryImage,
+  GuestGalleryPage,
 } from './domain/event-images.repository';
 import { CreatorSession } from '../modules/auth/auth.service';
 
@@ -122,6 +123,29 @@ export class UploadsService {
       guestToken,
     );
     return this.eventImagesRepository.findAllByEventId(event.id, guest.id);
+  }
+
+  async getGuestGalleryPage(
+    publicId: string,
+    guestToken: string | undefined,
+    beforeId?: number,
+  ): Promise<GuestGalleryPage> {
+    const { event, guest } = await this.guestAccessService.authenticate(
+      publicId,
+      guestToken,
+    );
+    const pageSize = 24;
+    const records = await this.eventImagesRepository.findAllByEventId(
+      event.id,
+      guest.id,
+      { beforeId, take: pageSize + 1 },
+    );
+    const images = records.slice(0, pageSize);
+    return {
+      images,
+      nextCursor:
+        records.length > pageSize ? images[images.length - 1].id : null,
+    };
   }
 
   async toggleImageLike(

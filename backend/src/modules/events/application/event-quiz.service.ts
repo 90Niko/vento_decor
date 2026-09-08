@@ -30,6 +30,18 @@ export class EventQuizService {
       select: { score: true, total: true, answers: true },
     });
     const questions = this.readQuestions(event.quiz_questions);
+    const optionCounts = questions.map((question) =>
+      question.options.map(() => 0),
+    );
+    for (const attempt of attempts) {
+      const answers = this.readAnswers(attempt.answers);
+      optionCounts.forEach((counts, questionIndex) => {
+        const option = answers[questionIndex];
+        if (Number.isInteger(option) && option >= 0 && option < counts.length) {
+          counts[option] += 1;
+        }
+      });
+    }
     const averagePercent = attempts.length
       ? Math.round(
           attempts.reduce(
@@ -49,10 +61,7 @@ export class EventQuizService {
         ...question,
         optionPercentages: question.options.map((_, optionIndex) => {
           if (attempts.length === 0) return 0;
-          const selectedCount = attempts.reduce((count, attempt) => {
-            const answers = this.readAnswers(attempt.answers);
-            return count + (answers[questionIndex] === optionIndex ? 1 : 0);
-          }, 0);
+          const selectedCount = optionCounts[questionIndex][optionIndex];
           return Math.round((selectedCount / attempts.length) * 100);
         }),
       })),
@@ -197,6 +206,31 @@ export class EventQuizService {
       throw error;
     }
     return { score, total: questions.length };
+  }
+
+  async getSummary(publicId: string, token: string | undefined) {
+    const { event, guest } = await this.guestAccess.authenticate(
+      publicId,
+      token,
+    );
+    const [quiz, attempt] = await Promise.all([
+      this.prisma.events.findUnique({
+        where: { id: event.id },
+        select: { quiz_has_correct_answers: true },
+      }),
+      this.prisma.event_quiz_attempts.findFirst({
+        where: { event_id: event.id, guest_id: guest.id },
+        select: { score: true, total: true },
+      }),
+    ]);
+    return {
+      hasCorrectAnswers: quiz?.quiz_has_correct_answers ?? true,
+      percentage: attempt
+        ? attempt.total > 0
+          ? Math.round((attempt.score / attempt.total) * 100)
+          : 0
+        : null,
+    };
   }
 
   async getReview(publicId: string, token: string | undefined) {

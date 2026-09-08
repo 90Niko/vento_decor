@@ -1,5 +1,6 @@
 import {
   Controller,
+  BadRequestException,
   FileTypeValidator,
   Get,
   Headers,
@@ -9,13 +10,17 @@ import {
   ParseFilePipe,
   ParseUUIDPipe,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadedEventImage, UploadsService } from './uploads.service';
-import { GuestGalleryImage } from './domain/event-images.repository';
+import {
+  GuestGalleryImage,
+  GuestGalleryPage,
+} from './domain/event-images.repository';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -33,6 +38,29 @@ export class EventUploadsController {
       ? authorization.slice(7).trim()
       : undefined;
     return this.uploadsService.getGuestGallery(publicId, token || undefined);
+  }
+
+  @Get('page')
+  getGalleryPage(
+    @Param('publicId', new ParseUUIDPipe({ version: '4' })) publicId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Query('before') before?: string,
+  ): Promise<GuestGalleryPage> {
+    const beforeId = before === undefined ? undefined : Number(before);
+    if (
+      beforeId !== undefined &&
+      (!Number.isSafeInteger(beforeId) || beforeId < 1)
+    ) {
+      throw new BadRequestException('Invalid gallery cursor.');
+    }
+    const token = authorization?.startsWith('Bearer ')
+      ? authorization.slice(7).trim()
+      : undefined;
+    return this.uploadsService.getGuestGalleryPage(
+      publicId,
+      token || undefined,
+      beforeId,
+    );
   }
 
   @Post(':imageId/like')
